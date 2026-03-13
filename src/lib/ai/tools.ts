@@ -119,6 +119,15 @@ export const campusInfo = tool({
       "food centre": "Hawker",
       building: "Building",
       block: "Building",
+      aic: "AIC Office",
+      "aic office": "AIC Office",
+      "aic link": "AIC Office",
+      sgo: "AIC Office",
+      "silver generation": "AIC Office",
+      caregiver: "AIC Office",
+      eldercare: "AIC Office",
+      "elderfund": "AIC Office",
+      "nursing home": "AIC Office",
     };
 
     const matchedCategory = Object.entries(categoryKeywords).find(([kw]) => q.includes(kw));
@@ -178,6 +187,17 @@ export const campusInfo = tool({
       starbucks: "Starbucks is in Block C, Level 1.",
       "study room":
         "Study spaces are available at Block B Level 3, Block C Level 4, and the SUSS Library (Block C Level 2) with 5 discussion rooms.",
+      aic: "AIC (Agency for Integrated Care) provides community care services for seniors and caregivers in Singapore. AIC Hotline: 1800-650-6060 (Mon–Fri 8:30AM–8:30PM, Sat 8:30AM–4PM). AIC Link centres are located at major hospitals (SGH, TTSH, CGH, KTPH, NUH, SKH, NTFGH, Alexandra Hospital). Silver Generation Office (SGO) has 17 satellite offices across Singapore for senior outreach. HQ: 5 Maxwell Road, #10-00 Tower Block, MND Complex, S069110. Email: enquiries@aic.sg",
+      "aic link":
+        "AIC Link centres provide walk-in advice on care services and schemes including: ElderFund, CHAS, Home Caregiving Grant (HCG), Seniors' Mobility and Enabling Fund (SMF), Caregivers Training Grant (CTG), nursing home and day care placement, dementia support, and respite care. Located at major hospitals: SGH, TTSH, CGH, KTPH, NUH, SKH, NTFGH, and Alexandra Hospital. Hours: Mon–Fri 8:30AM–5:30PM.",
+      "silver generation":
+        "The Silver Generation Office (SGO) is part of AIC. SGO volunteers conduct door-to-door outreach to seniors, connecting them to care services, health screenings (functional screening), and community programmes. 17 satellite offices across Singapore covering Ang Mo Kio, Bishan-Toa Payoh, Jalan Besar, Tanjong Pagar, Marine Parade, East Coast, Aljunied, Tampines, Pasir Ris-Punggol, Sengkang, Holland-Bukit Timah, West Coast, Jurong, Choa Chu Kang, Marsiling-Yew Tee, Nee Soon, and Sembawang.",
+      caregiver:
+        "AIC supports caregivers with: Caregivers Training Grant (CTG) for subsidised training, respite care to give caregivers a break, Home Caregiving Grant (HCG) for monthly cash payouts, and caregiver support resources. Call AIC Hotline 1800-650-6060 or visit any AIC Link centre at major hospitals.",
+      eldercare:
+        "AIC eldercare services include: home care, day care, dementia day care, day rehabilitation, nursing home placement, ElderFund, Seniors' Mobility and Enabling Fund (SMF), Home Caregiving Grant (HCG), and Pioneer Generation Disability Assistance Scheme. Call AIC Hotline 1800-650-6060.",
+      "nursing home":
+        "For nursing home placement assistance, visit any AIC Link centre at major hospitals or call AIC Hotline 1800-650-6060. AIC Care Consultants can help assess care needs and find suitable facilities. Financial assistance (ElderFund, Medifund) may be available.",
     };
 
     const matched = Object.entries(info).find(([key]) => q.includes(key));

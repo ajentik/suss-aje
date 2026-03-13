@@ -9,12 +9,12 @@ export interface POI {
   description: string;
   address?: string;
   hours?: string;
+  contact?: string;
   rating?: number;
   notes?: string;
   cuisine?: string;
   tags?: string[];
   distanceFromCampus?: string;
-  contact?: string;
   website?: string;
   priceLevel?: PriceLevel;
 }
