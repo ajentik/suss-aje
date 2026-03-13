@@ -13,6 +13,7 @@ import RouteOverlay from "@/components/map/RouteOverlay";
 import AerialViewButton from "@/components/map/AerialViewButton";
 import POIPopup from "@/components/map/POIPopup";
 import EventPopup from "@/components/map/EventPopup";
+import Onboarding from "@/components/layout/Onboarding";
 
 const MapView = dynamic(() => import("@/components/map/MapView"), {
   ssr: false,
@@ -278,6 +279,8 @@ export default function AppShell() {
           <EventPopup />
         </main>
       </APIProvider>
+
+      <Onboarding />
     </div>
   );
 }

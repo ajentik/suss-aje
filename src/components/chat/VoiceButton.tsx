@@ -26,6 +26,7 @@ export default function VoiceButton({ onTranscript }: VoiceButtonProps) {
       onClick={handleClick}
       className={cn(
         "flex items-center justify-center w-10 h-10 rounded-full transition-all",
+        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
         isListening
           ? "bg-surface-danger text-surface-danger-foreground animate-pulse"
           : "bg-secondary hover:bg-secondary/80 text-muted-foreground"

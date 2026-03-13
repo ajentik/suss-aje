@@ -1,16 +1,18 @@
 "use client";
 
 import { useChat } from "@ai-sdk/react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import Image from "next/image";
+import { SquarePen } from "lucide-react";
 import type { TextUIPart, DynamicToolUIPart } from "ai";
 import { toast } from "sonner";
 import ChatMessage from "./ChatMessage";
 import ChatInput from "./ChatInput";
+import QuickActions from "./QuickActions";
 import { useAppStore } from "@/store/app-store";
 import { useSpeechSynthesis } from "@/lib/voice/speech-synthesis";
 import { findPOI } from "@/lib/maps/campus-pois";
-import type { DateRangePreset } from "@/types";
+import type { ChatMessage as StoredMessage, DateRangePreset } from "@/types";
 
 function isToolPart(p: { type: string }): p is DynamicToolUIPart {
   return p.type === "dynamic-tool" || p.type.startsWith("tool-");
@@ -20,7 +22,6 @@ function extractMessageContent(parts: Array<{ type: string; [key: string]: unkno
   text: string;
   isStreaming: boolean;
 } {
-  // First try text parts
   const textParts = parts.filter(
     (p): p is TextUIPart => p.type === "text"
   );
@@ -31,7 +32,6 @@ function extractMessageContent(parts: Array<{ type: string; [key: string]: unkno
     };
   }
 
-  // Fall back to tool output messages (when Gemini stops after tool call)
   const toolParts = parts.filter(isToolPart);
   for (const tp of toolParts) {
     if (tp.state === "output-available") {
@@ -61,9 +61,15 @@ export default function ChatPanel() {
   const mapEventMarkers = useAppStore((s) => s.mapEventMarkers);
   const setHighlightedEventIds = useAppStore((s) => s.setHighlightedEventIds);
   const ttsEnabled = useAppStore((s) => s.ttsEnabled);
+  const setChatMessages = useAppStore((s) => s.setChatMessages);
+  const conversationId = useAppStore((s) => s.conversationId);
+  const newChat = useAppStore((s) => s.newChat);
+  const pendingChatMessage = useAppStore((s) => s.pendingChatMessage);
+  const setPendingChatMessage = useAppStore((s) => s.setPendingChatMessage);
   const { speak } = useSpeechSynthesis();
 
-  const { messages, sendMessage, status, error } = useChat({
+  const { messages, sendMessage, status, error, setMessages } = useChat({
+    id: conversationId,
     onError: (err) => {
       console.error("[AskSUSSi chat error]", err);
       toast.error(err.message || "Chat request failed.");
@@ -76,7 +82,24 @@ export default function ChatPanel() {
     },
   });
 
-  // Process tool results from messages for UI side effects
+  useEffect(() => {
+    if (pendingChatMessage) {
+      sendMessage({ text: pendingChatMessage });
+      setPendingChatMessage(null);
+    }
+  }, [pendingChatMessage, sendMessage, setPendingChatMessage]);
+
+  useEffect(() => {
+    const stored: StoredMessage[] = messages
+      .map((msg) => {
+        const { text } = extractMessageContent(msg.parts ?? []);
+        if (!text) return null;
+        return { id: msg.id, role: msg.role as "user" | "assistant", content: text };
+      })
+      .filter((m): m is StoredMessage => m !== null);
+    if (stored.length > 0) setChatMessages(stored);
+  }, [messages, setChatMessages]);
+
   useEffect(() => {
     for (const msg of messages) {
       if (msg.role !== "assistant") continue;
@@ -170,13 +193,36 @@ export default function ChatPanel() {
     endRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
-  const handleSend = (text: string) => {
-    userScrolledUpRef.current = false;
-    sendMessage({ text });
-  };
+  const handleSend = useCallback(
+    (text: string) => {
+      userScrolledUpRef.current = false;
+      sendMessage({ text });
+    },
+    [sendMessage]
+  );
+
+  const handleNewChat = useCallback(() => {
+    setMessages([]);
+    processedToolsRef.current.clear();
+    newChat();
+  }, [setMessages, newChat]);
 
   return (
     <div className="flex flex-col h-full relative">
+      {messages.length > 0 && (
+        <div className="flex items-center justify-end px-3 pt-2 shrink-0">
+          <button
+            type="button"
+            onClick={handleNewChat}
+            aria-label="Start new chat"
+            className="inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-foreground px-2 py-1 rounded-md hover:bg-muted transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          >
+            <SquarePen size={14} aria-hidden="true" />
+            New Chat
+          </button>
+        </div>
+      )}
+
       <div
         role="log"
         aria-label="Chat messages"
@@ -210,7 +256,7 @@ export default function ChatPanel() {
                   type="button"
                   key={q}
                   onClick={() => handleSend(q)}
-                  className="text-sm px-4 py-2.5 rounded-full border border-primary/20 text-primary hover:bg-primary hover:text-primary-foreground transition-colors font-medium"
+                  className="text-sm px-4 py-2.5 rounded-full border border-primary/20 text-primary hover:bg-primary hover:text-primary-foreground transition-colors font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                 >
                   {q}
                 </button>
@@ -231,15 +277,15 @@ export default function ChatPanel() {
           );
         })}
         {error && (
-          <div className="mx-2 mb-3 p-3 rounded-lg bg-destructive/10 text-destructive text-sm">
+          <div role="alert" className="mx-2 mb-3 p-3 rounded-lg bg-destructive/10 text-destructive text-sm">
             <p className="font-medium">Chat error</p>
             <p className="mt-1 opacity-80">{error.message}</p>
           </div>
         )}
         <div ref={endRef} />
         {isWaiting && (
-          <div className="flex justify-start mb-3">
-            <div className="bg-secondary rounded-2xl rounded-bl-sm px-4 py-3 text-base">
+          <output className="flex justify-start mb-3" aria-label="AskSUSSi is typing">
+            <span className="bg-secondary rounded-2xl rounded-bl-sm px-4 py-3 text-base">
               <span className="inline-flex gap-1">
                 <span className="animate-bounce">·</span>
                 <span className="animate-bounce" style={{ animationDelay: "0.1s" }}>
@@ -249,19 +295,21 @@ export default function ChatPanel() {
                   ·
                 </span>
               </span>
-            </div>
-          </div>
+            </span>
+          </output>
         )}
       </div>
       {hasNewMessages && (
         <button
           type="button"
           onClick={scrollToBottom}
-          className="absolute bottom-16 left-1/2 -translate-x-1/2 z-10 bg-primary text-primary-foreground text-xs font-medium px-3 py-1.5 rounded-full shadow-lg hover:bg-primary/90 transition-colors"
+          aria-label="Scroll to new messages"
+          className="absolute bottom-28 left-1/2 -translate-x-1/2 z-10 bg-primary text-primary-foreground text-xs font-medium px-3 py-1.5 rounded-full shadow-lg hover:bg-primary/90 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         >
           New messages ↓
         </button>
       )}
+      <QuickActions onSend={handleSend} disabled={isActive} />
       <ChatInput onSend={handleSend} isLoading={isActive} />
     </div>
   );
