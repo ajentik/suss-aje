@@ -4,15 +4,12 @@ import { useEffect, useRef, useCallback, useState } from "react";
 import { useAppStore } from "@/store/app-store";
 import { CAMPUS_CENTER, CAMPUS_POIS } from "@/lib/maps/campus-pois";
 
-const MAPS_API_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || "";
-
 let mapsReady: Promise<void> | null = null;
 
 function loadMapsAPI(): Promise<void> {
   if (mapsReady) return mapsReady;
 
   mapsReady = (async () => {
-    // Inject the script tag if not already present
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     if (!(window as any).google?.maps) {
       const existing = document.querySelector(
@@ -20,29 +17,35 @@ function loadMapsAPI(): Promise<void> {
       );
       if (!existing) {
         const script = document.createElement("script");
-        script.src = `https://maps.googleapis.com/maps/api/js?key=${MAPS_API_KEY}&v=alpha&libraries=maps3d,streetView`;
+        // NOTE: process.env.NEXT_PUBLIC_* is inlined at build time by Turbopack.
+        // Do NOT guard on the key value — Turbopack dead-code-eliminates the
+        // entire function body when the build-time value is "".
+        // Railway's build has the real key, so this works in production.
+        script.src = `https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || ""}&v=alpha&libraries=maps3d,streetView`;
         script.async = true;
         document.head.appendChild(script);
       }
 
-      // Poll until the core API object is available
+      // Poll until the core API object is available (15s timeout)
       const deadline = Date.now() + 15000;
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       while (!(window as any).google?.maps?.importLibrary) {
         if (Date.now() > deadline) {
-          throw new Error("Google Maps API failed to initialize (timeout)");
+          throw new Error(
+            "Google Maps API failed to initialize — ensure Maps JavaScript API and Map Tiles API are enabled in your GCP project."
+          );
         }
         await new Promise((r) => setTimeout(r, 100));
       }
     }
 
-    // Explicitly load the maps3d library so web components are registered
+    // Explicitly load the maps3d library so gmp-map-3d web component is registered
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     await (window as any).google.maps.importLibrary("maps3d");
   })();
 
   mapsReady.catch(() => {
-    mapsReady = null; // allow retry on failure
+    mapsReady = null;
   });
 
   return mapsReady;
@@ -53,11 +56,6 @@ export default function MapView() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!MAPS_API_KEY) {
-      setError("Set NEXT_PUBLIC_GOOGLE_MAPS_API_KEY to enable 3D map");
-      return;
-    }
-
     loadMapsAPI()
       .then(() => setLoaded(true))
       .catch((err) => setError(err.message));
@@ -91,7 +89,10 @@ function Map3DInner() {
   const routeInfo = useAppStore((s) => s.routeInfo);
   const polylineRef = useRef<HTMLElement | null>(null);
   const [inStreetView, setInStreetView] = useState(false);
-  const [streetViewLocation, setStreetViewLocation] = useState<{ lat: number; lng: number } | null>(null);
+  const [streetViewLocation, setStreetViewLocation] = useState<{
+    lat: number;
+    lng: number;
+  } | null>(null);
   const [mapError, setMapError] = useState<string | null>(null);
 
   const initMap = useCallback(async () => {
@@ -99,7 +100,10 @@ function Map3DInner() {
 
     try {
       const map = document.createElement("gmp-map-3d") as HTMLElement;
-      map.setAttribute("center", `${CAMPUS_CENTER.lat},${CAMPUS_CENTER.lng},300`);
+      map.setAttribute(
+        "center",
+        `${CAMPUS_CENTER.lat},${CAMPUS_CENTER.lng},300`
+      );
       map.setAttribute("tilt", "55");
       map.setAttribute("heading", "0");
       map.setAttribute("range", "800");
@@ -139,7 +143,9 @@ function Map3DInner() {
         map.appendChild(marker);
       }
     } catch (err) {
-      setMapError(err instanceof Error ? err.message : "Failed to initialize 3D map");
+      setMapError(
+        err instanceof Error ? err.message : "Failed to initialize 3D map"
+      );
     }
   }, []);
 
@@ -209,7 +215,9 @@ function Map3DInner() {
   if (mapError) {
     return (
       <div className="w-full h-full flex items-center justify-center bg-muted/80">
-        <p className="text-muted-foreground text-sm text-center px-4">{mapError}</p>
+        <p className="text-muted-foreground text-sm text-center px-4">
+          {mapError}
+        </p>
       </div>
     );
   }
@@ -231,7 +239,17 @@ function Map3DInner() {
             onClick={() => setInStreetView(false)}
             className="absolute top-4 left-4 z-10 flex items-center gap-2 px-3 py-2 bg-white/95 backdrop-blur rounded-lg shadow-lg text-sm font-medium hover:bg-white transition-colors"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
               <path d="m12 19-7-7 7-7" />
               <path d="M19 12H5" />
             </svg>
