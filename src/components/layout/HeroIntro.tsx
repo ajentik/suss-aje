@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
+import Image from "next/image";
 import { lookupAerialVideo } from "@/lib/maps/aerial-view";
 
 const SUSS_ADDRESS = "463 Clementi Road, Singapore 599494";
@@ -58,16 +59,14 @@ export default function HeroIntro({ onEnter }: HeroIntroProps) {
       <div className="relative z-10 text-center px-6 max-w-lg">
         {/* SUSS Logo */}
         <div className="mb-6">
-          <svg width="160" height="44" viewBox="0 0 160 44" fill="none" xmlns="http://www.w3.org/2000/svg" className="mx-auto">
-            <path d="M8 22L18 6L28 22L18 38Z" fill="white" opacity="0.9" />
-            <path d="M14 22L24 6L34 22L24 38Z" fill="white" opacity="0.5" />
-            <text x="42" y="30" fontFamily="sans-serif" fontSize="26" fontWeight="800" fill="white" letterSpacing="2">
-              SUSS
-            </text>
-            <circle cx="86" cy="10" r="2.5" fill="#DA291C" />
-            <circle cx="94" cy="10" r="2.5" fill="#DA291C" />
-            <circle cx="102" cy="10" r="2.5" fill="#DA291C" />
-          </svg>
+          <Image
+            src="/suss-logo.png"
+            alt="SUSS — Singapore University of Social Sciences"
+            width={200}
+            height={70}
+            className="mx-auto h-16 md:h-20 w-auto brightness-0 invert"
+            priority
+          />
         </div>
 
         <h1 className="text-3xl md:text-4xl font-bold text-white mb-3 tracking-tight">
