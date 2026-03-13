@@ -1,9 +1,15 @@
 "use client";
 
 import { useCallback, useState, useRef } from "react";
-import { X, Calendar, Clock, MapPin, Navigation } from "lucide-react";
+import { X, Calendar, Clock, MapPin, Navigation, ExternalLink } from "lucide-react";
 import { useAppStore } from "@/store/app-store";
 import type { CampusEvent } from "@/types";
+
+const EVENT_TYPE_DOT_COLOR: Record<string, string> = {
+  "On-Campus": "bg-event-oncampus-fg",
+  Online: "bg-event-online-fg",
+  External: "bg-event-external-fg",
+};
 
 export default function EventPopup() {
   const selectedEvent = useAppStore((s) => s.selectedEvent);
@@ -19,6 +25,7 @@ export default function EventPopup() {
   // Swipe-to-dismiss
   const touchStartY = useRef(0);
   const touchCurrentY = useRef(0);
+  const popupRef = useRef<HTMLDivElement>(null);
 
   const handleTouchStart = useCallback((e: React.TouchEvent) => {
     touchStartY.current = e.touches[0].clientY;
@@ -27,6 +34,11 @@ export default function EventPopup() {
 
   const handleTouchMove = useCallback((e: React.TouchEvent) => {
     touchCurrentY.current = e.touches[0].clientY;
+    const deltaY = touchCurrentY.current - touchStartY.current;
+    if (deltaY > 0 && popupRef.current) {
+      popupRef.current.style.transform = `translateX(-50%) translateY(${deltaY}px)`;
+      popupRef.current.style.opacity = `${Math.max(0.4, 1 - deltaY / 200)}`;
+    }
   }, []);
 
   const handleClose = useCallback(() => {
@@ -36,6 +48,10 @@ export default function EventPopup() {
 
   const handleTouchEnd = useCallback(() => {
     const deltaY = touchCurrentY.current - touchStartY.current;
+    if (popupRef.current) {
+      popupRef.current.style.transform = "";
+      popupRef.current.style.opacity = "";
+    }
     if (deltaY > 60) {
       handleClose();
     }
@@ -57,9 +73,12 @@ export default function EventPopup() {
 
   if (!displayEvent) return null;
 
+  const typeDotClass = EVENT_TYPE_DOT_COLOR[displayEvent.type] ?? "bg-muted-foreground";
+
   return (
     <div
-      className={`absolute bottom-24 md:bottom-20 left-1/2 -translate-x-1/2 z-20 transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] ${
+      ref={popupRef}
+      className={`absolute bottom-28 md:bottom-20 left-1/2 -translate-x-1/2 z-20 transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] w-[calc(100vw-1.5rem)] max-w-md sm:w-[380px] ${
         isVisible
           ? "opacity-100 translate-y-0 scale-100"
           : "opacity-0 translate-y-6 scale-95 pointer-events-none"
@@ -69,23 +88,29 @@ export default function EventPopup() {
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
     >
-      <div className="bg-card rounded-2xl shadow-xl max-w-md w-[calc(100vw-1.5rem)] sm:w-[380px] p-5 relative border border-border">
+      <div className="bg-card rounded-2xl shadow-lg shadow-black/10 max-h-[calc(100dvh-10rem)] overflow-y-auto overscroll-contain p-5 relative border border-border">
+        {/* Drag handle */}
+        <div className="flex justify-center mb-3 md:hidden" aria-hidden="true">
+          <div className="w-8 h-1 rounded-full bg-muted-foreground/30" />
+        </div>
+
         <button
           type="button"
           onClick={handleClose}
-          className="absolute top-3 right-3 flex items-center justify-center w-9 h-9 rounded-full bg-muted hover:bg-muted/80 text-muted-foreground hover:text-foreground transition-colors"
+          className="absolute top-3 right-3 flex items-center justify-center w-11 h-11 rounded-full bg-muted hover:bg-muted/80 text-muted-foreground hover:text-foreground transition-colors"
           aria-label="Close popup"
         >
           <X size={18} aria-hidden="true" />
         </button>
 
         <div className="mb-2">
-          <span className="inline-block bg-secondary text-secondary-foreground text-sm font-semibold px-3 py-1 rounded-full">
+          <span className="inline-flex items-center gap-1.5 bg-secondary text-secondary-foreground text-sm font-semibold px-3 py-1 rounded-full">
+            <span className={`w-2 h-2 rounded-full ${typeDotClass}`} aria-hidden="true" />
             {displayEvent.category}
           </span>
         </div>
 
-        <h3 className="text-xl font-bold text-card-foreground mb-1.5 pr-10">
+        <h3 className="text-xl font-bold text-card-foreground mb-1.5 pr-12">
           {displayEvent.title}
         </h3>
 
@@ -153,9 +178,10 @@ export default function EventPopup() {
               href={displayEvent.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-sm text-primary hover:underline font-medium"
+              className="inline-flex items-center gap-1 text-sm text-primary hover:underline font-medium"
             >
-              Details &rarr;
+              Details
+              <ExternalLink size={14} aria-hidden="true" />
             </a>
           </div>
         )}
@@ -164,7 +190,7 @@ export default function EventPopup() {
           <button
             type="button"
             onClick={handleNavigate}
-            className="w-full bg-primary text-primary-foreground rounded-xl px-4 py-3 text-[0.9375rem] font-semibold hover:bg-primary/90 active:scale-[0.98] transition-all flex items-center justify-center gap-2"
+            className="w-full bg-primary text-primary-foreground rounded-xl px-4 min-h-[48px] text-[0.9375rem] font-semibold hover:bg-primary/90 active:scale-[0.98] transition-all flex items-center justify-center gap-2"
           >
             <Navigation size={18} aria-hidden="true" />
             Navigate here
@@ -174,9 +200,10 @@ export default function EventPopup() {
             href={displayEvent.url}
             target="_blank"
             rel="noopener noreferrer"
-            className="w-full bg-primary text-primary-foreground rounded-xl px-4 py-3 text-[0.9375rem] font-semibold hover:bg-primary/90 active:scale-[0.98] transition-all flex items-center justify-center gap-2"
+            className="w-full bg-primary text-primary-foreground rounded-xl px-4 min-h-[48px] text-[0.9375rem] font-semibold hover:bg-primary/90 active:scale-[0.98] transition-all flex items-center justify-center gap-2"
           >
-            Join Online &rarr;
+            <ExternalLink size={16} aria-hidden="true" />
+            Join Online
           </a>
         ) : null}
       </div>
