@@ -239,7 +239,7 @@ export default function ChatPanel() {
       endRef.current?.scrollIntoView({ behavior: "smooth" });
       setHasNewMessages(false);
     }
-  });
+  }, [messages.length]);
 
   useEffect(() => {
     if (activePanel === "events" && mapEventMarkers.length > 0) {
@@ -260,7 +260,7 @@ export default function ChatPanel() {
   const scrollToBottom = () => {
     userScrolledUpRef.current = false;
     setHasNewMessages(false);
-    endRef.current?.scrollIntoView({ behavior: "smooth" });
+    endRef.current?.scrollIntoView({ behavior: "smooth" }, [messages.length]);
   };
 
   const handleSend = (text: string) => {
