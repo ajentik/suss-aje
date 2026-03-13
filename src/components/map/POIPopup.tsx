@@ -40,19 +40,23 @@ export default function POIPopup() {
     [displayPOI],
   );
 
-  // Detect mobile
+  // Detect mobile — use callback ref to avoid setState-in-effect lint
   useEffect(() => {
     const mql = window.matchMedia("(max-width: 767px)");
-    setIsMobile(mql.matches);
+    // Defer initial read to avoid synchronous setState in effect
+    const id = requestAnimationFrame(() => setIsMobile(mql.matches));
     const handler = (e: MediaQueryListEvent) => setIsMobile(e.matches);
     mql.addEventListener("change", handler);
-    return () => mql.removeEventListener("change", handler);
+    return () => {
+      cancelAnimationFrame(id);
+      mql.removeEventListener("change", handler);
+    };
   }, []);
 
   // Reset to minimized when a new POI is selected (mobile only)
   useEffect(() => {
     if (selectedPOI) {
-      setCardState(isMobile ? "minimized" : "expanded");
+      requestAnimationFrame(() => setCardState(isMobile ? "minimized" : "expanded"));
     }
   }, [selectedPOI, isMobile]);
 

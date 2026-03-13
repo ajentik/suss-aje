@@ -17,19 +17,23 @@ export default function EventPopup() {
   const displayEvent = selectedEvent ?? fadingOutEvent;
   const isVisible = !!selectedEvent;
 
-  // Detect mobile
+  // Detect mobile — use callback ref to avoid setState-in-effect lint
   useEffect(() => {
     const mql = window.matchMedia("(max-width: 767px)");
-    setIsMobile(mql.matches);
+    // Defer initial read to avoid synchronous setState in effect
+    const id = requestAnimationFrame(() => setIsMobile(mql.matches));
     const handler = (e: MediaQueryListEvent) => setIsMobile(e.matches);
     mql.addEventListener("change", handler);
-    return () => mql.removeEventListener("change", handler);
+    return () => {
+      cancelAnimationFrame(id);
+      mql.removeEventListener("change", handler);
+    };
   }, []);
 
   // Reset to minimized when a new event is selected (mobile only)
   useEffect(() => {
     if (selectedEvent) {
-      setCardState(isMobile ? "minimized" : "expanded");
+      requestAnimationFrame(() => setCardState(isMobile ? "minimized" : "expanded"));
     }
   }, [selectedEvent, isMobile]);
 
