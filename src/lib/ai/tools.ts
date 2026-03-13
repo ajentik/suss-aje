@@ -117,6 +117,8 @@ export const campusInfo = tool({
       hawker: "Hawker",
       "food court": "Hawker",
       "food centre": "Hawker",
+      building: "Building",
+      block: "Building",
     };
 
     const matchedCategory = Object.entries(categoryKeywords).find(([kw]) => q.includes(kw));
@@ -146,15 +148,36 @@ export const campusInfo = tool({
       shuttle:
         "Campus shuttle buses run every 15 minutes between SUSS Bus Stop and Clementi MRT (Exit A). First bus: 7:30 AM, last bus: 10:00 PM.",
       library:
-        "The SUSS Library is open Mon-Fri 8:30 AM - 9:00 PM, Sat 8:30 AM - 1:00 PM. Closed on Sundays and public holidays.",
+        "The SUSS Library is in Block C, Level 2 (room C.2.02). Open Mon–Fri 8:30AM–9:00PM, Sat 8:30AM–1:00PM. Closed Sun & public holidays. Features 5 discussion rooms (up to 5 persons), 2 call pods, A3 scanner, power outlets & wireless chargers, and 24/7 smart locker pickup.",
       canteen:
-        "The Campus Canteen operates Mon-Sat 7:30 AM - 8:00 PM. Features local cuisine, vegetarian options, and a halal stall.",
-      gym: "The Sports Complex includes a gym, badminton courts, and a multipurpose hall. Open daily 7:00 AM - 10:00 PM. Bring your student card.",
+        "The Campus Canteen (FoodClique & Food Gallery) is in Block A, Level 3. Open Mon–Fri 7:30AM–8PM, Sat till 2PM. Features local cuisine, vegetarian options, and a halal stall. Block B Level 1 also has Subway & FoodFest (Halal-certified).",
+      gym: "The Gym is in Block A, Level 1 (rooms A1.11, A1.14, A1.15). Max 1.5hr sessions per day. Block D has the Multi-purpose Sports Hall (badminton, basketball, floorball, netball, volleyball, 50 pax) and Sports Therapy/First Aid Room.",
       wifi: "Campus WiFi: Connect to 'SUSS-Student' using your student portal credentials. IT Helpdesk can assist with connectivity issues.",
       parking:
-        "Student parking is available at Basement 1. Season parking costs $60/month. Apply via the Admin Office.",
+        "Parking available at Block A and Block C carpark entrances. $1.28/hour for cars, free for motorcycles. 6:00AM–12:00AM daily. Season parking $60/month via Admin Office.",
       bookstore:
-        "The Campus Bookstore is open Mon-Fri 9:00 AM - 6:00 PM. Textbooks, stationery, and SUSS merchandise available.",
+        "The Campus Bookstore is open Mon–Fri 9:00AM–6:00PM. Textbooks, stationery, and SUSS merchandise available.",
+      "block a":
+        "Block A: Student Lounge (L1), Gym (L1 – rooms A1.11/A1.14/A1.15), FoodClique & Food Gallery (L3), Carpark entrance.",
+      "block b":
+        "Block B: Student Hub (L1), Subway & FoodFest (L1, Halal-certified), Study Spaces (L3).",
+      "block c":
+        "Block C: Starbucks (L1), SUSS Library (L2 – C.2.02, 5 discussion rooms, call pods, smart locker), Seminar Rooms (60-120 pax), Study Spaces (L4), Carpark entrance.",
+      "block d":
+        "Block D: Performing Arts Theatre (L1, 400 seats), Dance Studio, Multi-purpose Sports Hall (badminton, basketball, floorball, netball, volleyball – 50 pax), Sports Therapy & First Aid Room.",
+      sim: "SIM (Singapore Institute of Management) shares the campus at 461 Clementi Road. SIM Global Education offers degree programmes with overseas partner universities. SIM manages venue allocation for shared facilities. SIM Open House is held bi-annually (March & September). The DREAMS Career Fair features ~60 companies.",
+      "ngee ann":
+        "Ngee Ann Polytechnic (NP) is at 535 Clementi Road — adjacent to SUSS/SIM campus and within walking distance. SUSS counselling services (C-three) have been relocated to NP Block 23, Level 5.",
+      counselling:
+        "SUSS counselling services (C-three) have been relocated to Ngee Ann Polytechnic, Block 23, Level 5 (535 Clementi Road, Singapore 599489).",
+      mrt: "Nearest MRT: King Albert Park (Downtown Line DT6, Exit A). Campus shuttle runs every 15 min to Clementi MRT.",
+      bus: "Bus routes 74, 151, 154 stop at 'Clementi Rd – Opp SIM HQ'. Campus shuttle to Clementi MRT every 15 min (7:30AM–10:00PM).",
+      hours: "Campus hours: 6:00AM–11:59PM daily, including weekends and public holidays.",
+      theatre:
+        "The Performing Arts Theatre is in Block D, Level 1. It seats 400 and hosts performances, conferences, and events.",
+      starbucks: "Starbucks is in Block C, Level 1.",
+      "study room":
+        "Study spaces are available at Block B Level 3, Block C Level 4, and the SUSS Library (Block C Level 2) with 5 discussion rooms.",
     };
 
     const matched = Object.entries(info).find(([key]) => q.includes(key));
@@ -164,7 +187,7 @@ export const campusInfo = tool({
       query,
       answer: matched
         ? matched[1]
-        : `Here's what I know about SUSS campus: It's located at 463 Clementi Road with facilities including a library, canteen, sports complex, lecture halls, IT helpdesk, bookstore, and admin office. The campus shuttle connects to Clementi MRT. Nearby you'll find supermarkets (FairPrice), restaurants, malls (Clementi Mall), bars, and hawker centres. Ask me about any of these!`,
+        : `Here's what I know about SUSS campus at 463 Clementi Road: 4 main blocks (A–D) with library, canteen, gym, sports hall, theatre, Starbucks, study spaces, and more. The campus is shared with SIM. Ngee Ann Polytechnic is adjacent. Campus shuttle connects to Clementi MRT. Nearby: supermarkets (FairPrice), restaurants, malls (Clementi Mall), bars, and hawker centres. Ask me about any of these!`,
     };
   },
 });
