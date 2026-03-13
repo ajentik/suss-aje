@@ -83,9 +83,8 @@ export default function AppShell() {
   const setActivePanel = useAppStore((s) => s.setActivePanel);
   const ttsEnabled = useAppStore((s) => s.ttsEnabled);
   const setTtsEnabled = useAppStore((s) => s.setTtsEnabled);
-  const [mobileSheet, setMobileSheet] = useState<
-    "collapsed" | "peek" | "expanded"
-  >("expanded");
+  const mobileSheet = useAppStore((s) => s.mobileSheetState);
+  const setMobileSheet = useAppStore((s) => s.setMobileSheetState);
   const [minimized, setMinimized] = useState(false);
   const [panelWidth, setPanelWidth] = useState(DEFAULT_WIDTH);
   const isResizing = useRef(false);
@@ -112,14 +111,15 @@ export default function AppShell() {
   }, [activePanel]);
 
   const cycleSheet = useCallback(() => {
-    setMobileSheet((prev) =>
+    const prev = useAppStore.getState().mobileSheetState;
+    setMobileSheet(
       prev === "collapsed"
         ? "peek"
         : prev === "peek"
           ? "expanded"
           : "collapsed",
     );
-  }, []);
+  }, [setMobileSheet]);
 
   // Mobile swipe gesture for bottom sheet
   const sheetTouchStartY = useRef(0);
@@ -143,26 +143,23 @@ export default function AppShell() {
     const deltaY = sheetTouchCurrentY.current - sheetTouchStartY.current;
     const threshold = 40;
 
+    const prev = useAppStore.getState().mobileSheetState;
     if (deltaY < -threshold) {
       // Swipe up — expand
-      setMobileSheet((prev) =>
+      setMobileSheet(
         prev === "collapsed"
           ? "peek"
-          : prev === "peek"
-            ? "expanded"
-            : "expanded",
+          : "expanded",
       );
     } else if (deltaY > threshold) {
       // Swipe down — collapse
-      setMobileSheet((prev) =>
+      setMobileSheet(
         prev === "expanded"
           ? "peek"
-          : prev === "peek"
-            ? "collapsed"
-            : "collapsed",
+          : "collapsed",
       );
     }
-  }, []);
+  }, [setMobileSheet]);
 
   const toggleTts = useCallback(
     () => setTtsEnabled(!ttsEnabled),

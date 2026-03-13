@@ -45,6 +45,9 @@ interface AppState {
 
   pendingChatMessage: string | null;
   setPendingChatMessage: (message: string | null) => void;
+
+  mobileSheetState: "collapsed" | "peek" | "expanded";
+  setMobileSheetState: (state: "collapsed" | "peek" | "expanded") => void;
 }
 
 function generateId(): string {
@@ -55,7 +58,11 @@ export const useAppStore = create<AppState>()(
   persist(
     (set) => ({
       selectedPOI: null,
-      setSelectedPOI: (poi) => set({ selectedPOI: poi, selectedEvent: null }),
+      setSelectedPOI: (poi) => set((state) => ({
+        selectedPOI: poi,
+        selectedEvent: null,
+        ...(poi && state.mobileSheetState === "expanded" ? { mobileSheetState: "peek" as const } : {}),
+      })),
       selectedDestination: null,
       setSelectedDestination: (poi) => set({ selectedDestination: poi }),
       routeInfo: null,
@@ -75,7 +82,11 @@ export const useAppStore = create<AppState>()(
       highlightedEventIds: [],
       setHighlightedEventIds: (ids) => set({ highlightedEventIds: ids }),
       selectedEvent: null,
-      setSelectedEvent: (event) => set({ selectedEvent: event, selectedPOI: null }),
+      setSelectedEvent: (event) => set((state) => ({
+        selectedEvent: event,
+        selectedPOI: null,
+        ...(event && state.mobileSheetState === "expanded" ? { mobileSheetState: "peek" as const } : {}),
+      })),
       streetViewEvent: null,
       setStreetViewEvent: (event) => set({ streetViewEvent: event }),
 
@@ -101,6 +112,9 @@ export const useAppStore = create<AppState>()(
 
       pendingChatMessage: null,
       setPendingChatMessage: (message) => set({ pendingChatMessage: message }),
+
+      mobileSheetState: "expanded",
+      setMobileSheetState: (state) => set({ mobileSheetState: state }),
     }),
     {
       name: "asksussi-prefs",
