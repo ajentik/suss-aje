@@ -20,9 +20,10 @@ import ChatPanel from "@/components/chat/ChatPanel";
 import EventsPanel from "@/components/events/EventsPanel";
 import RouteOverlay from "@/components/map/RouteOverlay";
 import AerialViewButton from "@/components/map/AerialViewButton";
-import POIPopup from "@/components/map/POIPopup";
-import EventPopup from "@/components/map/EventPopup";
+import POIPopup, { POIDetailCard } from "@/components/map/POIPopup";
+import EventPopup, { EventDetailCard } from "@/components/map/EventPopup";
 import Onboarding from "@/components/layout/Onboarding";
+import type { CampusEvent } from "@/types";
 
 const MapView = dynamic(() => import("@/components/map/MapView"), {
   ssr: false,
@@ -85,6 +86,15 @@ export default function AppShell() {
   const setTtsEnabled = useAppStore((s) => s.setTtsEnabled);
   const mobileSheet = useAppStore((s) => s.mobileSheetState);
   const setMobileSheet = useAppStore((s) => s.setMobileSheetState);
+  const sheetContentMode = useAppStore((s) => s.sheetContentMode);
+  const setSheetContentMode = useAppStore((s) => s.setSheetContentMode);
+  const selectedPOI = useAppStore((s) => s.selectedPOI);
+  const selectedEvent = useAppStore((s) => s.selectedEvent);
+  const setSelectedPOI = useAppStore((s) => s.setSelectedPOI);
+  const setSelectedEvent = useAppStore((s) => s.setSelectedEvent);
+  const setSelectedDestination = useAppStore((s) => s.setSelectedDestination);
+  const setStreetViewEvent = useAppStore((s) => s.setStreetViewEvent);
+
   const [minimized, setMinimized] = useState(false);
   const [panelWidth, setPanelWidth] = useState(DEFAULT_WIDTH);
   const isResizing = useRef(false);
@@ -111,15 +121,14 @@ export default function AppShell() {
   }, [activePanel]);
 
   const cycleSheet = useCallback(() => {
-    const prev = useAppStore.getState().mobileSheetState;
     setMobileSheet(
-      prev === "collapsed"
+      mobileSheet === "collapsed"
         ? "peek"
-        : prev === "peek"
+        : mobileSheet === "peek"
           ? "expanded"
           : "collapsed",
     );
-  }, [setMobileSheet]);
+  }, [mobileSheet, setMobileSheet]);
 
   // Mobile swipe gesture for bottom sheet
   const sheetTouchStartY = useRef(0);
@@ -143,28 +152,73 @@ export default function AppShell() {
     const deltaY = sheetTouchCurrentY.current - sheetTouchStartY.current;
     const threshold = 40;
 
-    const prev = useAppStore.getState().mobileSheetState;
     if (deltaY < -threshold) {
       // Swipe up — expand
       setMobileSheet(
-        prev === "collapsed"
+        mobileSheet === "collapsed"
           ? "peek"
           : "expanded",
       );
     } else if (deltaY > threshold) {
-      // Swipe down — collapse
-      setMobileSheet(
-        prev === "expanded"
-          ? "peek"
-          : "collapsed",
-      );
+      // Swipe down — collapse or close detail
+      if (mobileSheet === "peek" && sheetContentMode !== "default") {
+        // Swiping down on detail in peek → close detail, go back to default
+        setSheetContentMode("default");
+        setSelectedPOI(null);
+        setSelectedEvent(null);
+        setMobileSheet("collapsed");
+      } else {
+        setMobileSheet(
+          mobileSheet === "expanded"
+            ? "peek"
+            : "collapsed",
+        );
+      }
     }
-  }, [setMobileSheet]);
+  }, [mobileSheet, setMobileSheet, sheetContentMode, setSheetContentMode, setSelectedPOI, setSelectedEvent]);
 
   const toggleTts = useCallback(
     () => setTtsEnabled(!ttsEnabled),
     [ttsEnabled, setTtsEnabled],
   );
+
+  // Close detail and return to default sheet content
+  const handleCloseDetail = useCallback(() => {
+    setSheetContentMode("default");
+    setSelectedPOI(null);
+    setSelectedEvent(null);
+    setMobileSheet("expanded");
+  }, [setSheetContentMode, setSelectedPOI, setSelectedEvent, setMobileSheet]);
+
+  // Handle navigate from detail cards
+  const handleNavigatePOI = useCallback(() => {
+    if (selectedPOI) {
+      setSelectedDestination(selectedPOI);
+      setStreetViewEvent({
+        id: `poi-${selectedPOI.id}`,
+        title: selectedPOI.name,
+        date: "",
+        time: "",
+        location: selectedPOI.address || selectedPOI.name,
+        category: selectedPOI.category,
+        description: selectedPOI.description,
+        type: "On-Campus",
+        school: "SUSS",
+        lat: selectedPOI.lat,
+        lng: selectedPOI.lng,
+      } as CampusEvent);
+    }
+    setSelectedPOI(null);
+    setSheetContentMode("default");
+  }, [selectedPOI, setSelectedDestination, setStreetViewEvent, setSelectedPOI, setSheetContentMode]);
+
+  const handleNavigateEvent = useCallback(() => {
+    if (selectedEvent && selectedEvent.type !== "Online") {
+      setStreetViewEvent(selectedEvent);
+    }
+    setSelectedEvent(null);
+    setSheetContentMode("default");
+  }, [selectedEvent, setStreetViewEvent, setSelectedEvent, setSheetContentMode]);
 
   useEffect(() => {
     const handleMove = (e: MouseEvent | TouchEvent) => {
@@ -197,6 +251,16 @@ export default function AppShell() {
       window.removeEventListener("touchend", handleUp);
     };
   }, []);
+
+  // Determine mobile sheet height class
+  const sheetHeightClass =
+    mobileSheet === "expanded"
+      ? "h-[75dvh]"
+      : mobileSheet === "peek"
+        ? sheetContentMode !== "default"
+          ? "h-[280px]"  // Taller peek for detail cards
+          : "h-[140px]"
+        : "h-16";
 
   return (
     <div className="h-dvh w-full flex flex-col md:flex-row overflow-hidden">
@@ -286,7 +350,7 @@ export default function AppShell() {
         aria-label="Chat and Events (mobile)"
         className={`
           md:hidden fixed bottom-0 left-0 right-0 z-30
-          ${mobileSheet === "expanded" ? "h-[75dvh]" : mobileSheet === "peek" ? "h-[140px]" : "h-16"}
+          ${sheetHeightClass}
           bg-background/95 backdrop-blur-xl
           transition-all duration-350 ease-[cubic-bezier(0.32,0.72,0,1)]
           flex flex-col overflow-hidden
@@ -334,41 +398,60 @@ export default function AppShell() {
 
         {mobileSheet !== "collapsed" && (
           <>
-            <BrandHeader ttsEnabled={ttsEnabled} onToggleTts={toggleTts} />
+            {/* Content mode routing */}
+            {sheetContentMode === "poi-detail" && selectedPOI ? (
+              <POIDetailCard
+                poi={selectedPOI}
+                onClose={handleCloseDetail}
+                onNavigate={handleNavigatePOI}
+                compact={mobileSheet === "peek"}
+              />
+            ) : sheetContentMode === "event-detail" && selectedEvent ? (
+              <EventDetailCard
+                event={selectedEvent}
+                onClose={handleCloseDetail}
+                onNavigate={handleNavigateEvent}
+                compact={mobileSheet === "peek"}
+              />
+            ) : (
+              <>
+                <BrandHeader ttsEnabled={ttsEnabled} onToggleTts={toggleTts} />
 
-            <Tabs
-              value={activePanel}
-              onValueChange={(v) =>
-                setActivePanel(v as "chat" | "events")
-              }
-              className="flex-1 flex flex-col min-h-0"
-            >
-              <TabsList className="mx-3 mt-2 shrink-0 h-12">
-                <TabsTrigger
-                  value="chat"
-                  className="flex-1 min-h-[44px] text-sm gap-1.5 font-medium"
+                <Tabs
+                  value={activePanel}
+                  onValueChange={(v) =>
+                    setActivePanel(v as "chat" | "events")
+                  }
+                  className="flex-1 flex flex-col min-h-0"
                 >
-                  <MessageSquare size={15} aria-hidden="true" />
-                  Chat
-                </TabsTrigger>
-                <TabsTrigger
-                  value="events"
-                  className="flex-1 min-h-[44px] text-sm gap-1.5 font-medium"
-                >
-                  <Calendar size={15} aria-hidden="true" />
-                  Events
-                </TabsTrigger>
-              </TabsList>
-              <TabsContent value="chat" className="flex-1 min-h-0 mt-0">
-                <ChatPanel />
-              </TabsContent>
-              <TabsContent
-                value="events"
-                className="flex-1 min-h-0 mt-0 overflow-y-auto"
-              >
-                <EventsPanel />
-              </TabsContent>
-            </Tabs>
+                  <TabsList className="mx-3 mt-2 shrink-0 h-12">
+                    <TabsTrigger
+                      value="chat"
+                      className="flex-1 min-h-[44px] text-sm gap-1.5 font-medium"
+                    >
+                      <MessageSquare size={15} aria-hidden="true" />
+                      Chat
+                    </TabsTrigger>
+                    <TabsTrigger
+                      value="events"
+                      className="flex-1 min-h-[44px] text-sm gap-1.5 font-medium"
+                    >
+                      <Calendar size={15} aria-hidden="true" />
+                      Events
+                    </TabsTrigger>
+                  </TabsList>
+                  <TabsContent value="chat" className="flex-1 min-h-0 mt-0">
+                    <ChatPanel />
+                  </TabsContent>
+                  <TabsContent
+                    value="events"
+                    className="flex-1 min-h-0 mt-0 overflow-y-auto"
+                  >
+                    <EventsPanel />
+                  </TabsContent>
+                </Tabs>
+              </>
+            )}
           </>
         )}
       </aside>

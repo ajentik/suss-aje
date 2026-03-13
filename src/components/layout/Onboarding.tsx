@@ -26,40 +26,23 @@ export default function Onboarding() {
   const setOnboardingDismissed = useAppStore((s) => s.setOnboardingDismissed);
   const setPendingChatMessage = useAppStore((s) => s.setPendingChatMessage);
   const dialogRef = useRef<HTMLDivElement>(null);
-  const [isDragging, setIsDragging] = useState(false);
-  const [dragY, setDragY] = useState(0);
-  const dragStart = useRef(0);
+  const [slideOut, setSlideOut] = useState(false);
 
   const handleDismiss = useCallback(() => {
-    setOnboardingDismissed(true);
+    setSlideOut(true);
+    setTimeout(() => setOnboardingDismissed(true), 350);
   }, [setOnboardingDismissed]);
 
   const handleTrySuggestion = useCallback(
     (text: string) => {
-      setOnboardingDismissed(true);
-      setPendingChatMessage(text);
+      setSlideOut(true);
+      setTimeout(() => {
+        setOnboardingDismissed(true);
+        setPendingChatMessage(text);
+      }, 350);
     },
     [setOnboardingDismissed, setPendingChatMessage]
   );
-
-  // Swipe-down to dismiss
-  const handleTouchStart = useCallback((e: React.TouchEvent) => {
-    dragStart.current = e.touches[0].clientY;
-    setIsDragging(true);
-  }, []);
-
-  const handleTouchMove = useCallback((e: React.TouchEvent) => {
-    const delta = e.touches[0].clientY - dragStart.current;
-    if (delta > 0) setDragY(delta);
-  }, []);
-
-  const handleTouchEnd = useCallback(() => {
-    setIsDragging(false);
-    if (dragY > 120) {
-      handleDismiss();
-    }
-    setDragY(0);
-  }, [dragY, handleDismiss]);
 
   useEffect(() => {
     if (onboardingDismissed) return;
@@ -85,49 +68,35 @@ export default function Onboarding() {
   if (onboardingDismissed) return null;
 
   return (
-    // eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions
     <div
-      className="fixed inset-0 z-[45] flex items-end sm:items-center justify-center bg-black/50 backdrop-blur-sm p-0 sm:p-4"
+      className="fixed inset-0 z-[45] flex items-end md:items-center justify-center bg-black/50 backdrop-blur-sm p-0 md:p-4"
       role="dialog"
       aria-modal="true"
       aria-label="Welcome to AskSUSSi"
-      onKeyDown={(e) => {
-        if (e.key === "Escape") handleDismiss();
-      }}
-      onClick={(e) => {
-        if (e.target === e.currentTarget) handleDismiss();
-      }}
     >
       <div
         ref={dialogRef}
-        onTouchStart={handleTouchStart}
-        onTouchMove={handleTouchMove}
-        onTouchEnd={handleTouchEnd}
-        style={{
-          transform: dragY > 0 ? `translateY(${dragY}px)` : undefined,
-          transition: isDragging ? "none" : "transform 0.3s ease-out",
-          opacity: dragY > 80 ? 1 - (dragY - 80) / 120 : 1,
-        }}
-        className="relative w-full sm:max-w-md max-h-[92dvh] bg-background rounded-t-3xl sm:rounded-2xl shadow-2xl border border-border overflow-y-auto animate-hero-fade-in-up"
+        className={`relative w-full md:max-w-md bg-background rounded-t-2xl md:rounded-2xl shadow-2xl border border-border overflow-hidden ${
+          slideOut
+            ? "translate-y-full md:translate-y-0 md:opacity-0 md:scale-95"
+            : "animate-onboarding-slide-up"
+        } transition-all duration-300 ease-out`}
       >
-        {/* Swipe handle — mobile only */}
-        <div className="flex justify-center pt-3 pb-1 sm:hidden sticky top-0 z-20 bg-background">
-          <div className="w-10 h-1 rounded-full bg-muted-foreground/20" />
+        {/* Drag handle (mobile) */}
+        <div className="flex justify-center pt-2 pb-0 md:hidden">
+          <div className="w-10 h-1 rounded-full bg-muted-foreground/25" />
         </div>
 
-        {/* Header with gradient */}
-        <div className="bg-gradient-to-br from-surface-brand to-surface-brand-hover px-6 py-5 text-surface-brand-foreground relative overflow-hidden sticky top-0 sm:top-0 z-10">
-          {/* Subtle radial glow */}
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_20%,rgba(255,255,255,0.08)_0%,transparent_50%)] pointer-events-none" />
+        <div className="bg-surface-brand px-6 py-5 text-surface-brand-foreground">
           <button
             type="button"
             onClick={handleDismiss}
             aria-label="Close welcome dialog"
-            className="absolute top-4 right-4 flex items-center justify-center w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 active:bg-white/30 backdrop-blur-sm transition-colors text-white/80 hover:text-white min-w-[44px] min-h-[44px]"
+            className="absolute top-4 right-4 flex items-center justify-center w-11 h-11 md:w-8 md:h-8 rounded-full bg-white/10 hover:bg-white/20 transition-colors duration-200 text-white/80 hover:text-white active:scale-95"
           >
-            <X size={18} />
+            <X size={16} />
           </button>
-          <div className="flex items-center gap-3 mb-3 relative">
+          <div className="flex items-center gap-3 mb-3">
             <Image
               src="/suss-logo.png"
               alt="SUSS"
@@ -137,41 +106,37 @@ export default function Onboarding() {
               priority
             />
             <div className="h-5 w-px bg-white/25" />
-            <span className="text-sm font-bold tracking-wide opacity-90">AskSUSSi</span>
+            <span className="text-sm font-bold tracking-wider opacity-90">AskSUSSi</span>
           </div>
-          <h2 className="text-xl font-bold relative">Welcome to your campus assistant</h2>
-          <p className="text-sm opacity-80 mt-1.5 leading-relaxed relative">
+          <h2 className="text-lg font-bold">Welcome to your campus assistant</h2>
+          <p className="text-sm opacity-80 mt-1">
             I can help you navigate, find events, and discover what&apos;s around SUSS.
           </p>
         </div>
 
-        {/* Capabilities — single-column scrollable list on mobile, 2-col on wider */}
-        <div className="px-5 py-4">
+        <div className="px-6 py-4">
           <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">
             What I can do
           </p>
-          <div className="flex flex-col gap-2 sm:grid sm:grid-cols-2">
+          <div className="grid grid-cols-2 gap-2">
             {CAPABILITIES.map(({ icon: Icon, label, description }, i) => (
               <div
                 key={label}
-                className="flex items-center gap-3 rounded-xl border border-border/50 bg-muted/30 p-3 animate-hero-fade-in-up"
-                style={{ animationDelay: `${200 + i * 60}ms` }}
+                className="flex items-start gap-2.5 rounded-lg border border-border/60 bg-muted/40 p-2.5 animate-onboarding-stagger-in"
+                style={{ animationDelay: `${100 + i * 50}ms` }}
               >
-                <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
-                  <Icon size={18} className="text-primary" aria-hidden="true" />
-                </div>
-                <div className="min-w-0">
-                  <p className="text-sm font-semibold text-foreground">{label}</p>
-                  <p className="text-xs text-muted-foreground leading-snug">{description}</p>
+                <Icon size={16} className="text-primary mt-0.5 shrink-0" aria-hidden="true" />
+                <div>
+                  <p className="text-sm font-medium text-foreground">{label}</p>
+                  <p className="text-xs text-muted-foreground">{description}</p>
                 </div>
               </div>
             ))}
           </div>
         </div>
 
-        {/* Try suggestions — larger touch targets with staggered entrance */}
-        <div className="px-5 pb-4">
-          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2.5">
+        <div className="px-6 pb-4">
+          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
             Try asking...
           </p>
           <div className="flex flex-wrap gap-2">
@@ -180,8 +145,8 @@ export default function Onboarding() {
                 key={text}
                 type="button"
                 onClick={() => handleTrySuggestion(text)}
-                className="text-sm px-4 py-2.5 rounded-full border border-primary/20 text-primary hover:bg-primary hover:text-primary-foreground active:bg-primary/90 transition-all duration-200 font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring min-h-[44px] animate-hero-fade-in"
-                style={{ animationDelay: `${600 + i * 80}ms` }}
+                className="text-sm px-3.5 min-h-[44px] rounded-full border border-primary/20 text-primary hover:bg-primary hover:text-primary-foreground transition-colors duration-200 font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring active:scale-95 animate-chip-shimmer"
+                style={{ animationDelay: `${400 + i * 80}ms` }}
               >
                 {text}
               </button>
@@ -189,12 +154,11 @@ export default function Onboarding() {
           </div>
         </div>
 
-        {/* CTA */}
-        <div className="px-5 pb-6 pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-1">
+        <div className="px-6 pb-5 pb-safe">
           <button
             type="button"
             onClick={handleDismiss}
-            className="w-full bg-primary text-primary-foreground rounded-xl px-4 py-3.5 text-[0.938rem] font-bold hover:bg-primary/90 active:bg-primary/80 active:scale-[0.98] transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring min-h-[48px] shadow-sm"
+            className="w-full bg-primary text-primary-foreground rounded-full px-4 min-h-[48px] text-sm font-semibold hover:bg-primary/90 transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring active:scale-[0.98]"
           >
             Get Started
           </button>

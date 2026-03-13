@@ -301,18 +301,49 @@ function Map3DInner() {
     };
   }, []);
 
+  // On mobile, after selecting a marker, nudge the camera so the marker
+  // sits in the upper 60% of the viewport (above the bottom sheet peek).
+  const nudgeCameraForMobile = useCallback(
+    (lat: number, lng: number) => {
+      if (typeof window === "undefined" || window.innerWidth >= 768) return;
+      if (!mapRef.current) return;
+      // Offset the center southward so the marker appears above the sheet.
+      // The bottom sheet peek is ~280px; shift center down proportionally.
+      const viewportHeight = window.innerHeight;
+      const sheetPeekPx = 280;
+      // We want the marker at roughly 40% from top → 60% visible area.
+      // Nudge lat south by a fraction of the current camera range.
+      const currentMap = mapRef.current.map3d;
+      const range = typeof currentMap?.range === "number" ? currentMap.range : 800;
+      // Approximate: 1 degree lat ≈ 111km. Range is in meters.
+      const latOffsetDeg = (range / 111000) * (sheetPeekPx / viewportHeight) * 0.5;
+      mapRef.current.flyCameraTo({
+        endCamera: {
+          center: { lat: lat - latOffsetDeg, lng, altitude: 200 },
+          range: Math.min(range, 600),
+          tilt: 55,
+          heading: typeof currentMap?.heading === "number" ? currentMap.heading : 0,
+        },
+        durationMillis: 800,
+      });
+    },
+    [],
+  );
+
   const handleMarkerClick = useCallback(
     (poi: POI) => {
       setSelectedPOI(poi);
+      nudgeCameraForMobile(poi.lat, poi.lng);
     },
-    [setSelectedPOI]
+    [setSelectedPOI, nudgeCameraForMobile]
   );
 
   const handleEventMarkerClick = useCallback(
     (event: CampusEvent) => {
       setSelectedEvent(event);
+      nudgeCameraForMobile(event.lat, event.lng);
     },
-    [setSelectedEvent]
+    [setSelectedEvent, nudgeCameraForMobile]
   );
 
   useEffect(() => {
