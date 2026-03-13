@@ -10,12 +10,12 @@ interface QuickAction {
 }
 
 const QUICK_ACTIONS: QuickAction[] = [
-  { emoji: "🗺️", label: "Campus Map", message: "Show me the campus map" },
-  { emoji: "📅", label: "Events Today", message: "What events are happening today?" },
-  { emoji: "🍔", label: "Where to Eat", message: "Where can I eat near campus?" },
-  { emoji: "📚", label: "Library Hours", message: "What are the library hours?" },
-  { emoji: "🚌", label: "Shuttle Schedule", message: "What is the shuttle bus schedule?" },
-  { emoji: "🏥", label: "Nearest AAC", message: "Where is the nearest AAC (Academic Advisory Centre)?" },
+  { emoji: "\u{1F5FA}\uFE0F", label: "Campus Map", message: "Show me the campus map" },
+  { emoji: "\u{1F4C5}", label: "Events Today", message: "What events are happening today?" },
+  { emoji: "\u{1F354}", label: "Where to Eat", message: "Where can I eat near campus?" },
+  { emoji: "\u{1F4DA}", label: "Library Hours", message: "What are the library hours?" },
+  { emoji: "\u{1F68C}", label: "Shuttle Schedule", message: "What is the shuttle bus schedule?" },
+  { emoji: "\u{1F3E5}", label: "Nearest AAC", message: "Where is the nearest AAC (Academic Advisory Centre)?" },
 ];
 
 interface QuickActionsProps {
@@ -57,38 +57,49 @@ export default function QuickActions({ onSend, disabled }: QuickActionsProps) {
   );
 
   return (
-    <div
-      ref={scrollRef}
-      role="listbox"
-      aria-label="Quick action suggestions"
-      tabIndex={0}
-      onKeyDown={handleKeyDown}
-      className="flex gap-2 overflow-x-auto px-3 py-2 scrollbar-none"
-    >
-      {QUICK_ACTIONS.map((action) => (
-        <button
-          key={action.label}
-          type="button"
-          role="option"
-          aria-selected={false}
-          aria-label={action.label}
-          tabIndex={-1}
-          onClick={() => handleChipClick(action.message)}
-          disabled={disabled}
-          className={cn(
-            "inline-flex items-center gap-1.5 whitespace-nowrap rounded-full",
-            "border border-primary/20 bg-background px-3 py-1.5",
-            "text-sm font-medium text-primary",
-            "hover:bg-primary hover:text-primary-foreground",
-            "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-            "transition-colors shrink-0",
-            "disabled:opacity-50 disabled:pointer-events-none"
-          )}
-        >
-          <span aria-hidden="true">{action.emoji}</span>
-          {action.label}
-        </button>
-      ))}
+    <div className="relative">
+      <div
+        ref={scrollRef}
+        role="listbox"
+        aria-label="Quick action suggestions"
+        tabIndex={0}
+        onKeyDown={handleKeyDown}
+        className={cn(
+          "flex gap-2 overflow-x-auto px-4 py-3 scrollbar-none",
+          "scroll-fade-edges"
+        )}
+      >
+        {QUICK_ACTIONS.map((action, i) => (
+          <button
+            key={action.label}
+            type="button"
+            role="option"
+            aria-selected={false}
+            aria-label={action.label}
+            tabIndex={-1}
+            onClick={() => handleChipClick(action.message)}
+            disabled={disabled}
+            className={cn(
+              "inline-flex items-center gap-2 whitespace-nowrap rounded-full",
+              "bg-secondary/80 backdrop-blur-sm px-4 py-2.5",
+              "text-sm font-medium text-foreground",
+              "border border-border/30",
+              "hover:bg-primary hover:text-primary-foreground hover:border-primary/30",
+              "active:scale-[0.96]",
+              "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+              "transition-all duration-200 shrink-0",
+              "disabled:opacity-40 disabled:pointer-events-none",
+              "min-h-[44px]",
+              "animate-chip-enter",
+              "shadow-[0_1px_2px_oklch(0_0_0/0.04)]"
+            )}
+            style={{ animationDelay: `${i * 50}ms` }}
+          >
+            <span aria-hidden="true" className="text-base">{action.emoji}</span>
+            {action.label}
+          </button>
+        ))}
+      </div>
     </div>
   );
 }

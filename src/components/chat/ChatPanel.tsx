@@ -3,11 +3,12 @@
 import { useChat } from "@ai-sdk/react";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import Image from "next/image";
-import { AlertCircle, RotateCcw } from "lucide-react";
+import { AlertCircle, RotateCcw, ChevronDown } from "lucide-react";
 import type { TextUIPart, DynamicToolUIPart } from "ai";
 import { toast } from "sonner";
 import ChatMessage from "./ChatMessage";
 import ChatInput from "./ChatInput";
+import QuickActions from "./QuickActions";
 import ToolResultCard from "./ToolResultCard";
 import { Button } from "@/components/ui/button";
 import { useAppStore } from "@/store/app-store";
@@ -31,6 +32,20 @@ function extractTextContent(parts: Array<{ type: string; [key: string]: unknown 
     text: textParts.map((p) => p.text).join(""),
     isStreaming: textParts.some((p) => p.state === "streaming"),
   };
+}
+
+function getActiveToolLabel(parts: Array<{ type: string; [key: string]: unknown }>): string | null {
+  for (const p of parts) {
+    if (!isToolPart(p)) continue;
+    const tp = p as DynamicToolUIPart;
+    if (tp.state === "input-streaming" || tp.state === "input-available") {
+      if (tp.toolName === "navigate_to") return "Finding location...";
+      if (tp.toolName === "show_events") return "Searching events...";
+      if (tp.toolName === "campus_info") return "Looking up info...";
+      return "Thinking...";
+    }
+  }
+  return null;
 }
 
 function renderAssistantParts(
@@ -200,14 +215,21 @@ export default function ChatPanel() {
   const isStreaming = status === "streaming";
   const isActive = isStreaming || isWaiting;
 
-  const hasToolInProgress = isActive && messages.some((msg) => {
-    if (msg.role !== "assistant") return false;
-    return (msg.parts ?? []).some((p) => {
-      if (!isToolPart(p)) return false;
-      const state = (p as DynamicToolUIPart).state;
-      return state === "input-streaming" || state === "input-available";
-    });
-  });
+  // Get contextual label for tool-in-progress
+  let thinkingLabel: string | null = null;
+  if (isActive) {
+    for (let i = messages.length - 1; i >= 0; i--) {
+      const msg = messages[i];
+      if (msg.role !== "assistant") continue;
+      const label = getActiveToolLabel(msg.parts ?? []);
+      if (label) {
+        thinkingLabel = label;
+        break;
+      }
+    }
+  }
+
+  const hasToolInProgress = thinkingLabel !== null;
 
   useEffect(() => {
     if (userScrolledUpRef.current) {
@@ -251,6 +273,8 @@ export default function ChatPanel() {
     handleSend(lastFailedInput);
   };
 
+  const isEmpty = messages.length === 0;
+
   return (
     <div className="flex flex-col h-full relative">
       <div
@@ -261,20 +285,20 @@ export default function ChatPanel() {
         onScroll={handleScroll}
         className="flex-1 overflow-y-auto p-4"
       >
-        {messages.length === 0 && (
-          <div className="text-center py-10 px-4">
+        {isEmpty && (
+          <div className="text-center py-10 px-4 animate-chat-fade-in">
             <Image
               src="/suss-logo.png"
               alt="SUSS — Singapore University of Social Sciences"
               width={160}
               height={56}
-              className="mx-auto mb-5 h-16 w-auto"
+              className="mx-auto mb-5 h-16 w-auto animate-welcome-float"
               priority
             />
             <p className="font-bold text-foreground text-lg">
               Welcome to AskSUSSi
             </p>
-            <p className="mt-1.5 text-muted-foreground text-sm">
+            <p className="mt-1.5 text-muted-foreground text-sm leading-relaxed max-w-[280px] mx-auto">
               Your campus intelligent assistant. Ask me about directions, events,
               or campus services.
             </p>
@@ -286,12 +310,13 @@ export default function ChatPanel() {
                 "Where is the library?",
                 "What events are today?",
                 "How to get to the canteen?",
-              ].map((q) => (
+              ].map((q, i) => (
                 <button
                   type="button"
                   key={q}
                   onClick={() => handleSend(q)}
-                  className="text-sm px-4 py-2.5 rounded-full border border-primary/20 text-primary hover:bg-primary hover:text-primary-foreground transition-colors font-medium"
+                  className="text-sm px-4 py-2.5 rounded-full border border-primary/20 text-primary hover:bg-primary hover:text-primary-foreground active:scale-95 transition-all duration-200 font-medium animate-chip-enter"
+                  style={{ animationDelay: `${200 + i * 80}ms` }}
                 >
                   {q}
                 </button>
@@ -305,7 +330,11 @@ export default function ChatPanel() {
             const { text } = extractTextContent(msg.parts ?? []);
             if (!text) return null;
             return (
-              <ChatMessage key={msg.id} role={"user" as const} content={text} />
+              <ChatMessage
+                key={msg.id}
+                role={"user" as const}
+                content={text}
+              />
             );
           }
 
@@ -316,7 +345,7 @@ export default function ChatPanel() {
         })}
 
         {error && (
-          <div className="mx-2 mb-3 p-3 rounded-lg bg-destructive/10 border border-destructive/20 text-sm">
+          <div className="mx-2 mb-3 p-3 rounded-xl bg-destructive/10 border border-destructive/20 text-sm animate-error-shake">
             <div className="flex items-start gap-2">
               <AlertCircle className="w-4 h-4 text-destructive shrink-0 mt-0.5" />
               <div className="flex-1 min-w-0">
@@ -346,27 +375,21 @@ export default function ChatPanel() {
         <div ref={endRef} />
 
         {(isWaiting || hasToolInProgress) && (
-          <div className="flex justify-start mb-3">
-            <div className="bg-secondary rounded-2xl rounded-bl-sm px-4 py-3 text-base">
-              <span className="inline-flex items-center gap-2">
-                <span className="inline-flex gap-1">
-                  <span className="animate-bounce">&middot;</span>
-                  <span
-                    className="animate-bounce"
-                    style={{ animationDelay: "0.1s" }}
-                  >
-                    &middot;
-                  </span>
-                  <span
-                    className="animate-bounce"
-                    style={{ animationDelay: "0.2s" }}
-                  >
-                    &middot;
-                  </span>
+          <div className="flex justify-start mb-3 animate-chat-fade-in">
+            <div className="bg-secondary rounded-2xl rounded-bl-sm px-4 py-3">
+              <span className="inline-flex items-center gap-2.5">
+                <span className="inline-flex gap-1.5">
+                  {[0, 1, 2].map((i) => (
+                    <span
+                      key={i}
+                      className="w-1.5 h-1.5 rounded-full bg-primary animate-thinking-dot"
+                      style={{ animationDelay: `${i * 0.2}s` }}
+                    />
+                  ))}
                 </span>
-                {hasToolInProgress && (
+                {(thinkingLabel || isWaiting) && (
                   <span className="text-xs text-muted-foreground italic">
-                    Thinking...
+                    {thinkingLabel ?? "Thinking..."}
                   </span>
                 )}
               </span>
@@ -379,12 +402,14 @@ export default function ChatPanel() {
         <button
           type="button"
           onClick={scrollToBottom}
-          className="absolute bottom-16 left-1/2 -translate-x-1/2 z-10 bg-primary text-primary-foreground text-xs font-medium px-3 py-1.5 rounded-full shadow-lg hover:bg-primary/90 transition-colors"
+          className="absolute bottom-20 left-1/2 -translate-x-1/2 z-10 bg-primary text-primary-foreground text-xs font-medium px-3.5 py-2 rounded-full shadow-lg hover:bg-primary/90 active:scale-95 transition-all duration-200 animate-scroll-bounce-in inline-flex items-center gap-1"
         >
-          New messages &darr;
+          New messages
+          <ChevronDown className="w-3.5 h-3.5" />
         </button>
       )}
 
+      {isEmpty && <QuickActions onSend={handleSend} disabled={isActive} />}
       <ChatInput onSend={handleSend} isLoading={isActive} />
     </div>
   );

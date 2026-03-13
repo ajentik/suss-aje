@@ -27,11 +27,28 @@ interface CampusInfoOutput {
   venues?: POI[];
 }
 
+function ToolLoadingSkeleton({ label }: { label: string }) {
+  return (
+    <div className="flex items-center gap-3 py-2 animate-chat-fade-in">
+      <span className="inline-flex gap-1.5">
+        {[0, 1, 2].map((i) => (
+          <span
+            key={i}
+            className="w-1.5 h-1.5 rounded-full bg-primary animate-thinking-dot"
+            style={{ animationDelay: `${i * 0.2}s` }}
+          />
+        ))}
+      </span>
+      <span className="text-xs text-muted-foreground italic">{label}</span>
+    </div>
+  );
+}
+
 function LocationCard({ output }: { output: NavigateOutput }) {
   const poi = output.poi;
   if (!poi) {
     return (
-      <Card size="sm" className="bg-destructive/5 ring-destructive/20">
+      <Card size="sm" className="bg-destructive/5 ring-destructive/20 animate-chat-scale-in">
         <CardContent className="flex items-start gap-2.5">
           <MapPin className="w-4 h-4 text-destructive shrink-0 mt-0.5" />
           <p className="text-sm text-destructive">{output.message}</p>
@@ -41,12 +58,12 @@ function LocationCard({ output }: { output: NavigateOutput }) {
   }
 
   return (
-    <Card size="sm" className="bg-surface-brand/5 ring-primary/20">
+    <Card size="sm" className="bg-surface-brand/5 ring-primary/20 animate-chat-scale-in shadow-sm">
       <CardContent className="flex items-start gap-3">
-        <div className="shrink-0 mt-0.5 flex items-center justify-center w-8 h-8 rounded-full bg-primary/10">
-          <MapPin className="w-4 h-4 text-primary" />
+        <div className="shrink-0 mt-0.5 flex items-center justify-center w-9 h-9 rounded-full bg-primary/10">
+          <MapPin className="w-4.5 h-4.5 text-primary" />
         </div>
-        <div className="flex-1 min-w-0 space-y-1">
+        <div className="flex-1 min-w-0 space-y-1.5">
           <div className="flex items-center gap-2">
             <p className="font-semibold text-sm leading-snug">{poi.name}</p>
             <Badge variant="secondary" className="text-[0.625rem]">
@@ -93,7 +110,7 @@ function EventListCard({ output }: { output: ShowEventsOutput }) {
 
   if (events.length === 0) {
     return (
-      <Card size="sm" className="bg-muted/30">
+      <Card size="sm" className="bg-muted/30 animate-chat-scale-in">
         <CardContent className="flex items-start gap-2.5">
           <Calendar className="w-4 h-4 text-muted-foreground shrink-0 mt-0.5" />
           <p className="text-sm text-muted-foreground">{message}</p>
@@ -106,7 +123,7 @@ function EventListCard({ output }: { output: ShowEventsOutput }) {
   const remaining = events.length - displayEvents.length;
 
   return (
-    <Card size="sm" className="bg-card">
+    <Card size="sm" className="bg-card animate-chat-scale-in shadow-sm">
       <CardContent className="space-y-2">
         <div className="flex items-center gap-2">
           <Calendar className="w-4 h-4 text-primary shrink-0" />
@@ -120,7 +137,7 @@ function EventListCard({ output }: { output: ShowEventsOutput }) {
             return (
               <div
                 key={event.id}
-                className="flex flex-col gap-1 rounded-lg border p-2.5 text-sm"
+                className="flex flex-col gap-1 rounded-xl border p-3 text-sm transition-colors active:bg-muted/50"
               >
                 <div className="flex items-start justify-between gap-2">
                   <span className="font-medium text-[0.8125rem] leading-snug">
@@ -171,7 +188,7 @@ function EventListCard({ output }: { output: ShowEventsOutput }) {
 
 function CampusInfoCard({ output }: { output: CampusInfoOutput }) {
   return (
-    <Card size="sm" className="bg-card">
+    <Card size="sm" className="bg-card animate-chat-scale-in shadow-sm">
       <CardContent className="space-y-2">
         <div className="flex items-start gap-2.5">
           <Info className="w-4 h-4 text-primary shrink-0 mt-0.5" />
@@ -184,7 +201,7 @@ function CampusInfoCard({ output }: { output: CampusInfoOutput }) {
             {output.venues.map((venue) => (
               <div
                 key={venue.id}
-                className="flex items-start gap-2 rounded-lg border p-2 text-xs"
+                className="flex items-start gap-2 rounded-xl border p-2.5 text-xs transition-colors active:bg-muted/50"
               >
                 <MapPin className="w-3 h-3 text-primary shrink-0 mt-0.5" />
                 <div className="flex-1 min-w-0">
@@ -227,32 +244,13 @@ interface ToolResultCardProps {
 
 function ToolResultCardInner({ toolName, output, state }: ToolResultCardProps) {
   if (state !== "output-available") {
-    return (
-      <div className="flex items-center gap-2 text-sm text-muted-foreground py-1">
-        <span className="inline-flex gap-1">
-          <span className="animate-bounce text-primary">&middot;</span>
-          <span
-            className="animate-bounce text-primary"
-            style={{ animationDelay: "0.1s" }}
-          >
-            &middot;
-          </span>
-          <span
-            className="animate-bounce text-primary"
-            style={{ animationDelay: "0.2s" }}
-          >
-            &middot;
-          </span>
-        </span>
-        <span className="text-xs italic">
-          {toolName === "navigate_to"
-            ? "Finding location..."
-            : toolName === "show_events"
-              ? "Searching events..."
-              : "Looking up campus info..."}
-        </span>
-      </div>
-    );
+    const label =
+      toolName === "navigate_to"
+        ? "Finding location..."
+        : toolName === "show_events"
+          ? "Searching events..."
+          : "Looking up campus info...";
+    return <ToolLoadingSkeleton label={label} />;
   }
 
   switch (toolName) {
