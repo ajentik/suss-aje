@@ -1,12 +1,14 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import dynamic from "next/dynamic";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAppStore } from "@/store/app-store";
 import ChatPanel from "@/components/chat/ChatPanel";
 import EventsPanel from "@/components/events/EventsPanel";
 import RouteOverlay from "@/components/map/RouteOverlay";
+import AerialViewButton from "@/components/map/AerialViewButton";
 
 const MapView = dynamic(() => import("@/components/map/MapView"), {
   ssr: false,
@@ -16,24 +18,6 @@ const MapView = dynamic(() => import("@/components/map/MapView"), {
     </div>
   ),
 });
-
-function SussLogo() {
-  return (
-    <svg width="100" height="28" viewBox="0 0 100 28" fill="none" xmlns="http://www.w3.org/2000/svg">
-      {/* Geometric diamond mark */}
-      <path d="M4 14L10 4L16 14L10 24Z" fill="currentColor" opacity="0.9" />
-      <path d="M8 14L14 4L20 14L14 24Z" fill="currentColor" opacity="0.5" />
-      {/* SUSS text */}
-      <text x="24" y="20" fontFamily="var(--font-sans), sans-serif" fontSize="16" fontWeight="800" fill="currentColor" letterSpacing="1.5">
-        SUSS
-      </text>
-      {/* Three red dots above U position - Head, Heart, Habit */}
-      <circle cx="52" cy="6" r="1.8" fill="#DA291C" />
-      <circle cx="57" cy="6" r="1.8" fill="#DA291C" />
-      <circle cx="62" cy="6" r="1.8" fill="#DA291C" />
-    </svg>
-  );
-}
 
 export default function AppShell() {
   const activePanel = useAppStore((s) => s.activePanel);
@@ -67,7 +51,14 @@ export default function AppShell() {
         {/* Header - SUSS branded */}
         <div className="flex items-center justify-between px-4 py-2.5 border-b bg-[#003B5C] text-white shrink-0 md:rounded-none rounded-t-2xl">
           <div className="flex items-center gap-2.5">
-            <SussLogo />
+            <Image
+              src="/suss-logo.png"
+              alt="SUSS"
+              width={80}
+              height={28}
+              className="h-7 w-auto brightness-0 invert"
+              priority
+            />
             <div className="h-5 w-px bg-white/25" />
             <span className="text-xs font-semibold tracking-wide opacity-90">AJE</span>
           </div>
@@ -116,6 +107,7 @@ export default function AppShell() {
       <div className="flex-1 h-full relative">
         <MapView />
         <RouteOverlay />
+        <AerialViewButton />
       </div>
     </div>
   );

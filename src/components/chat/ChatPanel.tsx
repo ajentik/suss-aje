@@ -2,6 +2,7 @@
 
 import { useChat } from "@ai-sdk/react";
 import { useEffect, useRef } from "react";
+import Image from "next/image";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import ChatMessage from "./ChatMessage";
 import ChatInput from "./ChatInput";
@@ -99,16 +100,14 @@ export default function ChatPanel() {
       <ScrollArea className="flex-1 p-4" ref={scrollRef}>
         {messages.length === 0 && (
           <div className="text-center text-sm py-8 px-4">
-            <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-[#003B5C] mb-3">
-              <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M12 6V2H8" />
-                <path d="m8 18-4 4V8a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2Z" />
-                <path d="M2 12h2" />
-                <path d="M9 11v2" />
-                <path d="M15 11v2" />
-                <path d="M20 12h2" />
-              </svg>
-            </div>
+            <Image
+              src="/suss-logo.png"
+              alt="SUSS — Singapore University of Social Sciences"
+              width={160}
+              height={56}
+              className="mx-auto mb-4 h-14 w-auto"
+              priority
+            />
             <p className="font-semibold text-foreground">Welcome to SUSS AJE</p>
             <p className="mt-1 text-muted-foreground">Your campus intelligent assistant. Ask me about directions, events, or campus services.</p>
             <div className="mt-5 flex flex-wrap justify-center gap-2">
