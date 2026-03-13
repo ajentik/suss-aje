@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useCallback } from "react";
 import {
   MapPin,
   Clock,
@@ -14,6 +15,8 @@ import {
   ShoppingBag,
   ShoppingCart,
   Footprints,
+  ChevronDown,
+  ChevronUp,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -50,15 +53,24 @@ function renderPriceLevel(level: PriceLevel): string {
 export default function VenueCard({ venue }: VenueCardProps) {
   const setFlyToTarget = useAppStore((s) => s.setFlyToTarget);
   const setSelectedPOI = useAppStore((s) => s.setSelectedPOI);
+  const [isExpanded, setIsExpanded] = useState(false);
 
   const CategoryIcon = categoryIconMap[venue.category] ?? MapPin;
   const iconColors =
     categoryColorMap[venue.category] ?? "bg-muted text-muted-foreground";
 
-  function handleCardClick() {
-    setFlyToTarget({ lat: venue.lat, lng: venue.lng });
-    setSelectedPOI(venue);
-  }
+  const toggleExpand = useCallback(() => {
+    setIsExpanded((prev) => !prev);
+  }, []);
+
+  const handleShowOnMap = useCallback(
+    (e: React.MouseEvent) => {
+      e.stopPropagation();
+      setFlyToTarget({ lat: venue.lat, lng: venue.lng });
+      setSelectedPOI(venue);
+    },
+    [venue, setFlyToTarget, setSelectedPOI],
+  );
 
   function handleNavigate(e: React.MouseEvent) {
     e.stopPropagation();
@@ -81,12 +93,15 @@ export default function VenueCard({ venue }: VenueCardProps) {
   }
 
   return (
-    <button
-      type="button"
-      onClick={handleCardClick}
-      className="group w-full text-left rounded-xl border border-border bg-card p-3.5 transition-all duration-150 hover:shadow-md hover:border-primary/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-    >
-      <div className="flex gap-3">
+    <div className="w-full rounded-xl border border-border bg-card transition-all duration-150 hover:shadow-md hover:border-primary/30 overflow-hidden">
+      {/* Collapsed header — always visible */}
+      <button
+        type="button"
+        onClick={toggleExpand}
+        className="group w-full text-left flex items-center gap-3 p-3.5 min-h-[56px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset"
+        aria-expanded={isExpanded}
+        aria-label={`${venue.name} — tap to ${isExpanded ? "collapse" : "expand"}`}
+      >
         <div
           className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ${iconColors}`}
         >
@@ -136,62 +151,99 @@ export default function VenueCard({ venue }: VenueCardProps) {
               </span>
             )}
           </div>
+        </div>
 
-          {venue.hours && (
-            <div className="mt-1 flex items-center gap-1 text-xs text-muted-foreground">
-              <Clock size={11} className="shrink-0" aria-hidden="true" />
-              <span className="truncate">{venue.hours}</span>
-            </div>
-          )}
+        <div className="flex items-center justify-center w-7 h-7 rounded-full text-muted-foreground shrink-0">
+          {isExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+        </div>
+      </button>
 
-          {venue.tags && venue.tags.length > 0 && (
-            <div className="mt-1.5 flex flex-wrap gap-1">
-              {venue.tags.map((tag) => (
-                <Badge
-                  key={tag}
-                  variant="secondary"
-                  className="px-1.5 py-0 text-[0.625rem] leading-4"
+      {/* Expandable details */}
+      <div
+        className={`grid transition-[grid-template-rows] duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] ${
+          isExpanded ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
+        }`}
+      >
+        <div className="overflow-hidden">
+          <div className="px-3.5 pb-3.5 pt-0">
+            {venue.description && (
+              <p className="text-[0.8125rem] text-muted-foreground mb-2.5 line-clamp-3 leading-relaxed">
+                {venue.description}
+              </p>
+            )}
+
+            {venue.hours && (
+              <div className="flex items-center gap-1.5 text-xs text-muted-foreground mb-2">
+                <Clock size={12} className="shrink-0" aria-hidden="true" />
+                <span className="truncate">{venue.hours}</span>
+              </div>
+            )}
+
+            {venue.address && (
+              <div className="flex items-center gap-1.5 text-xs text-muted-foreground mb-2">
+                <MapPin size={12} className="shrink-0" aria-hidden="true" />
+                <span className="truncate">{venue.address}</span>
+              </div>
+            )}
+
+            {venue.tags && venue.tags.length > 0 && (
+              <div className="flex flex-wrap gap-1 mb-3">
+                {venue.tags.map((tag) => (
+                  <Badge
+                    key={tag}
+                    variant="secondary"
+                    className="px-1.5 py-0 text-[0.625rem] leading-4"
+                  >
+                    {tag}
+                  </Badge>
+                ))}
+              </div>
+            )}
+
+            <div className="flex items-center gap-1.5 pt-2.5 border-t border-border">
+              <button
+                type="button"
+                onClick={handleShowOnMap}
+                className="inline-flex items-center gap-1.5 rounded-lg bg-surface-brand px-3.5 py-2 min-h-[44px] text-xs font-semibold text-surface-brand-foreground transition-colors hover:bg-surface-brand-hover active:scale-[0.97] flex-1 justify-center"
+              >
+                <MapPin size={14} aria-hidden="true" />
+                Show on map
+              </button>
+
+              <button
+                type="button"
+                onClick={handleNavigate}
+                className="inline-flex items-center gap-1 rounded-lg border border-border px-3 py-2 min-h-[44px] text-xs font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground active:scale-[0.97]"
+              >
+                <Navigation size={12} aria-hidden="true" />
+                Navigate
+              </button>
+
+              {venue.contact && (
+                <button
+                  type="button"
+                  onClick={handleCall}
+                  className="inline-flex items-center justify-center rounded-lg border border-border w-[44px] h-[44px] text-muted-foreground transition-colors hover:bg-muted hover:text-foreground active:scale-[0.97]"
+                  aria-label="Call"
                 >
-                  {tag}
-                </Badge>
-              ))}
+                  <Phone size={14} aria-hidden="true" />
+                </button>
+              )}
+
+              {venue.website && (
+                <button
+                  type="button"
+                  onClick={handleWebsite}
+                  className="inline-flex items-center justify-center rounded-lg border border-border w-[44px] h-[44px] text-muted-foreground transition-colors hover:bg-muted hover:text-foreground active:scale-[0.97]"
+                  aria-label="Website"
+                >
+                  <ExternalLink size={14} aria-hidden="true" />
+                </button>
+              )}
             </div>
-          )}
-
-          <div className="mt-2.5 flex items-center gap-1.5">
-            <button
-              type="button"
-              onClick={handleNavigate}
-              className="inline-flex items-center gap-1 rounded-lg bg-surface-brand px-3 py-1.5 min-h-[36px] text-xs font-medium text-surface-brand-foreground transition-colors hover:bg-surface-brand-hover active:scale-[0.97]"
-            >
-              <Navigation size={12} aria-hidden="true" />
-              Navigate
-            </button>
-
-            {venue.contact && (
-              <button
-                type="button"
-                onClick={handleCall}
-                className="inline-flex items-center gap-1 rounded-lg border border-border px-2.5 py-1.5 min-h-[36px] text-xs font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground active:scale-[0.97]"
-              >
-                <Phone size={12} aria-hidden="true" />
-                Call
-              </button>
-            )}
-
-            {venue.website && (
-              <button
-                type="button"
-                onClick={handleWebsite}
-                className="inline-flex items-center gap-1 rounded-lg border border-border px-2.5 py-1.5 min-h-[36px] text-xs font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground active:scale-[0.97]"
-              >
-                <ExternalLink size={12} aria-hidden="true" />
-                Web
-              </button>
-            )}
           </div>
         </div>
       </div>
-    </button>
+    </div>
   );
 }
