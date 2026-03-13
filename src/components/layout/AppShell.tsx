@@ -64,7 +64,7 @@ export default function AppShell() {
               priority
             />
             <div className="h-5 w-px bg-white/25" />
-            <span className="text-xs font-semibold tracking-wide opacity-90">AJE</span>
+            <span className="text-xs font-semibold tracking-wide opacity-90">AskSUSSi</span>
           </div>
           <button
             type="button"

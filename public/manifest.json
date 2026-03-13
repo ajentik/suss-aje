@@ -1,7 +1,7 @@
 {
-  "name": "AskSUSSi — Campus Intelligent Assistant",
+  "name": "AskSUSSi — Your Smart Campus Companion",
   "short_name": "AskSUSSi",
-  "description": "AI-powered campus intelligent assistant for SUSS",
+  "description": "Resolve campus affairs with one sentence. Navigate, discover events, and explore SUSS in 3D.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
