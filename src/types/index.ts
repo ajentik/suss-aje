@@ -39,3 +39,5 @@ export interface ChatMessage {
   role: "user" | "assistant";
   content: string;
 }
+
+export type DateRangePreset = "all" | "1d" | "3d" | "7d";
