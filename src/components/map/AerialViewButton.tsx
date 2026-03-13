@@ -49,15 +49,21 @@ export default function AerialViewButton() {
 
   return (
     <>
+      {/* Desktop: top-right with label. Mobile: FAB above sheet */}
       <button
         type="button"
         aria-label="Aerial flyover"
         onClick={handleClick}
         disabled={loading}
-        className="absolute top-[max(1rem,env(safe-area-inset-top,1rem))] right-3 z-10 flex items-center gap-2 px-3.5 min-h-[44px] bg-card/80 backdrop-blur-lg border border-border/50 rounded-xl shadow-lg text-xs font-medium text-card-foreground hover:bg-card/95 active:scale-95 transition-all disabled:opacity-50 animate-in fade-in duration-300"
+        className="absolute z-10 flex items-center justify-center gap-2 bg-card/80 backdrop-blur-xl border border-border/30 shadow-lg text-card-foreground hover:bg-card/95 active:scale-95 transition-all duration-200 disabled:opacity-50 animate-control-fade-in md:top-[max(1rem,env(safe-area-inset-top,1rem))] md:right-3 md:px-3.5 md:min-h-[44px] md:rounded-xl md:text-xs md:font-medium right-3 w-11 h-11 rounded-full"
+        style={{
+          bottom: "calc(var(--sheet-height, 64px) + 16px)",
+        }}
       >
         <Plane size={18} aria-hidden="true" />
-        {loading ? "Loading…" : "Aerial View"}
+        <span className="hidden md:inline">
+          {loading ? "Loading\u2026" : "Aerial View"}
+        </span>
       </button>
 
       {/* Aerial video overlay */}
@@ -86,7 +92,7 @@ export default function AerialViewButton() {
                 type="button"
                 aria-label="Close aerial view"
                 onClick={() => setShowVideo(false)}
-                className="absolute top-3 right-3 flex items-center justify-center w-11 h-11 bg-white/20 hover:bg-white/30 active:scale-95 rounded-full text-white transition-all"
+                className="absolute top-3 right-3 flex items-center justify-center w-11 h-11 bg-white/20 hover:bg-white/30 active:scale-95 rounded-full text-white transition-all duration-200"
                 style={{ marginTop: "env(safe-area-inset-top, 0px)" }}
               >
                 <X size={20} />

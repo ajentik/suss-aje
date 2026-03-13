@@ -188,6 +188,37 @@ function getEventPinStyle(
   };
 }
 
+function StreetViewHint() {
+  const [show, setShow] = useState(() => {
+    if (typeof window !== "undefined") {
+      return !sessionStorage.getItem("sv-hint-shown");
+    }
+    return true;
+  });
+
+  useEffect(() => {
+    if (!show) return;
+    sessionStorage.setItem("sv-hint-shown", "1");
+    const timer = setTimeout(() => setShow(false), 5000);
+    return () => clearTimeout(timer);
+  }, [show]);
+
+  if (!show) return null;
+
+  return (
+    <output
+      aria-label="Street View hint"
+      className="absolute right-3 z-10 text-xs text-white/90 bg-card/80 backdrop-blur-xl border border-border/30 px-3.5 py-2 rounded-2xl pointer-events-none animate-control-fade-in md:bottom-3"
+      style={{
+        bottom: `calc(var(--sheet-height, 64px) + 16px)`,
+        transition: "bottom 300ms cubic-bezier(0.32, 0.72, 0, 1), opacity 500ms ease",
+      }}
+    >
+      Double-click to enter Street View
+    </output>
+  );
+}
+
 function Map3DInner() {
   const defaultCamera = {
     center: {
@@ -403,9 +434,7 @@ function Map3DInner() {
             {routeInfo && routeInfo.polyline.length > 0 && <RoutePolyline />}
           </Map3D>
 
-          <output aria-label="Street View hint" className="absolute bottom-36 md:bottom-3 right-3 z-10 text-xs text-white/90 bg-black/50 backdrop-blur-lg border border-white/10 px-3 py-1.5 rounded-xl pointer-events-none animate-in fade-in duration-500">
-            Double-click to enter Street View
-          </output>
+          <StreetViewHint />
         </>
       )}
     </div>

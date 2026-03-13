@@ -2,59 +2,17 @@
 
 import { useEffect, useRef, useState, useCallback } from "react";
 import Image from "next/image";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Navigation, Globe, MessageCircle, CalendarDays } from "lucide-react";
 import { lookupAerialVideo } from "@/lib/maps/aerial-view";
 
 const SUSS_ADDRESS =
   "Singapore University of Social Sciences, 463 Clementi Road, Singapore 599494";
 
 const FEATURES = [
-  {
-    icon: (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
-        <title>3D Map</title>
-        <path d="m3 11 19-9-9 19-2-8Z" />
-        <path d="M11 13 3 11" />
-      </svg>
-    ),
-    label: "3D Campus Map",
-    desc: "Explore SUSS in photorealistic 3D",
-  },
-  {
-    icon: (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
-        <title>Street View</title>
-        <circle cx="12" cy="12" r="10" />
-        <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20" />
-        <path d="M2 12h20" />
-      </svg>
-    ),
-    label: "Street View",
-    desc: "Walk through campus & indoor spaces",
-  },
-  {
-    icon: (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
-        <title>AI Chat</title>
-        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-      </svg>
-    ),
-    label: "AI Chat & Voice",
-    desc: "Ask SUSSi anything about campus",
-  },
-  {
-    icon: (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
-        <title>Events</title>
-        <rect width="18" height="18" x="3" y="4" rx="2" ry="2" />
-        <line x1="16" x2="16" y1="2" y2="6" />
-        <line x1="8" x2="8" y1="2" y2="6" />
-        <line x1="3" x2="21" y1="10" y2="10" />
-      </svg>
-    ),
-    label: "Events & Navigation",
-    desc: "Discover events, navigate to venues",
-  },
+  { icon: Navigation, label: "3D Campus Map", desc: "Explore SUSS in photorealistic 3D" },
+  { icon: Globe, label: "Street View", desc: "Walk through campus & indoor spaces" },
+  { icon: MessageCircle, label: "AI Chat & Voice", desc: "Ask SUSSi anything about campus" },
+  { icon: CalendarDays, label: "Events & Navigation", desc: "Discover events, navigate to venues" },
 ];
 
 interface HeroIntroProps {
@@ -129,16 +87,16 @@ export default function HeroIntro({ onEnter }: HeroIntroProps) {
         fadeOut ? "opacity-0 pointer-events-none" : "opacity-100"
       }`}
     >
-      {/* Gradient fallback */}
+      {/* Animated gradient fallback */}
       <div
-        className={`absolute inset-0 bg-primary transition-opacity duration-[2000ms] pointer-events-none ${
+        className={`absolute inset-0 bg-gradient-to-br from-primary via-primary/90 to-surface-brand animate-gradient-shift transition-opacity duration-[2000ms] pointer-events-none ${
           videoReady ? "opacity-0" : "opacity-100"
         }`}
       />
 
       {/* Radial glow accents */}
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_60%_40%,rgba(99,102,241,0.15)_0%,transparent_70%)] pointer-events-none" />
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_20%_80%,rgba(20,184,166,0.1)_0%,transparent_60%)] pointer-events-none" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_60%_40%,oklch(0.55_0.15_250_/_0.2)_0%,transparent_70%)] pointer-events-none" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_20%_80%,oklch(0.55_0.12_170_/_0.12)_0%,transparent_60%)] pointer-events-none" />
 
       {/* Loading progress */}
       {!videoFailed && !videoReady && (
@@ -176,8 +134,13 @@ export default function HeroIntro({ onEnter }: HeroIntroProps) {
 
       {/* Content */}
       <div className="relative z-10 text-center px-6 max-w-2xl">
-        {/* SUSS Logo */}
-        <div className="mb-4 animate-hero-fade-in-up [animation-delay:300ms]">
+        {/* SUSS Logo — spring scale-in */}
+        <div
+          className="mb-4 opacity-0"
+          style={{
+            animation: "hero-fade-in-up 0.9s cubic-bezier(0.34, 1.56, 0.64, 1) 300ms forwards",
+          }}
+        >
           <Image
             src="/suss-logo.png"
             alt="SUSS — Singapore University of Social Sciences"
@@ -193,8 +156,13 @@ export default function HeroIntro({ onEnter }: HeroIntroProps) {
           <div className="h-px bg-white/40 animate-hero-line-expand [animation-delay:600ms]" />
         </div>
 
-        {/* Brand name */}
-        <h1 className="text-5xl md:text-7xl font-bold text-white mb-2 tracking-tight drop-shadow-lg animate-hero-fade-in-up [animation-delay:600ms]">
+        {/* Brand name — gradient text */}
+        <h1
+          className="text-5xl md:text-7xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-white via-white/95 to-white/80 mb-2 tracking-wider drop-shadow-lg opacity-0"
+          style={{
+            animation: "hero-fade-in-up 0.9s cubic-bezier(0.34, 1.56, 0.64, 1) 600ms forwards",
+          }}
+        >
           AskSUSSi
         </h1>
 
@@ -212,21 +180,24 @@ export default function HeroIntro({ onEnter }: HeroIntroProps) {
               className="group flex items-center gap-2 bg-white/10 border border-white/20 backdrop-blur-sm rounded-full px-4 py-2 text-white/85 text-xs md:text-sm hover:bg-white/15 transition-colors cursor-default"
               title={f.desc}
             >
-              <span className="text-white/70 group-hover:text-white transition-colors">
-                {f.icon}
-              </span>
+              <f.icon size={16} className="text-white/70 group-hover:text-white transition-colors" aria-hidden="true" />
               <span>{f.label}</span>
             </div>
           ))}
         </div>
 
-        {/* CTA */}
-        <div className="animate-hero-fade-in-up [animation-delay:1100ms]">
+        {/* CTA — 56px, pill, subtle glow */}
+        <div
+          className="opacity-0"
+          style={{
+            animation: "hero-fade-in-up 0.9s cubic-bezier(0.34, 1.56, 0.64, 1) 1100ms forwards",
+          }}
+        >
           <button
             type="button"
             aria-label="Enter AskSUSSi campus assistant"
             onClick={handleEnter}
-            className="inline-flex items-center gap-2.5 px-10 py-3.5 bg-white text-primary rounded-full font-semibold text-base shadow-lg shadow-white/20 hover:bg-white/95 hover:shadow-xl hover:shadow-white/30 transition-all duration-300 hover:scale-105 active:scale-95"
+            className="inline-flex items-center gap-2.5 px-10 h-14 bg-white text-primary rounded-full font-semibold text-base shadow-lg hover:bg-white/95 hover:shadow-xl transition-all duration-300 hover:scale-105 active:scale-95 animate-subtle-glow"
           >
             <ArrowRight size={20} aria-hidden="true" />
             Explore Campus

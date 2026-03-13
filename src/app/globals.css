@@ -468,3 +468,100 @@
 @utility pb-safe {
   padding-bottom: env(safe-area-inset-bottom, 0px);
 }
+
+/* ── Dynamic Map Control Positioning ── */
+
+:root {
+  --sheet-height: 64px;
+}
+
+@keyframes control-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes control-slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes gradient-shift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes onboarding-slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes onboarding-stagger-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes chip-shimmer {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+@keyframes subtle-glow {
+  0%, 100% { box-shadow: 0 0 20px 0 oklch(0.99 0 0 / 0.15); }
+  50% { box-shadow: 0 0 30px 4px oklch(0.99 0 0 / 0.25); }
+}
+
+@utility animate-control-fade-in {
+  animation: control-fade-in 0.3s cubic-bezier(0.32, 0.72, 0, 1) both;
+}
+
+@utility animate-control-slide-up {
+  animation: control-slide-up 0.4s cubic-bezier(0.32, 0.72, 0, 1) both;
+}
+
+@utility animate-gradient-shift {
+  background-size: 200% 200%;
+  animation: gradient-shift 8s ease-in-out infinite;
+}
+
+@utility animate-onboarding-slide-up {
+  animation: onboarding-slide-up 0.4s cubic-bezier(0.32, 0.72, 0, 1) both;
+}
+
+@utility animate-onboarding-stagger-in {
+  animation: onboarding-stagger-in 0.35s cubic-bezier(0.32, 0.72, 0, 1) both;
+}
+
+@utility animate-chip-shimmer {
+  background: linear-gradient(90deg, transparent 0%, oklch(0.99 0 0 / 0.06) 50%, transparent 100%);
+  background-size: 200% 100%;
+  animation: chip-shimmer 2s ease-in-out 1;
+}
+
+@utility animate-subtle-glow {
+  animation: subtle-glow 3s ease-in-out infinite;
+}
