@@ -84,11 +84,11 @@ export default function VenueCard({ venue }: VenueCardProps) {
     <button
       type="button"
       onClick={handleCardClick}
-      className="group w-full text-left rounded-xl border border-border bg-card p-3.5 transition-all duration-150 hover:shadow-md hover:border-primary/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+      className="group w-full text-left rounded-xl border border-border bg-card p-3.5 transition-all duration-200 hover:shadow-md hover:border-primary/30 active:scale-[0.99] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
     >
       <div className="flex gap-3">
         <div
-          className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ${iconColors}`}
+          className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-lg ${iconColors}`}
         >
           <CategoryIcon size={20} aria-hidden="true" />
         </div>
@@ -110,7 +110,7 @@ export default function VenueCard({ venue }: VenueCardProps) {
                 </span>
               )}
               {venue.priceLevel != null && (
-                <span className="text-xs font-medium text-green-700 dark:text-green-400">
+                <span className="text-xs font-medium text-muted-foreground">
                   <DollarSign
                     size={10}
                     className="inline -mt-px"
@@ -162,9 +162,9 @@ export default function VenueCard({ venue }: VenueCardProps) {
             <button
               type="button"
               onClick={handleNavigate}
-              className="inline-flex items-center gap-1 rounded-lg bg-surface-brand px-3 py-1.5 min-h-[36px] text-xs font-medium text-surface-brand-foreground transition-colors hover:bg-surface-brand-hover active:scale-[0.97]"
+              className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-3 min-h-[44px] py-1.5 text-xs font-semibold text-primary-foreground transition-all hover:bg-primary/90 active:bg-primary/80 active:scale-[0.97]"
             >
-              <Navigation size={12} aria-hidden="true" />
+              <Navigation size={13} aria-hidden="true" />
               Navigate
             </button>
 
@@ -172,9 +172,9 @@ export default function VenueCard({ venue }: VenueCardProps) {
               <button
                 type="button"
                 onClick={handleCall}
-                className="inline-flex items-center gap-1 rounded-lg border border-border px-2.5 py-1.5 min-h-[36px] text-xs font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground active:scale-[0.97]"
+                className="inline-flex items-center gap-1 rounded-lg border border-border px-2.5 min-h-[44px] py-1.5 text-xs font-medium text-muted-foreground transition-all hover:bg-muted hover:text-foreground active:bg-muted/80 active:scale-[0.97]"
               >
-                <Phone size={12} aria-hidden="true" />
+                <Phone size={13} aria-hidden="true" />
                 Call
               </button>
             )}
@@ -183,9 +183,9 @@ export default function VenueCard({ venue }: VenueCardProps) {
               <button
                 type="button"
                 onClick={handleWebsite}
-                className="inline-flex items-center gap-1 rounded-lg border border-border px-2.5 py-1.5 min-h-[36px] text-xs font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground active:scale-[0.97]"
+                className="inline-flex items-center gap-1 rounded-lg border border-border px-2.5 min-h-[44px] py-1.5 text-xs font-medium text-muted-foreground transition-all hover:bg-muted hover:text-foreground active:bg-muted/80 active:scale-[0.97]"
               >
-                <ExternalLink size={12} aria-hidden="true" />
+                <ExternalLink size={13} aria-hidden="true" />
                 Web
               </button>
             )}

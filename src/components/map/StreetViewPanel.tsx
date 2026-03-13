@@ -14,11 +14,11 @@ function EventInfoOverlay({ event }: { event: CampusEvent }) {
   const [isExpanded, setIsExpanded] = useState(false);
 
   return (
-    <div className="absolute bottom-4 left-4 z-10 max-w-sm bg-card/95 backdrop-blur rounded-2xl shadow-xl border border-border overflow-hidden">
-      <div className={`p-3 ${isExpanded && event.longDescription ? "max-h-[60vh] overflow-y-auto" : ""}`}>
-        <h3 className="text-sm font-bold text-foreground">{event.title}</h3>
+    <div className="absolute bottom-4 left-4 right-4 sm:right-auto z-10 max-w-sm bg-card/95 backdrop-blur-lg rounded-2xl shadow-xl border border-border/60 overflow-hidden ring-1 ring-border/40">
+      <div className={`p-4 ${isExpanded && event.longDescription ? "max-h-[60vh] overflow-y-auto" : ""}`}>
+        <h3 className="text-sm font-bold text-card-foreground">{event.title}</h3>
 
-        <div className="mt-1">
+        <div className="mt-1.5">
           <p className="text-xs text-muted-foreground">
             {event.date}{event.endDate ? ` – ${event.endDate}` : ""} • {event.time}
           </p>
@@ -32,26 +32,26 @@ function EventInfoOverlay({ event }: { event: CampusEvent }) {
           )}
         </div>
 
-        <p className="text-xs text-muted-foreground mt-1">
+        <p className="text-xs text-muted-foreground mt-1.5">
           {event.description}
         </p>
 
         {event.longDescription && (
-          <div className="mt-1.5">
+          <div className="mt-2">
             <div className={`text-xs text-muted-foreground whitespace-pre-line ${isExpanded ? "" : "line-clamp-3"}`}>
               {event.longDescription}
             </div>
             <button
               type="button"
               onClick={() => setIsExpanded(!isExpanded)}
-              className="text-primary hover:underline mt-1 font-medium text-[11px]"
+              className="text-primary hover:underline mt-1.5 font-medium text-[11px] min-h-[44px] inline-flex items-center"
             >
               {isExpanded ? "Show less" : "Show more"}
             </button>
           </div>
         )}
 
-        <div className="flex flex-wrap gap-1.5 mt-2">
+        <div className="flex flex-wrap gap-1.5 mt-2.5">
           <span className="text-[10px] px-1.5 py-0.5 rounded-full font-medium bg-secondary text-secondary-foreground">
             {event.type}
           </span>
@@ -68,7 +68,7 @@ function EventInfoOverlay({ event }: { event: CampusEvent }) {
             href={event.url}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-block mt-2 text-xs text-primary hover:underline"
+            className="inline-flex items-center mt-2.5 text-xs text-primary hover:underline min-h-[44px] font-medium"
           >
             Event Details →
           </a>
@@ -109,7 +109,7 @@ export default function StreetViewPanel({
       <button
         type="button"
         onClick={onClose}
-        className="absolute top-4 left-4 z-10 flex items-center gap-2 px-4 py-2.5 min-h-[44px] bg-card/95 backdrop-blur rounded-xl shadow-xl border border-border text-sm font-medium text-card-foreground hover:bg-card transition-colors"
+        className="absolute top-4 left-4 z-10 flex items-center gap-2 px-4 min-h-[44px] py-2.5 bg-card/95 backdrop-blur-lg rounded-xl shadow-lg border border-border/60 text-sm font-medium text-card-foreground hover:bg-card active:bg-muted transition-colors ring-1 ring-border/40"
       >
         <ArrowLeft size={16} aria-hidden="true" />
         Back to 3D Map

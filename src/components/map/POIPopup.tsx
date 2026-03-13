@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useState, useMemo, useRef } from "react";
-import { X, MapPin, Clock, Star, Navigation, Calendar } from "lucide-react";
+import { X, MapPin, Clock, Star, Navigation, Calendar, ChevronRight } from "lucide-react";
 import { useAppStore } from "@/store/app-store";
 import type { POI } from "@/types";
 import campusEvents from "@/../public/campus-events.json";
@@ -113,36 +113,39 @@ export default function POIPopup() {
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
     >
-      <div className="bg-card rounded-2xl shadow-xl max-w-md w-[calc(100vw-1.5rem)] sm:w-[380px] p-5 relative border border-border">
+      <div className="bg-card rounded-2xl shadow-xl max-w-md w-[calc(100vw-1.5rem)] sm:w-[380px] p-5 relative border border-border/60 ring-1 ring-border/40">
+        {/* Swipe-down dismiss hint */}
+        <div className="absolute top-2 left-1/2 -translate-x-1/2 w-8 h-1 rounded-full bg-muted-foreground/20 sm:hidden" />
+
         <button
           type="button"
           onClick={handleClose}
-          className="absolute top-3 right-3 flex items-center justify-center w-9 h-9 rounded-full bg-muted hover:bg-muted/80 text-muted-foreground hover:text-foreground transition-colors"
+          className="absolute top-3 right-3 flex items-center justify-center w-11 h-11 -m-1 rounded-full text-muted-foreground hover:text-foreground hover:bg-muted active:bg-muted/80 transition-colors"
           aria-label="Close popup"
         >
           <X size={18} aria-hidden="true" />
         </button>
 
-        <div className="mb-2">
+        <div className="mb-2.5 mt-1">
           <span className="inline-block bg-secondary text-secondary-foreground text-sm font-semibold px-3 py-1 rounded-full">
             {displayPOI.category}
           </span>
         </div>
 
-        <h3 className="text-xl font-bold text-card-foreground mb-1.5 pr-10">
+        <h3 className="text-xl font-bold text-card-foreground mb-1.5 pr-8 leading-tight">
           {displayPOI.name}
         </h3>
 
-        <p className="text-[0.9375rem] text-muted-foreground mb-3 line-clamp-2 leading-relaxed">
+        <p className="text-[0.9375rem] text-muted-foreground mb-3.5 line-clamp-2 leading-relaxed">
           {displayPOI.description}
         </p>
 
-        <div className="space-y-2 mb-4 text-[0.9375rem] text-muted-foreground">
+        <div className="space-y-2.5 mb-4 text-[0.9375rem] text-muted-foreground">
           {displayPOI.address && (
-            <div className="flex items-start gap-2">
+            <div className="flex items-start gap-2.5">
               <MapPin
                 size={16}
-                className="mt-0.5 shrink-0"
+                className="mt-0.5 shrink-0 text-muted-foreground/70"
                 aria-hidden="true"
               />
               <span className="line-clamp-1">{displayPOI.address}</span>
@@ -150,10 +153,10 @@ export default function POIPopup() {
           )}
 
           {displayPOI.hours && (
-            <div className="flex items-start gap-2">
+            <div className="flex items-start gap-2.5">
               <Clock
                 size={16}
-                className="mt-0.5 shrink-0"
+                className="mt-0.5 shrink-0 text-muted-foreground/70"
                 aria-hidden="true"
               />
               <span className="line-clamp-1">{displayPOI.hours}</span>
@@ -161,7 +164,7 @@ export default function POIPopup() {
           )}
 
           {displayPOI.rating && (
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2.5">
               <Star
                 size={16}
                 className="text-yellow-500 fill-yellow-500 shrink-0"
@@ -173,25 +176,26 @@ export default function POIPopup() {
         </div>
 
         {nearbyEvents.length > 0 && (
-          <div className="mb-3 border-t border-border pt-3">
-            <p className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-2 flex items-center gap-1.5">
-              <Calendar size={14} aria-hidden="true" />
+          <div className="mb-4 border-t border-border/60 pt-3.5">
+            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2.5 flex items-center gap-1.5">
+              <Calendar size={13} aria-hidden="true" />
               Upcoming Events Nearby
             </p>
-            <div className="space-y-1.5">
+            <div className="space-y-2">
               {nearbyEvents.map((evt) => (
                 <button
                   key={evt.id}
                   type="button"
                   onClick={() => handleEventClick(evt)}
-                  className="w-full text-left flex items-center gap-2.5 bg-secondary/50 border border-secondary rounded-lg px-3.5 py-2.5 min-h-[44px] hover:bg-secondary/80 active:bg-secondary transition-colors"
+                  className="w-full text-left flex items-center gap-3 bg-secondary/50 border border-border/40 rounded-xl px-3.5 min-h-[48px] py-2.5 hover:bg-secondary active:bg-secondary/80 transition-colors group"
                 >
-                  <span className="text-primary text-sm font-medium shrink-0">
+                  <span className="text-primary text-sm font-semibold shrink-0 tabular-nums">
                     {evt.date}
                   </span>
-                  <span className="text-sm text-card-foreground truncate">
+                  <span className="text-sm text-card-foreground truncate flex-1">
                     {evt.title}
                   </span>
+                  <ChevronRight size={14} className="text-muted-foreground/50 shrink-0 group-hover:text-muted-foreground transition-colors" aria-hidden="true" />
                 </button>
               ))}
             </div>
@@ -201,7 +205,7 @@ export default function POIPopup() {
         <button
           type="button"
           onClick={handleNavigate}
-          className="w-full bg-surface-brand text-surface-brand-foreground rounded-xl px-4 py-3 text-[0.9375rem] font-semibold hover:bg-surface-brand/90 active:scale-[0.98] transition-all flex items-center justify-center gap-2"
+          className="w-full bg-primary text-primary-foreground rounded-xl px-4 min-h-[48px] py-3 text-[0.9375rem] font-semibold hover:bg-primary/90 active:bg-primary/80 active:scale-[0.98] transition-all flex items-center justify-center gap-2"
         >
           <Navigation size={18} aria-hidden="true" />
           Navigate here

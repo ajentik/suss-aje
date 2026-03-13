@@ -291,7 +291,7 @@ export default function AppShell() {
           md:hidden fixed bottom-0 left-0 right-0 z-30
           ${mobileSheet === "expanded" ? "h-[75dvh]" : mobileSheet === "peek" ? "h-[140px]" : "h-16"}
           bg-background/95 backdrop-blur-xl
-          transition-all duration-350 ease-[cubic-bezier(0.32,0.72,0,1)]
+          transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]
           flex flex-col overflow-hidden
           rounded-t-2xl shadow-[0_-4px_30px_rgba(0,0,0,0.1)]
           border-t border-border/50

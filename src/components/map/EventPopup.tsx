@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useState, useRef } from "react";
-import { X, Calendar, Clock, MapPin, Navigation } from "lucide-react";
+import { X, Calendar, Clock, MapPin, Navigation, ExternalLink } from "lucide-react";
 import { useAppStore } from "@/store/app-store";
 import type { CampusEvent } from "@/types";
 
@@ -69,35 +69,38 @@ export default function EventPopup() {
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
     >
-      <div className="bg-card rounded-2xl shadow-xl max-w-md w-[calc(100vw-1.5rem)] sm:w-[380px] p-5 relative border border-border">
+      <div className="bg-card rounded-2xl shadow-xl max-w-md w-[calc(100vw-1.5rem)] sm:w-[380px] p-5 relative border border-border/60 ring-1 ring-border/40">
+        {/* Swipe-down dismiss hint */}
+        <div className="absolute top-2 left-1/2 -translate-x-1/2 w-8 h-1 rounded-full bg-muted-foreground/20 sm:hidden" />
+
         <button
           type="button"
           onClick={handleClose}
-          className="absolute top-3 right-3 flex items-center justify-center w-9 h-9 rounded-full bg-muted hover:bg-muted/80 text-muted-foreground hover:text-foreground transition-colors"
+          className="absolute top-3 right-3 flex items-center justify-center w-11 h-11 -m-1 rounded-full text-muted-foreground hover:text-foreground hover:bg-muted active:bg-muted/80 transition-colors"
           aria-label="Close popup"
         >
           <X size={18} aria-hidden="true" />
         </button>
 
-        <div className="mb-2">
+        <div className="mb-2.5 mt-1">
           <span className="inline-block bg-secondary text-secondary-foreground text-sm font-semibold px-3 py-1 rounded-full">
             {displayEvent.category}
           </span>
         </div>
 
-        <h3 className="text-xl font-bold text-card-foreground mb-1.5 pr-10">
+        <h3 className="text-xl font-bold text-card-foreground mb-1.5 pr-8 leading-tight">
           {displayEvent.title}
         </h3>
 
-        <p className="text-[0.9375rem] text-muted-foreground mb-3 line-clamp-2 leading-relaxed">
+        <p className="text-[0.9375rem] text-muted-foreground mb-3.5 line-clamp-2 leading-relaxed">
           {displayEvent.description}
         </p>
 
-        <div className="space-y-2 mb-4 text-[0.9375rem] text-muted-foreground">
-          <div className="flex items-start gap-2">
+        <div className="space-y-2.5 mb-4 text-[0.9375rem] text-muted-foreground">
+          <div className="flex items-start gap-2.5">
             <Calendar
               size={16}
-              className="mt-0.5 shrink-0"
+              className="mt-0.5 shrink-0 text-muted-foreground/70"
               aria-hidden="true"
             />
             <span className="line-clamp-1">
@@ -106,43 +109,38 @@ export default function EventPopup() {
             </span>
           </div>
 
-          <div className="flex items-start gap-2">
+          <div className="flex items-start gap-2.5">
             <Clock
               size={16}
-              className="mt-0.5 shrink-0"
+              className="mt-0.5 shrink-0 text-muted-foreground/70"
               aria-hidden="true"
             />
             <span className="line-clamp-1">{displayEvent.time}</span>
           </div>
 
-          <div className="flex items-start gap-2">
+          <div className="flex items-start gap-2.5">
             <MapPin
               size={16}
-              className="mt-0.5 shrink-0"
+              className="mt-0.5 shrink-0 text-muted-foreground/70"
               aria-hidden="true"
             />
             <span className="line-clamp-1">{displayEvent.location}</span>
           </div>
 
           {displayEvent.venueAddress && (
-            <div className="flex items-start gap-2">
-              <MapPin
-                size={16}
-                className="mt-0.5 shrink-0"
-                aria-hidden="true"
-              />
-              <span className="line-clamp-1">
+            <div className="flex items-start gap-2.5 pl-[26px]">
+              <span className="line-clamp-1 text-sm text-muted-foreground/80">
                 {displayEvent.venueAddress}
               </span>
             </div>
           )}
         </div>
 
-        <div className="flex gap-2 mb-4">
-          <span className="bg-secondary text-secondary-foreground text-xs px-2 py-0.5 rounded-full font-medium">
+        <div className="flex gap-2 mb-4 flex-wrap">
+          <span className="bg-secondary text-secondary-foreground text-xs px-2.5 py-1 rounded-full font-medium">
             {displayEvent.type}
           </span>
-          <span className="bg-muted text-muted-foreground text-xs px-2 py-0.5 rounded-full font-medium">
+          <span className="bg-muted text-muted-foreground text-xs px-2.5 py-1 rounded-full font-medium">
             {displayEvent.school}
           </span>
         </div>
@@ -153,9 +151,10 @@ export default function EventPopup() {
               href={displayEvent.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-sm text-primary hover:underline font-medium"
+              className="inline-flex items-center gap-1.5 text-sm text-primary hover:underline font-medium min-h-[44px] px-2"
             >
-              Details &rarr;
+              <ExternalLink size={14} aria-hidden="true" />
+              Details
             </a>
           </div>
         )}
@@ -164,7 +163,7 @@ export default function EventPopup() {
           <button
             type="button"
             onClick={handleNavigate}
-            className="w-full bg-primary text-primary-foreground rounded-xl px-4 py-3 text-[0.9375rem] font-semibold hover:bg-primary/90 active:scale-[0.98] transition-all flex items-center justify-center gap-2"
+            className="w-full bg-primary text-primary-foreground rounded-xl px-4 min-h-[48px] py-3 text-[0.9375rem] font-semibold hover:bg-primary/90 active:bg-primary/80 active:scale-[0.98] transition-all flex items-center justify-center gap-2"
           >
             <Navigation size={18} aria-hidden="true" />
             Navigate here
@@ -174,9 +173,10 @@ export default function EventPopup() {
             href={displayEvent.url}
             target="_blank"
             rel="noopener noreferrer"
-            className="w-full bg-primary text-primary-foreground rounded-xl px-4 py-3 text-[0.9375rem] font-semibold hover:bg-primary/90 active:scale-[0.98] transition-all flex items-center justify-center gap-2"
+            className="w-full bg-primary text-primary-foreground rounded-xl px-4 min-h-[48px] py-3 text-[0.9375rem] font-semibold hover:bg-primary/90 active:bg-primary/80 active:scale-[0.98] transition-all flex items-center justify-center gap-2"
           >
-            Join Online &rarr;
+            <ExternalLink size={18} aria-hidden="true" />
+            Join Online
           </a>
         ) : null}
       </div>

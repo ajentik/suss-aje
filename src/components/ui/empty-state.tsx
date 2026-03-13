@@ -14,21 +14,21 @@ export function EmptyState({
   action,
 }: EmptyStateProps) {
   return (
-    <div className="flex flex-col items-center justify-center gap-3 py-12 px-6 text-center">
-      <div className="flex items-center justify-center w-14 h-14 rounded-2xl bg-muted">
+    <div className="flex flex-col items-center justify-center gap-3 py-16 px-6 text-center min-h-[200px]">
+      <div className="flex items-center justify-center w-16 h-16 rounded-2xl bg-muted/60 mb-1 animate-[pulse_3s_ease-in-out_infinite]">
         {icon ?? (
-          <Inbox className="h-7 w-7 text-muted-foreground" aria-hidden="true" />
+          <Inbox className="h-7 w-7 text-muted-foreground/60" aria-hidden="true" />
         )}
       </div>
-      <div className="space-y-1">
-        <p className="text-sm font-semibold text-foreground">{title}</p>
+      <div className="space-y-1.5">
+        <p className="text-base font-semibold text-foreground">{title}</p>
         {description && (
-          <p className="text-xs text-muted-foreground max-w-[240px] leading-relaxed">
+          <p className="text-sm text-muted-foreground max-w-[260px] leading-relaxed">
             {description}
           </p>
         )}
       </div>
-      {action && <div className="mt-1">{action}</div>}
+      {action && <div className="mt-2">{action}</div>}
     </div>
   );
 }
