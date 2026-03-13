@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useState, useMemo } from "react";
+import { useCallback, useState, useMemo, useRef } from "react";
 import { X, MapPin, Clock, Star, Navigation, Calendar } from "lucide-react";
 import { useAppStore } from "@/store/app-store";
 import type { POI } from "@/types";
@@ -34,13 +34,33 @@ export default function POIPopup() {
 
   const nearbyEvents = useMemo(
     () => (displayPOI ? findUpcomingEventsNear(displayPOI) : []),
-    [displayPOI]
+    [displayPOI],
   );
+
+  // Swipe-to-dismiss
+  const touchStartY = useRef(0);
+  const touchCurrentY = useRef(0);
+
+  const handleTouchStart = useCallback((e: React.TouchEvent) => {
+    touchStartY.current = e.touches[0].clientY;
+    touchCurrentY.current = e.touches[0].clientY;
+  }, []);
+
+  const handleTouchMove = useCallback((e: React.TouchEvent) => {
+    touchCurrentY.current = e.touches[0].clientY;
+  }, []);
 
   const handleClose = useCallback(() => {
     setFadingOutPOI(useAppStore.getState().selectedPOI);
     setSelectedPOI(null);
   }, [setSelectedPOI]);
+
+  const handleTouchEnd = useCallback(() => {
+    const deltaY = touchCurrentY.current - touchStartY.current;
+    if (deltaY > 60) {
+      handleClose();
+    }
+  }, [handleClose]);
 
   const handleTransitionEnd = useCallback(() => {
     if (!useAppStore.getState().selectedPOI) {
@@ -51,7 +71,6 @@ export default function POIPopup() {
   const handleNavigate = useCallback(() => {
     if (displayPOI) {
       setSelectedDestination(displayPOI);
-      // Open street view at the POI location
       setStreetViewEvent({
         id: `poi-${displayPOI.id}`,
         title: displayPOI.name,
@@ -77,45 +96,48 @@ export default function POIPopup() {
       setSelectedEvent(event);
       setActivePanel("events");
     },
-    [setSelectedPOI, setSelectedEvent, setActivePanel]
+    [setSelectedPOI, setSelectedEvent, setActivePanel],
   );
 
   if (!displayPOI) return null;
 
   return (
     <div
-      className={`absolute bottom-20 left-1/2 -translate-x-1/2 z-20 transition-all duration-200 ease-in-out ${
+      className={`absolute bottom-24 md:bottom-20 left-1/2 -translate-x-1/2 z-20 transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] ${
         isVisible
           ? "opacity-100 translate-y-0 scale-100"
-          : "opacity-0 translate-y-4 scale-95 pointer-events-none"
+          : "opacity-0 translate-y-6 scale-95 pointer-events-none"
       }`}
       onTransitionEnd={handleTransitionEnd}
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
     >
-      <div className="bg-white rounded-xl shadow-lg max-w-md w-[calc(100vw-2rem)] sm:w-[380px] p-5 relative border border-gray-100">
+      <div className="bg-card rounded-2xl shadow-xl max-w-md w-[calc(100vw-1.5rem)] sm:w-[380px] p-5 relative border border-border">
         <button
           type="button"
           onClick={handleClose}
-          className="absolute top-3 right-3 text-gray-400 hover:text-gray-600 transition-colors"
+          className="absolute top-3 right-3 flex items-center justify-center w-9 h-9 rounded-full bg-muted hover:bg-muted/80 text-muted-foreground hover:text-foreground transition-colors"
           aria-label="Close popup"
         >
-          <X size={20} aria-hidden="true" />
+          <X size={18} aria-hidden="true" />
         </button>
 
         <div className="mb-2">
-          <span className="inline-block bg-blue-50 text-surface-brand text-sm font-semibold px-3 py-1 rounded-full border border-blue-100">
+          <span className="inline-block bg-secondary text-secondary-foreground text-sm font-semibold px-3 py-1 rounded-full">
             {displayPOI.category}
           </span>
         </div>
 
-        <h3 className="text-xl font-bold text-gray-900 mb-1.5 pr-6">
+        <h3 className="text-xl font-bold text-card-foreground mb-1.5 pr-10">
           {displayPOI.name}
         </h3>
 
-        <p className="text-[0.9375rem] text-gray-600 mb-3 line-clamp-2 leading-relaxed">
+        <p className="text-[0.9375rem] text-muted-foreground mb-3 line-clamp-2 leading-relaxed">
           {displayPOI.description}
         </p>
 
-        <div className="space-y-2 mb-4 text-[0.9375rem] text-gray-500">
+        <div className="space-y-2 mb-4 text-[0.9375rem] text-muted-foreground">
           {displayPOI.address && (
             <div className="flex items-start gap-2">
               <MapPin
@@ -151,8 +173,8 @@ export default function POIPopup() {
         </div>
 
         {nearbyEvents.length > 0 && (
-          <div className="mb-3 border-t border-gray-100 pt-3">
-            <p className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+          <div className="mb-3 border-t border-border pt-3">
+            <p className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-2 flex items-center gap-1.5">
               <Calendar size={14} aria-hidden="true" />
               Upcoming Events Nearby
             </p>
@@ -162,12 +184,12 @@ export default function POIPopup() {
                   key={evt.id}
                   type="button"
                   onClick={() => handleEventClick(evt)}
-                  className="w-full text-left flex items-center gap-2.5 bg-amber-50 border border-amber-100 rounded-lg px-3.5 py-2.5 hover:bg-amber-100 transition-colors"
+                  className="w-full text-left flex items-center gap-2.5 bg-secondary/50 border border-secondary rounded-lg px-3.5 py-2.5 min-h-[44px] hover:bg-secondary/80 active:bg-secondary transition-colors"
                 >
-                  <span className="text-amber-600 text-sm font-medium shrink-0">
+                  <span className="text-primary text-sm font-medium shrink-0">
                     {evt.date}
                   </span>
-                  <span className="text-sm text-gray-700 truncate">
+                  <span className="text-sm text-card-foreground truncate">
                     {evt.title}
                   </span>
                 </button>
@@ -179,9 +201,9 @@ export default function POIPopup() {
         <button
           type="button"
           onClick={handleNavigate}
-          className="w-full bg-surface-brand text-surface-brand-foreground rounded-lg px-4 py-2.5 text-[0.9375rem] font-semibold hover:bg-surface-brand/90 transition-colors flex items-center justify-center gap-2"
+          className="w-full bg-surface-brand text-surface-brand-foreground rounded-xl px-4 py-3 text-[0.9375rem] font-semibold hover:bg-surface-brand/90 active:scale-[0.98] transition-all flex items-center justify-center gap-2"
         >
-          <Navigation size={16} aria-hidden="true" />
+          <Navigation size={18} aria-hidden="true" />
           Navigate here
         </button>
       </div>

@@ -14,7 +14,7 @@ function EventInfoOverlay({ event }: { event: CampusEvent }) {
   const [isExpanded, setIsExpanded] = useState(false);
 
   return (
-    <div className="absolute bottom-4 left-4 z-10 max-w-sm bg-white/95 backdrop-blur rounded-xl shadow-lg border border-gray-100 overflow-hidden">
+    <div className="absolute bottom-4 left-4 z-10 max-w-sm bg-card/95 backdrop-blur rounded-2xl shadow-xl border border-border overflow-hidden">
       <div className={`p-3 ${isExpanded && event.longDescription ? "max-h-[60vh] overflow-y-auto" : ""}`}>
         <h3 className="text-sm font-bold text-foreground">{event.title}</h3>
 
@@ -109,7 +109,7 @@ export default function StreetViewPanel({
       <button
         type="button"
         onClick={onClose}
-        className="absolute top-4 left-4 z-10 flex items-center gap-2 px-3 py-2 bg-white/95 backdrop-blur rounded-lg shadow-lg text-sm font-medium hover:bg-white transition-colors"
+        className="absolute top-4 left-4 z-10 flex items-center gap-2 px-4 py-2.5 min-h-[44px] bg-card/95 backdrop-blur rounded-xl shadow-xl border border-border text-sm font-medium text-card-foreground hover:bg-card transition-colors"
       >
         <ArrowLeft size={16} aria-hidden="true" />
         Back to 3D Map
