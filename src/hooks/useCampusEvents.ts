@@ -6,7 +6,7 @@ import { getDateRange } from "@/lib/date-utils";
 
 export function useCampusEvents() {
   const [events, setEvents] = useState<CampusEvent[]>([]);
-  const [dateFilter, setDateFilter] = useState<DateRangePreset>("7d");
+  const [dateFilter, setDateFilter] = useState<DateRangePreset>("all");
   const [categoryFilter, setCategoryFilter] = useState("");
   const [schoolFilter, setSchoolFilter] = useState("");
   const [isLoading, setIsLoading] = useState(true);

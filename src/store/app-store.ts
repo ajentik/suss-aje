@@ -27,6 +27,10 @@ interface AppState {
   setMapEventMarkers: (events: CampusEvent[]) => void;
   highlightedEventIds: string[];
   setHighlightedEventIds: (ids: string[]) => void;
+  selectedEvent: CampusEvent | null;
+  setSelectedEvent: (event: CampusEvent | null) => void;
+  streetViewEvent: CampusEvent | null;
+  setStreetViewEvent: (event: CampusEvent | null) => void;
 
   // Voice
   isSpeaking: boolean;
@@ -37,7 +41,7 @@ interface AppState {
 
 export const useAppStore = create<AppState>((set) => ({
   selectedPOI: null,
-  setSelectedPOI: (poi) => set({ selectedPOI: poi }),
+  setSelectedPOI: (poi) => set({ selectedPOI: poi, selectedEvent: null }),
   selectedDestination: null,
   setSelectedDestination: (poi) => set({ selectedDestination: poi }),
   routeInfo: null,
@@ -56,6 +60,10 @@ export const useAppStore = create<AppState>((set) => ({
   setMapEventMarkers: (events) => set({ mapEventMarkers: events }),
   highlightedEventIds: [],
   setHighlightedEventIds: (ids) => set({ highlightedEventIds: ids }),
+  selectedEvent: null,
+  setSelectedEvent: (event) => set({ selectedEvent: event, selectedPOI: null }),
+  streetViewEvent: null,
+  setStreetViewEvent: (event) => set({ streetViewEvent: event }),
 
   isSpeaking: false,
   setIsSpeaking: (speaking) => set({ isSpeaking: speaking }),

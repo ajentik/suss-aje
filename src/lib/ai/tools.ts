@@ -45,7 +45,7 @@ export const showEvents = tool({
     category: z
       .string()
       .optional()
-      .describe("Filter events by category, e.g. 'Tech', 'Academic', 'Sports', 'Community', 'Lecture', 'Forum', 'Conference', 'Career', 'Information Session', 'Open House'"),
+      .describe("Filter events by category, e.g. 'Information Session', 'Open House', 'Public Lecture', 'Symposium', 'Career Fair', 'Lecture', 'Forum', 'Conference'"),
     school: z
       .string()
       .optional()

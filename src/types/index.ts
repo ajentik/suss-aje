@@ -26,6 +26,8 @@ export interface CampusEvent {
   lat: number;
   lng: number;
   url?: string;
+  venueAddress?: string;
+  longDescription?: string;
 }
 
 export interface RouteInfo {
