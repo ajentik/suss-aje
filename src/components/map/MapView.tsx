@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useRef, useState, useCallback } from "react";
+import { Component, useEffect, useRef, useState, useCallback } from "react";
+import type { ReactNode, ErrorInfo } from "react";
 import { Map3D, Marker3D, Pin } from "@vis.gl/react-google-maps";
 import type { Map3DRef, Map3DClickEvent } from "@vis.gl/react-google-maps";
 import { ErrorState } from "@/components/ui/error-state";
@@ -10,6 +11,29 @@ import { CAMPUS_CENTER, CAMPUS_POIS } from "@/lib/maps/campus-pois";
 import type { POI, CampusEvent } from "@/types";
 import RoutePolyline from "./RoutePolyline";
 import StreetViewPanel from "./StreetViewPanel";
+
+class PinErrorBoundary extends Component<
+  { children: ReactNode; fallback?: ReactNode },
+  { hasError: boolean }
+> {
+  constructor(props: { children: ReactNode; fallback?: ReactNode }) {
+    super(props);
+    this.state = { hasError: false };
+  }
+
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
+
+  componentDidCatch(_error: Error, _info: ErrorInfo) {}
+
+  render() {
+    if (this.state.hasError) {
+      return this.props.fallback ?? null;
+    }
+    return this.props.children;
+  }
+}
 
 let mapsReady: Promise<void> | null = null;
 
@@ -188,12 +212,14 @@ function Map3DInner() {
                   title={poi.name}
                   onClick={() => handleMarkerClick(poi)}
                 >
-                  <Pin
-                    background={isSelected ? "#003B5C" : "#DA291C"}
-                    borderColor={isSelected ? "#DA291C" : "#003B5C"}
-                    glyphColor={isSelected ? "#fff" : undefined}
-                    scale={isSelected ? 1.4 : 1.0}
-                  />
+                  <PinErrorBoundary>
+                    <Pin
+                      background={isSelected ? "#003B5C" : "#DA291C"}
+                      borderColor={isSelected ? "#DA291C" : "#003B5C"}
+                      glyphColor={isSelected ? "#fff" : undefined}
+                      scale={isSelected ? 1.4 : 1.0}
+                    />
+                  </PinErrorBoundary>
                 </Marker3D>
               );
             })}
@@ -211,12 +237,14 @@ function Map3DInner() {
                     setFlyToTarget({ lat: event.lat, lng: event.lng })
                   }
                 >
-                  <Pin
-                    background={isHighlighted ? "#D97706" : "#F59E0B"}
-                    borderColor={isHighlighted ? "#003B5C" : undefined}
-                    glyphColor={isHighlighted ? "#fff" : undefined}
-                    scale={isHighlighted ? 1.3 : 0.9}
-                  />
+                  <PinErrorBoundary>
+                    <Pin
+                      background={isHighlighted ? "#D97706" : "#F59E0B"}
+                      borderColor={isHighlighted ? "#003B5C" : undefined}
+                      glyphColor={isHighlighted ? "#fff" : undefined}
+                      scale={isHighlighted ? 1.3 : 0.9}
+                    />
+                  </PinErrorBoundary>
                 </Marker3D>
               );
             })}
