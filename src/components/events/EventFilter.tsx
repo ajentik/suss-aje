@@ -2,7 +2,7 @@
 
 import type { DateRangePreset } from "@/types";
 import { cn } from "@/lib/utils";
-import { X } from "lucide-react";
+import { X, SlidersHorizontal } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -14,7 +14,7 @@ import {
 const DATE_PRESETS: { value: DateRangePreset; label: string }[] = [
   { value: "1d", label: "Today" },
   { value: "3d", label: "3 Days" },
-  { value: "7d", label: "7 Days" },
+  { value: "7d", label: "This Week" },
   { value: "all", label: "All" },
 ];
 
@@ -37,22 +37,52 @@ export default function EventFilter({
   schoolFilter,
   onSchoolChange,
 }: EventFilterProps) {
-  const hasActiveFilters = dateFilter !== "all" || categoryFilter !== "" || schoolFilter !== "";
+  const activeCount =
+    (dateFilter !== "all" ? 1 : 0) +
+    (categoryFilter !== "" ? 1 : 0) +
+    (schoolFilter !== "" ? 1 : 0);
 
   return (
-    <div className="flex flex-col gap-2 p-3 border-b">
+    <div className="flex flex-col gap-2.5 px-4 py-3 border-b border-border/60 bg-background/80 backdrop-blur-sm">
+      {/* Section header with filter count */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <SlidersHorizontal className="w-3.5 h-3.5 text-muted-foreground/70" />
+          <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Filters</span>
+          {activeCount > 0 && (
+            <span className="animate-hero-fade-in flex items-center justify-center w-5 h-5 rounded-full bg-primary text-primary-foreground text-[0.625rem] font-bold">
+              {activeCount}
+            </span>
+          )}
+        </div>
+        {activeCount > 0 && (
+          <button
+            type="button"
+            onClick={() => {
+              onDateChange("all");
+              onCategoryChange("");
+              onSchoolChange("");
+            }}
+            className="animate-hero-fade-in flex items-center gap-1 text-xs text-primary hover:text-primary/80 font-medium transition-colors min-h-[44px] px-2"
+          >
+            <X className="w-3 h-3" />
+            Clear all
+          </button>
+        )}
+      </div>
+
       {/* Date segmented control */}
-      <div className="flex w-full rounded-lg bg-muted p-[3px]">
+      <div className="flex w-full rounded-xl bg-muted/70 p-1">
         {DATE_PRESETS.map((p) => (
           <button
             key={p.value}
             type="button"
             onClick={() => onDateChange(p.value)}
             className={cn(
-              "flex-1 rounded-md px-3 py-2 text-sm font-medium transition-colors min-h-[44px]",
+              "flex-1 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 min-h-[44px]",
               dateFilter === p.value
-                ? "bg-background text-foreground shadow-sm"
-                : "text-foreground/60 hover:text-foreground active:text-foreground"
+                ? "bg-background text-foreground shadow-sm ring-1 ring-border/50"
+                : "text-muted-foreground hover:text-foreground active:bg-background/50"
             )}
           >
             {p.label}
@@ -60,11 +90,11 @@ export default function EventFilter({
         ))}
       </div>
 
-      {/* Category & School dropdowns */}
-      <div className="flex gap-2 w-full">
+      {/* Category & School — full-width stacked on narrow screens */}
+      <div className="flex flex-col min-[400px]:flex-row gap-2 w-full">
         <Select value={categoryFilter} onValueChange={(value) => onCategoryChange(value ?? "")}>
           <SelectTrigger className={cn(
-            "text-sm h-11 rounded-lg bg-background px-3 flex-1 min-w-0",
+            "text-sm h-12 rounded-xl bg-background px-3.5 flex-1 min-w-0 transition-all duration-200",
             categoryFilter && "ring-2 ring-primary/30 border-primary/40"
           )}>
             <SelectValue placeholder="All categories" />
@@ -80,7 +110,7 @@ export default function EventFilter({
         </Select>
         <Select value={schoolFilter} onValueChange={(value) => onSchoolChange(value ?? "")}>
           <SelectTrigger className={cn(
-            "text-sm h-11 rounded-lg bg-background px-3 w-[120px] shrink-0",
+            "text-sm h-12 rounded-xl bg-background px-3.5 min-[400px]:w-[130px] shrink-0 transition-all duration-200",
             schoolFilter && "ring-2 ring-primary/30 border-primary/40"
           )}>
             <SelectValue placeholder="All schools" />
@@ -92,22 +122,6 @@ export default function EventFilter({
           </SelectContent>
         </Select>
       </div>
-
-      {/* Clear all filters */}
-      {hasActiveFilters && (
-        <button
-          type="button"
-          onClick={() => {
-            onDateChange("all");
-            onCategoryChange("");
-            onSchoolChange("");
-          }}
-          className="flex items-center gap-1 self-start text-xs text-primary hover:text-primary/80 font-medium transition-colors min-h-[32px]"
-        >
-          <X className="w-3 h-3" />
-          Clear all filters
-        </button>
-      )}
     </div>
   );
 }

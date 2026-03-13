@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { EmptyState } from "@/components/ui/empty-state";
-import { CalendarX } from "lucide-react";
+import { CalendarX, ChevronUp } from "lucide-react";
 import { useCampusEvents } from "@/hooks/useCampusEvents";
 import { useAppStore } from "@/store/app-store";
 import type { DateRangePreset } from "@/types";
@@ -28,6 +28,9 @@ export default function EventsPanel() {
   const storeCategory = useAppStore((s) => s.eventCategoryFilter);
   const setMapEventMarkers = useAppStore((s) => s.setMapEventMarkers);
 
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [showScrollTop, setShowScrollTop] = useState(false);
+
   useEffect(() => {
     if (storeDate) setDateFilter(storeDate);
   }, [storeDate, setDateFilter]);
@@ -40,8 +43,30 @@ export default function EventsPanel() {
     setMapEventMarkers(events);
   }, [events, setMapEventMarkers]);
 
+  // Track scroll to show/hide scroll-to-top button
+  useEffect(() => {
+    const viewport = scrollRef.current?.querySelector("[data-radix-scroll-area-viewport]");
+    if (!viewport) return;
+    const handleScroll = () => {
+      setShowScrollTop(viewport.scrollTop > 400);
+    };
+    viewport.addEventListener("scroll", handleScroll, { passive: true });
+    return () => viewport.removeEventListener("scroll", handleScroll);
+  }, [isLoading]);
+
+  const scrollToTop = useCallback(() => {
+    const viewport = scrollRef.current?.querySelector("[data-radix-scroll-area-viewport]");
+    viewport?.scrollTo({ top: 0, behavior: "smooth" });
+  }, []);
+
+  const handleClearFilters = useCallback(() => {
+    setDateFilter("all");
+    setCategoryFilter("");
+    setSchoolFilter("");
+  }, [setDateFilter, setCategoryFilter, setSchoolFilter]);
+
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full relative">
       <EventFilter
         dateFilter={dateFilter}
         onDateChange={(preset: DateRangePreset) => setDateFilter(preset)}
@@ -51,28 +76,29 @@ export default function EventsPanel() {
         schoolFilter={schoolFilter}
         onSchoolChange={setSchoolFilter}
       />
-      <ScrollArea className="flex-1 p-3">
+      <ScrollArea ref={scrollRef} className="flex-1 px-4 py-3">
         {isLoading ? (
           <div className="space-y-3">
-            <EventCardSkeleton />
-            <EventCardSkeleton />
-            <EventCardSkeleton />
-            <EventCardSkeleton />
+            {[0, 1, 2, 3].map((i) => (
+              <EventCardSkeleton key={i} index={i} />
+            ))}
           </div>
         ) : events.length === 0 ? (
           <EmptyState
-            icon={<CalendarX className="h-10 w-10 text-muted-foreground/60" />}
+            icon={
+              <div className="flex flex-col items-center gap-3 mb-1">
+                <div className="w-16 h-16 rounded-2xl bg-muted/60 flex items-center justify-center">
+                  <CalendarX className="h-8 w-8 text-muted-foreground/50" />
+                </div>
+              </div>
+            }
             title="No events found"
-            description="Try changing your date range or clearing filters to see more events."
+            description="Try adjusting your filters or check back later — new events are added regularly."
             action={
               <button
                 type="button"
-                onClick={() => {
-                  setDateFilter("all");
-                  setCategoryFilter("");
-                  setSchoolFilter("");
-                }}
-                className="mt-2 text-sm text-primary hover:underline font-medium min-h-[44px] flex items-center"
+                onClick={handleClearFilters}
+                className="mt-3 text-sm text-primary hover:text-primary/80 font-semibold min-h-[44px] flex items-center gap-1.5 transition-colors px-4 py-2 rounded-full border border-primary/20 hover:bg-primary/5"
               >
                 Clear all filters
               </button>
@@ -80,15 +106,30 @@ export default function EventsPanel() {
           />
         ) : (
           <div className="space-y-3">
-            <p className="text-xs text-muted-foreground px-1 font-medium tracking-wide uppercase">
-              {events.length} event{events.length !== 1 ? "s" : ""}
-            </p>
+            <div className="flex items-center justify-between px-1">
+              <p className="text-xs text-muted-foreground font-semibold tracking-wide uppercase">
+                <span className="tabular-nums">{events.length}</span>
+                {" "}event{events.length !== 1 ? "s" : ""}
+              </p>
+            </div>
             {events.map((event, i) => (
               <EventCard key={event.id} event={event} index={i} />
             ))}
           </div>
         )}
       </ScrollArea>
+
+      {/* Scroll to top FAB */}
+      {showScrollTop && (
+        <button
+          type="button"
+          onClick={scrollToTop}
+          aria-label="Scroll to top"
+          className="absolute bottom-4 right-4 z-10 w-11 h-11 rounded-full bg-primary text-primary-foreground shadow-lg shadow-primary/20 flex items-center justify-center hover:opacity-90 active:scale-90 transition-all animate-hero-fade-in-up min-w-[44px] min-h-[44px]"
+        >
+          <ChevronUp className="w-5 h-5" />
+        </button>
+      )}
     </div>
   );
 }

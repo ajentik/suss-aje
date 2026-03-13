@@ -125,20 +125,20 @@ export default function HeroIntro({ onEnter }: HeroIntroProps) {
 
   return (
     <header
-      className={`fixed inset-0 z-50 flex flex-col items-center justify-center transition-opacity duration-700 ease-out ${
-        fadeOut ? "opacity-0 pointer-events-none" : "opacity-100"
+      className={`fixed inset-0 z-50 flex flex-col items-center justify-center transition-all duration-700 ease-out ${
+        fadeOut ? "opacity-0 scale-105 pointer-events-none" : "opacity-100 scale-100"
       }`}
     >
-      {/* Gradient fallback */}
+      {/* Gradient fallback — animated subtle shift */}
       <div
         className={`absolute inset-0 bg-primary transition-opacity duration-[2000ms] pointer-events-none ${
           videoReady ? "opacity-0" : "opacity-100"
         }`}
       />
 
-      {/* Radial glow accents */}
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_60%_40%,rgba(99,102,241,0.15)_0%,transparent_70%)] pointer-events-none" />
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_20%_80%,rgba(20,184,166,0.1)_0%,transparent_60%)] pointer-events-none" />
+      {/* Radial glow accents — subtle animated ambience */}
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_60%_40%,rgba(99,102,241,0.18)_0%,transparent_70%)] pointer-events-none animate-hero-pulse-subtle" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_20%_80%,rgba(20,184,166,0.12)_0%,transparent_60%)] pointer-events-none animate-hero-pulse-subtle [animation-delay:1s]" />
 
       {/* Loading progress */}
       {!videoFailed && !videoReady && (
@@ -176,8 +176,8 @@ export default function HeroIntro({ onEnter }: HeroIntroProps) {
 
       {/* Content */}
       <div className="relative z-10 text-center px-6 max-w-2xl">
-        {/* SUSS Logo */}
-        <div className="mb-4 animate-hero-fade-in-up [animation-delay:300ms]">
+        {/* SUSS Logo — scale + fade entrance */}
+        <div className="mb-5 animate-hero-fade-in-up [animation-delay:300ms]">
           <Image
             src="/suss-logo.png"
             alt="SUSS — Singapore University of Social Sciences"
@@ -189,47 +189,47 @@ export default function HeroIntro({ onEnter }: HeroIntroProps) {
         </div>
 
         {/* Divider */}
-        <div className="flex justify-center mb-4 animate-hero-fade-in [animation-delay:500ms]">
+        <div className="flex justify-center mb-5 animate-hero-fade-in [animation-delay:500ms]">
           <div className="h-px bg-white/40 animate-hero-line-expand [animation-delay:600ms]" />
         </div>
 
-        {/* Brand name */}
-        <h1 className="text-5xl md:text-7xl font-bold text-white mb-2 tracking-tight drop-shadow-lg animate-hero-fade-in-up [animation-delay:600ms]">
+        {/* Brand name — premium typography */}
+        <h1 className="text-5xl md:text-7xl font-bold text-white mb-2.5 tracking-[-0.03em] drop-shadow-lg animate-hero-fade-in-up [animation-delay:600ms]">
           AskSUSSi
         </h1>
 
         {/* Tagline */}
-        <p className="text-white/80 text-sm md:text-base mb-8 leading-relaxed drop-shadow animate-hero-fade-in-up [animation-delay:800ms]">
+        <p className="text-white/80 text-sm md:text-base mb-10 leading-relaxed drop-shadow animate-hero-fade-in-up [animation-delay:800ms] max-w-xs mx-auto">
           Resolve campus affairs with one sentence. Navigate, discover events,
           and explore SUSS in 3D.
         </p>
 
-        {/* Feature pills */}
-        <div className="flex flex-wrap justify-center gap-2.5 mb-10 animate-hero-fade-in-up [animation-delay:900ms]">
+        {/* Feature pills — 2x2 grid on mobile for scannability */}
+        <div className="grid grid-cols-2 gap-2 mb-12 max-w-sm mx-auto animate-hero-fade-in-up [animation-delay:900ms]">
           {FEATURES.map((f) => (
             <div
               key={f.label}
-              className="group flex items-center gap-2 bg-white/10 border border-white/20 backdrop-blur-sm rounded-full px-4 py-2 text-white/85 text-xs md:text-sm hover:bg-white/15 transition-colors cursor-default"
+              className="group flex items-center gap-2 bg-white/10 border border-white/15 backdrop-blur-md rounded-xl px-3.5 py-2.5 text-white/85 text-xs md:text-sm cursor-default"
               title={f.desc}
             >
-              <span className="text-white/70 group-hover:text-white transition-colors">
+              <span className="text-white/60 shrink-0">
                 {f.icon}
               </span>
-              <span>{f.label}</span>
+              <span className="font-medium leading-tight">{f.label}</span>
             </div>
           ))}
         </div>
 
-        {/* CTA */}
+        {/* CTA — unmissable, animated */}
         <div className="animate-hero-fade-in-up [animation-delay:1100ms]">
           <button
             type="button"
             aria-label="Enter AskSUSSi campus assistant"
             onClick={handleEnter}
-            className="inline-flex items-center gap-2.5 px-10 py-3.5 bg-white text-primary rounded-full font-semibold text-base shadow-lg shadow-white/20 hover:bg-white/95 hover:shadow-xl hover:shadow-white/30 transition-all duration-300 hover:scale-105 active:scale-95"
+            className="group inline-flex items-center gap-2.5 px-10 py-4 bg-white text-primary rounded-full font-bold text-base shadow-lg shadow-white/20 hover:bg-white/95 hover:shadow-xl hover:shadow-white/30 transition-all duration-300 hover:scale-105 active:scale-95 min-h-[52px] animate-hero-cta-pulse"
           >
-            <ArrowRight size={20} aria-hidden="true" />
             Explore Campus
+            <ArrowRight size={20} aria-hidden="true" className="transition-transform group-hover:translate-x-0.5" />
           </button>
         </div>
       </div>
