@@ -13,6 +13,7 @@ interface HeroIntroProps {
 export default function HeroIntro({ onEnter }: HeroIntroProps) {
   const [videoUrl, setVideoUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [videoReady, setVideoReady] = useState(false);
   const [fadeOut, setFadeOut] = useState(false);
 
   useEffect(() => {
@@ -30,69 +31,116 @@ export default function HeroIntro({ onEnter }: HeroIntroProps) {
 
   const handleEnter = useCallback(() => {
     setFadeOut(true);
-    setTimeout(onEnter, 600);
+    setTimeout(onEnter, 700);
   }, [onEnter]);
 
   return (
     <div
-      className={`fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#003B5C] transition-opacity duration-500 ${
+      className={`fixed inset-0 z-50 flex flex-col items-center justify-center transition-opacity duration-700 ease-out ${
         fadeOut ? "opacity-0 pointer-events-none" : "opacity-100"
       }`}
     >
-      {/* Background video */}
+      {/* Base background — navy, visible during load */}
+      <div
+        className={`absolute inset-0 bg-[#003B5C] transition-opacity duration-[2000ms] pointer-events-none ${
+          videoReady ? "opacity-0" : "opacity-100"
+        }`}
+      />
+
+      {/* Loading pulse indicator */}
+      {loading && (
+        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20">
+          <div className="flex items-center gap-1.5">
+            <div className="w-1.5 h-1.5 rounded-full bg-white/50 animate-hero-pulse-subtle" />
+            <div className="w-1.5 h-1.5 rounded-full bg-white/50 animate-hero-pulse-subtle [animation-delay:300ms]" />
+            <div className="w-1.5 h-1.5 rounded-full bg-white/50 animate-hero-pulse-subtle [animation-delay:600ms]" />
+          </div>
+        </div>
+      )}
+
+      {/* Aerial flyover video — THE hero background */}
       {videoUrl && (
         <video
           autoPlay
           loop
           muted
           playsInline
-          className="absolute inset-0 w-full h-full object-cover opacity-40"
+          onLoadedData={() => setVideoReady(true)}
+          className={`absolute inset-0 w-full h-full object-cover scale-105 transition-opacity duration-[2000ms] ${
+            videoReady ? "opacity-90" : "opacity-0"
+          }`}
         >
           <source src={videoUrl} type="video/mp4" />
         </video>
       )}
 
-      {/* Gradient overlay */}
-      <div className="absolute inset-0 bg-gradient-to-t from-[#003B5C] via-[#003B5C]/60 to-transparent" />
+      {/* Top vignette — subtle darkening for depth */}
+      <div className="absolute inset-x-0 top-0 h-[30%] bg-gradient-to-b from-black/25 to-transparent pointer-events-none" />
+
+      {/* Bottom scrim — ensures text readability without killing video */}
+      <div className="absolute inset-x-0 bottom-0 h-[60%] bg-gradient-to-t from-black/60 via-black/15 to-transparent pointer-events-none" />
 
       {/* Content */}
-      <div className="relative z-10 text-center px-6 max-w-lg">
+      <div className="relative z-10 text-center px-6 max-w-xl">
         {/* SUSS Logo */}
-        <div className="mb-6">
+        <div className="mb-5 animate-hero-fade-in-up [animation-delay:300ms]">
           <Image
             src="/suss-logo.png"
             alt="SUSS — Singapore University of Social Sciences"
             width={200}
             height={70}
-            className="mx-auto h-16 md:h-20 w-auto brightness-0 invert"
+            className="mx-auto h-16 md:h-20 w-auto brightness-0 invert drop-shadow-lg"
             priority
           />
         </div>
 
-        <h1 className="text-3xl md:text-4xl font-bold text-white mb-3 tracking-tight">
+        {/* Separator line */}
+        <div className="flex justify-center mb-5 animate-hero-fade-in [animation-delay:500ms]">
+          <div className="h-px bg-white/50 animate-hero-line-expand [animation-delay:600ms]" />
+        </div>
+
+        {/* Title */}
+        <h1 className="text-3xl md:text-5xl font-bold text-white mb-3 tracking-tight drop-shadow-lg animate-hero-fade-in-up [animation-delay:600ms]">
           Campus Intelligent Assistant
         </h1>
-        <p className="text-white/70 text-sm md:text-base mb-8 leading-relaxed">
-          Resolve campus affairs with one sentence. Navigate, discover events, and explore SUSS in 3D.
+
+        {/* Subtitle */}
+        <p className="text-white/80 text-sm md:text-base mb-10 leading-relaxed drop-shadow animate-hero-fade-in-up [animation-delay:800ms]">
+          Resolve campus affairs with one sentence. Navigate, discover events,
+          and explore SUSS in 3D.
         </p>
 
-        <button
-          onClick={handleEnter}
-          className="inline-flex items-center gap-2 px-8 py-3 bg-white text-[#003B5C] rounded-full font-semibold text-sm hover:bg-white/90 transition-all hover:scale-105 active:scale-95"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M5 12h14" />
-            <path d="m12 5 7 7-7 7" />
-          </svg>
-          Explore Campus
-        </button>
+        {/* CTA Button */}
+        <div className="animate-hero-fade-in-up [animation-delay:1000ms]">
+          <button
+            type="button"
+            onClick={handleEnter}
+            className="inline-flex items-center gap-2.5 px-10 py-3.5 bg-white text-[#003B5C] rounded-full font-semibold text-base shadow-lg shadow-white/20 hover:bg-white/95 hover:shadow-xl hover:shadow-white/30 transition-all duration-300 hover:scale-105 active:scale-95"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
+              <path d="M5 12h14" />
+              <path d="m12 5 7 7-7 7" />
+            </svg>
+            Explore Campus
+          </button>
+        </div>
 
-        {loading && (
-          <p className="text-white/40 text-xs mt-6">Loading aerial view...</p>
-        )}
-
+        {/* Attribution */}
         {!loading && videoUrl && (
-          <p className="text-white/40 text-xs mt-6">Aerial flyover powered by Google Maps</p>
+          <p className="text-white/30 text-[10px] mt-8 tracking-wide uppercase animate-hero-fade-in [animation-delay:1200ms]">
+            Aerial flyover powered by Google Maps
+          </p>
         )}
       </div>
     </div>
