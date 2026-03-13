@@ -260,7 +260,7 @@ export default function ChatPanel() {
   const scrollToBottom = () => {
     userScrolledUpRef.current = false;
     setHasNewMessages(false);
-    endRef.current?.scrollIntoView({ behavior: "smooth" }, [messages.length]);
+    endRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
   const handleSend = (text: string) => {
