@@ -26,6 +26,13 @@ jobs:
 
       - run: npm run lint
 
+      - name: No hard-coded colors
+        run: |
+          if grep -rn --include='*.tsx' --include='*.ts' 'bg-\[#\|text-\[#\|border-\[#' src/; then
+            echo "::error::Hard-coded color classes found. Use design tokens from globals.css instead."
+            exit 1
+          fi
+
       - run: npm run build
         env:
           NEXT_PUBLIC_GOOGLE_MAPS_API_KEY: ${{ secrets.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY }}

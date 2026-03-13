@@ -2,6 +2,13 @@
 
 import type { DateRangePreset } from "@/types";
 import { cn } from "@/lib/utils";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 const DATE_PRESETS: { value: DateRangePreset; label: string }[] = [
   { value: "1d", label: "Today" },
@@ -48,27 +55,29 @@ export default function EventFilter({
           </button>
         ))}
       </div>
-      <select
-        value={categoryFilter}
-        onChange={(e) => onCategoryChange(e.target.value)}
-        className="text-xs h-8 rounded-md border bg-background px-2"
-      >
-        <option value="">All categories</option>
-        {categories.map((cat) => (
-          <option key={cat} value={cat}>
-            {cat}
-          </option>
-        ))}
-      </select>
-      <select
-        value={schoolFilter}
-        onChange={(e) => onSchoolChange(e.target.value)}
-        className="text-xs h-8 rounded-md border bg-background px-2"
-      >
-        <option value="">All schools</option>
-        <option value="SUSS">SUSS</option>
-        <option value="SIM">SIM</option>
-      </select>
+      <Select value={categoryFilter} onValueChange={(value) => onCategoryChange(value ?? "")}>
+        <SelectTrigger className="text-xs h-8 rounded-md bg-background px-2 w-[160px]">
+          <SelectValue placeholder="All categories" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="">All categories</SelectItem>
+          {categories.map((cat) => (
+            <SelectItem key={cat} value={cat}>
+              {cat}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+      <Select value={schoolFilter} onValueChange={(value) => onSchoolChange(value ?? "")}>
+        <SelectTrigger className="text-xs h-8 rounded-md bg-background px-2 w-[120px]">
+          <SelectValue placeholder="All schools" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="">All schools</SelectItem>
+          <SelectItem value="SUSS">SUSS</SelectItem>
+          <SelectItem value="SIM">SIM</SelectItem>
+        </SelectContent>
+      </Select>
     </div>
   );
 }
