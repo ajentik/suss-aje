@@ -9,6 +9,7 @@ import ChatInput from "./ChatInput";
 import { useAppStore } from "@/store/app-store";
 import { useSpeechSynthesis } from "@/lib/voice/speech-synthesis";
 import { findPOI } from "@/lib/maps/campus-pois";
+import type { DateRangePreset } from "@/types";
 
 export default function ChatPanel() {
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -56,8 +57,16 @@ export default function ChatPanel() {
       }
 
       if (toolName === "show_events") {
-        const { date, category } = args as { date?: string; category?: string };
-        if (date) setEventDateFilter(date);
+        const { date, category, range } = args as {
+          date?: string;
+          category?: string;
+          range?: DateRangePreset;
+        };
+        if (range) {
+          setEventDateFilter(range);
+        } else if (date) {
+          setEventDateFilter("1d");
+        }
         if (category) setEventCategoryFilter(category);
         setActivePanel("events");
       }
