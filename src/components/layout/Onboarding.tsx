@@ -85,7 +85,7 @@ export default function Onboarding() {
   if (onboardingDismissed) return null;
 
   return (
-    {/* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */}
+    // eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions
     <div
       className="fixed inset-0 z-[45] flex items-end sm:items-center justify-center bg-black/50 backdrop-blur-sm p-0 sm:p-4"
       role="dialog"
