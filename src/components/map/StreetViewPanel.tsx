@@ -88,6 +88,7 @@ export default function StreetViewPanel({
   useEffect(() => {
     if (!containerRef.current || !window.google?.maps) return;
 
+    // source DEFAULT includes indoor collections for multi-story navigation
     new window.google.maps.StreetViewPanorama(containerRef.current, {
       position: location,
       pov: { heading: 0, pitch: 0 },
@@ -96,7 +97,10 @@ export default function StreetViewPanel({
       motionTrackingControl: false,
       addressControl: true,
       fullscreenControl: false,
-    });
+      linksControl: true,
+      clickToGo: true,
+      scrollwheel: true,
+    } as google.maps.StreetViewPanoramaOptions);
   }, [location]);
 
   return (

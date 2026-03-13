@@ -3,7 +3,11 @@
 import { Component, useEffect, useRef, useState, useCallback } from "react";
 import type { ReactNode, ErrorInfo } from "react";
 import { Map3D, Marker3D, Pin } from "@vis.gl/react-google-maps";
-import type { Map3DRef, Map3DClickEvent } from "@vis.gl/react-google-maps";
+import type {
+  Map3DRef,
+  Map3DClickEvent,
+  Map3DCameraChangedEvent,
+} from "@vis.gl/react-google-maps";
 import { ErrorState } from "@/components/ui/error-state";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAppStore } from "@/store/app-store";
@@ -110,7 +114,20 @@ export default function MapView() {
 }
 
 function Map3DInner() {
+  const defaultCamera = {
+    center: {
+      lat: CAMPUS_CENTER.lat,
+      lng: CAMPUS_CENTER.lng,
+      altitude: 300,
+    },
+    range: 800,
+    tilt: 55,
+    heading: 0,
+    roll: 0,
+  };
   const mapRef = useRef<Map3DRef>(null);
+  const lastCameraRef = useRef(defaultCamera);
+  const previousStreetViewRef = useRef(false);
   const lastMapClickRef = useRef<{
     timestamp: number;
     position: { lat: number; lng: number } | null;
@@ -131,6 +148,7 @@ function Map3DInner() {
     lat: number;
     lng: number;
   } | null>(null);
+  const [mapViewCamera, setMapViewCamera] = useState(defaultCamera);
 
   useEffect(() => {
     if (!flyToTarget || !mapRef.current) return;
@@ -149,6 +167,41 @@ function Map3DInner() {
     });
     setFlyToTarget(null);
   }, [flyToTarget, setFlyToTarget]);
+
+  // Save camera state when entering street view, restore when exiting
+  useEffect(() => {
+    const isNowInStreetView = inStreetView && !!streetViewLocation;
+    if (isNowInStreetView && !previousStreetViewRef.current) {
+      // Entering street view — snapshot camera
+      const currentMap = mapRef.current?.map3d;
+      if (
+        currentMap?.center &&
+        typeof currentMap.range === "number" &&
+        typeof currentMap.tilt === "number" &&
+        typeof currentMap.heading === "number" &&
+        typeof currentMap.roll === "number"
+      ) {
+        lastCameraRef.current = {
+          center: currentMap.center,
+          range: currentMap.range,
+          tilt: currentMap.tilt,
+          heading: currentMap.heading,
+          roll: currentMap.roll,
+        };
+      }
+    }
+    previousStreetViewRef.current = isNowInStreetView;
+  }, [inStreetView, streetViewLocation]);
+
+  const handleCameraChanged = useCallback((event: Map3DCameraChangedEvent) => {
+    lastCameraRef.current = event.detail;
+  }, []);
+
+  const handleCloseStreetView = useCallback(() => {
+    setMapViewCamera(lastCameraRef.current);
+    setInStreetView(false);
+    setStreetViewEvent(null);
+  }, [setStreetViewEvent]);
 
   const handleMapClick = useCallback((e: Map3DClickEvent) => {
     const now = Date.now();
@@ -203,10 +256,7 @@ function Map3DInner() {
       {inStreetView && streetViewLocation ? (
         <StreetViewPanel
           location={streetViewLocation}
-          onClose={() => {
-            setInStreetView(false);
-            setStreetViewEvent(null);
-          }}
+          onClose={handleCloseStreetView}
           eventInfo={streetViewEvent ?? undefined}
         />
       ) : (
@@ -214,14 +264,12 @@ function Map3DInner() {
           <Map3D
             ref={mapRef}
             mode="SATELLITE"
-            defaultCenter={{
-              lat: CAMPUS_CENTER.lat,
-              lng: CAMPUS_CENTER.lng,
-              altitude: 300,
-            }}
-            defaultRange={800}
-            defaultTilt={55}
-            defaultHeading={0}
+            defaultCenter={mapViewCamera.center}
+            defaultRange={mapViewCamera.range}
+            defaultTilt={mapViewCamera.tilt}
+            defaultHeading={mapViewCamera.heading}
+            defaultRoll={mapViewCamera.roll}
+            onCameraChanged={handleCameraChanged}
             onClick={handleMapClick}
           >
             {CAMPUS_POIS.map((poi) => {
@@ -239,10 +287,32 @@ function Map3DInner() {
                 >
                   <PinErrorBoundary>
                     <Pin
-                      background={isSelected ? "#003B5C" : "#DA291C"}
-                      borderColor={isSelected ? "#DA291C" : "#003B5C"}
-                      glyphColor={isSelected ? "#fff" : undefined}
-                      scale={isSelected ? 1.4 : 1.0}
+                      background={
+                        isSelected
+                          ? "#003B5C"
+                          : poi.category === "Building"
+                            ? "#003B5C"
+                            : "#DA291C"
+                      }
+                      borderColor={
+                        isSelected
+                          ? "#DA291C"
+                          : poi.category === "Building"
+                            ? "#FFD700"
+                            : "#003B5C"
+                      }
+                      glyphColor={
+                        isSelected || poi.category === "Building"
+                          ? "#fff"
+                          : undefined
+                      }
+                      scale={
+                        isSelected
+                          ? 1.4
+                          : poi.category === "Building"
+                            ? 1.2
+                            : 1.0
+                      }
                     />
                   </PinErrorBoundary>
                 </Marker3D>
