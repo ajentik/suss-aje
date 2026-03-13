@@ -1,6 +1,6 @@
-# SUSS AJE — Campus Intelligent Assistant
+# AskSUSSi — Campus Intelligent Assistant
 
-AI-powered campus assistant for Singapore University of Social Sciences. Chat with AJE to navigate the 3D campus map, discover events, find nearby food and amenities, and get voice-guided directions.
+AI-powered campus assistant for Singapore University of Social Sciences. Chat with AskSUSSi to navigate the 3D campus map, discover events, find nearby food and amenities, and get voice-guided directions.
 
 ## Tech Stack
 

@@ -15,7 +15,7 @@ const sourceCodePro = Source_Code_Pro({
 });
 
 export const metadata: Metadata = {
-  title: "SUSS AJE — Campus Intelligent Assistant",
+  title: "AskSUSSi — Campus Intelligent Assistant",
   description: "Resolve campus affairs with one sentence. AI-powered assistant with 3D campus map, navigation, and events.",
   manifest: "/manifest.json",
 };
