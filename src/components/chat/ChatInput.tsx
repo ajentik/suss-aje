@@ -99,15 +99,15 @@ export default function ChatInput({ onSend, isLoading }: ChatInputProps) {
           disabled={isLoading}
           rows={1}
           className={cn(
-            "w-full resize-none rounded-[22px] border bg-secondary/50 px-4 py-3",
+            "w-full resize-none rounded-[22px] border bg-secondary/40 px-4 py-3",
             "text-base leading-snug placeholder:text-muted-foreground/50",
             "focus:outline-none focus:bg-background",
             "transition-all duration-300 ease-out",
             "min-h-[48px] max-h-[140px]",
-            "disabled:opacity-40",
+            isLoading && "opacity-50 cursor-not-allowed",
             isFocused
               ? "border-primary/30 shadow-[0_0_0_3px_oklch(0.45_0.06_240/0.1)]"
-              : "border-border/40"
+              : "border-border/30 shadow-[0_1px_2px_oklch(0_0_0/0.03)]"
           )}
         />
       </div>

@@ -152,7 +152,7 @@ export default function ChatMessage({
             <>
               <MemoizedMarkdown content={content} />
               {isStreaming && (
-                <span className="inline-block w-[3px] h-[18px] ml-0.5 -mb-0.5 bg-current rounded-full animate-pulse" />
+                <span className="inline-block w-[2px] h-[1em] ml-0.5 -mb-[2px] bg-primary/60 rounded-full animate-pulse" />
               )}
             </>
           ) : (

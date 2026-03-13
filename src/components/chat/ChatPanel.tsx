@@ -11,6 +11,7 @@ import ChatInput from "./ChatInput";
 import QuickActions from "./QuickActions";
 import ToolResultCard from "./ToolResultCard";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import { useAppStore } from "@/store/app-store";
 import { useSpeechSynthesis } from "@/lib/voice/speech-synthesis";
 import { findPOI } from "@/lib/maps/campus-pois";
@@ -84,7 +85,7 @@ function renderAssistantParts(
       const output = (tp.output ?? {}) as Record<string, unknown>;
       nodes.push(
         <div key={`${messageId}-tool-${tp.toolCallId}`} className="flex justify-start mb-3">
-          <div className="max-w-[85%]">
+          <div className="max-w-[88%]">
             <ToolResultCard
               toolName={tp.toolName}
               output={output}
@@ -295,12 +296,11 @@ export default function ChatPanel() {
               className="mx-auto mb-5 h-16 w-auto animate-welcome-float"
               priority
             />
-            <p className="font-bold text-foreground text-lg">
-              Welcome to AskSUSSi
+            <p className="font-bold text-foreground text-xl tracking-tight">
+              Hi there!
             </p>
-            <p className="mt-1.5 text-muted-foreground text-sm leading-relaxed max-w-[280px] mx-auto">
-              Your campus intelligent assistant. Ask me about directions, events,
-              or campus services.
+            <p className="mt-1 text-muted-foreground text-sm leading-relaxed max-w-[260px] mx-auto">
+              I&apos;m your SUSS campus assistant. Ask me about directions, events, services, or anything campus-related.
             </p>
             <section
               aria-label="Suggested questions"
@@ -315,7 +315,7 @@ export default function ChatPanel() {
                   type="button"
                   key={q}
                   onClick={() => handleSend(q)}
-                  className="text-sm px-4 py-2.5 rounded-full border border-primary/20 text-primary hover:bg-primary hover:text-primary-foreground active:scale-95 transition-all duration-200 font-medium animate-chip-enter"
+                  className="text-sm px-4 py-2.5 min-h-[44px] rounded-full border border-primary/20 text-primary hover:bg-primary hover:text-primary-foreground active:scale-95 transition-all duration-200 font-medium animate-chip-enter"
                   style={{ animationDelay: `${200 + i * 80}ms` }}
                 >
                   {q}
@@ -345,14 +345,16 @@ export default function ChatPanel() {
         })}
 
         {error && (
-          <div className="mx-2 mb-3 p-3 rounded-xl bg-destructive/10 border border-destructive/20 text-sm animate-error-shake">
-            <div className="flex items-start gap-2">
-              <AlertCircle className="w-4 h-4 text-destructive shrink-0 mt-0.5" />
+          <div className="mx-2 mb-3 p-3.5 rounded-2xl bg-destructive/8 border border-destructive/15 text-sm animate-error-shake">
+            <div className="flex items-start gap-2.5">
+              <div className="shrink-0 mt-0.5 flex items-center justify-center w-7 h-7 rounded-lg bg-destructive/10">
+                <AlertCircle className="w-3.5 h-3.5 text-destructive" />
+              </div>
               <div className="flex-1 min-w-0">
                 <p className="font-medium text-destructive">
-                  Something went wrong
+                  Oops, something went wrong
                 </p>
-                <p className="mt-1 text-destructive/80">{error.message}</p>
+                <p className="mt-1 text-destructive/70 text-[0.8125rem] leading-relaxed">{error.message}</p>
               </div>
             </div>
             {lastFailedInput && (
@@ -372,23 +374,21 @@ export default function ChatPanel() {
           </div>
         )}
 
-        <div ref={endRef} />
-
         {(isWaiting || hasToolInProgress) && (
           <div className="flex justify-start mb-3 animate-chat-fade-in">
-            <div className="bg-secondary rounded-2xl rounded-bl-sm px-4 py-3">
+            <div className="bg-secondary rounded-[20px] rounded-bl-[6px] px-4 py-3">
               <span className="inline-flex items-center gap-2.5">
                 <span className="inline-flex gap-1.5">
                   {[0, 1, 2].map((i) => (
                     <span
                       key={i}
-                      className="w-1.5 h-1.5 rounded-full bg-primary animate-thinking-dot"
+                      className="w-2 h-2 rounded-full bg-primary/70 animate-typing-pulse"
                       style={{ animationDelay: `${i * 0.2}s` }}
                     />
                   ))}
                 </span>
                 {(thinkingLabel || isWaiting) && (
-                  <span className="text-xs text-muted-foreground italic">
+                  <span className="text-xs text-muted-foreground/80 font-medium">
                     {thinkingLabel ?? "Thinking..."}
                   </span>
                 )}
@@ -396,20 +396,33 @@ export default function ChatPanel() {
             </div>
           </div>
         )}
+
+        <div ref={endRef} />
       </div>
 
       {hasNewMessages && (
         <button
           type="button"
           onClick={scrollToBottom}
-          className="absolute bottom-20 left-1/2 -translate-x-1/2 z-10 bg-primary text-primary-foreground text-xs font-medium px-3.5 py-2 rounded-full shadow-lg hover:bg-primary/90 active:scale-95 transition-all duration-200 animate-scroll-bounce-in inline-flex items-center gap-1"
+          className={cn(
+            "absolute left-1/2 z-10 bg-primary text-primary-foreground text-xs font-medium",
+            "px-3.5 py-2 min-h-[36px] rounded-full shadow-lg",
+            "hover:bg-primary/90 active:scale-95",
+            "transition-all duration-200 animate-scroll-bounce-in",
+            "inline-flex items-center gap-1",
+            isEmpty ? "bottom-28" : "bottom-20"
+          )}
         >
           New messages
           <ChevronDown className="w-3.5 h-3.5" />
         </button>
       )}
 
-      {isEmpty && <QuickActions onSend={handleSend} disabled={isActive} />}
+      {isEmpty && (
+        <div className="border-t border-border/40">
+          <QuickActions onSend={handleSend} disabled={isActive} />
+        </div>
+      )}
       <ChatInput onSend={handleSend} isLoading={isActive} />
     </div>
   );
