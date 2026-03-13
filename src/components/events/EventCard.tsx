@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useRef, useState, useCallback, useEffect } from "react";
 import type { CampusEvent } from "@/types";
 import { Badge } from "@/components/ui/badge";
 import { ExternalLink } from "lucide-react";
@@ -38,6 +38,13 @@ export default function EventCard({ event, index = 0 }: EventCardProps) {
   const setSelectedEvent = useAppStore((s) => s.setSelectedEvent);
   const setStreetViewEvent = useAppStore((s) => s.setStreetViewEvent);
   const [isExpanded, setIsExpanded] = useState(false);
+  const [contentHeight, setContentHeight] = useState(0);
+
+  useEffect(() => {
+    if (contentRef.current) {
+      setContentHeight(contentRef.current.scrollHeight);
+    }
+  }, [isExpanded]);
   const contentRef = useRef<HTMLDivElement>(null);
 
   const handleClick = () => {
@@ -155,7 +162,7 @@ export default function EventCard({ event, index = 0 }: EventCardProps) {
             className="overflow-hidden transition-[max-height] duration-300 ease-in-out"
             style={{
               maxHeight: isExpanded
-                ? `${contentRef.current?.scrollHeight ?? 500}px`
+                ? `${contentHeight || 500}px`
                 : "0px",
             }}
           >

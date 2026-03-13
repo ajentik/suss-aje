@@ -90,6 +90,9 @@ export default function Onboarding() {
       role="dialog"
       aria-modal="true"
       aria-label="Welcome to AskSUSSi"
+      onKeyDown={(e) => {
+        if (e.key === "Escape") handleDismiss();
+      }}
       onClick={(e) => {
         if (e.target === e.currentTarget) handleDismiss();
       }}
