@@ -2,10 +2,9 @@
 
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import type { POI, RouteInfo, CampusEvent, DateRangePreset } from "@/types";
+import type { POI, RouteInfo, CampusEvent, ChatMessage, DateRangePreset } from "@/types";
 
 interface AppState {
-  // Map
   selectedPOI: POI | null;
   setSelectedPOI: (poi: POI | null) => void;
   selectedDestination: POI | null;
@@ -15,11 +14,9 @@ interface AppState {
   flyToTarget: { lat: number; lng: number; altitude?: number } | null;
   setFlyToTarget: (target: { lat: number; lng: number; altitude?: number } | null) => void;
 
-  // Panels
   activePanel: "chat" | "events";
   setActivePanel: (panel: "chat" | "events") => void;
 
-  // Events
   eventDateFilter: DateRangePreset;
   setEventDateFilter: (preset: DateRangePreset) => void;
   eventCategoryFilter: string;
@@ -33,11 +30,25 @@ interface AppState {
   streetViewEvent: CampusEvent | null;
   setStreetViewEvent: (event: CampusEvent | null) => void;
 
-  // Voice
   isSpeaking: boolean;
   setIsSpeaking: (speaking: boolean) => void;
   ttsEnabled: boolean;
   setTtsEnabled: (enabled: boolean) => void;
+
+  onboardingDismissed: boolean;
+  setOnboardingDismissed: (dismissed: boolean) => void;
+
+  chatMessages: ChatMessage[];
+  setChatMessages: (messages: ChatMessage[]) => void;
+  conversationId: string;
+  newChat: () => void;
+
+  pendingChatMessage: string | null;
+  setPendingChatMessage: (message: string | null) => void;
+}
+
+function generateId(): string {
+  return Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
 }
 
 export const useAppStore = create<AppState>()(
@@ -72,12 +83,33 @@ export const useAppStore = create<AppState>()(
       setIsSpeaking: (speaking) => set({ isSpeaking: speaking }),
       ttsEnabled: false,
       setTtsEnabled: (enabled) => set({ ttsEnabled: enabled }),
+
+      onboardingDismissed: false,
+      setOnboardingDismissed: (dismissed) => set({ onboardingDismissed: dismissed }),
+
+      chatMessages: [],
+      setChatMessages: (messages) => set({ chatMessages: messages }),
+      conversationId: generateId(),
+      newChat: () =>
+        set({
+          chatMessages: [],
+          conversationId: generateId(),
+          routeInfo: null,
+          selectedDestination: null,
+          selectedPOI: null,
+        }),
+
+      pendingChatMessage: null,
+      setPendingChatMessage: (message) => set({ pendingChatMessage: message }),
     }),
     {
       name: "asksussi-prefs",
       partialize: (state) => ({
         ttsEnabled: state.ttsEnabled,
         activePanel: state.activePanel,
+        onboardingDismissed: state.onboardingDismissed,
+        chatMessages: state.chatMessages,
+        conversationId: state.conversationId,
       }),
     }
   )

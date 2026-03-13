@@ -116,11 +116,12 @@ export default function ChatMessage({
   isStreaming,
 }: ChatMessageProps) {
   return (
-    <div
+    <article
       className={cn(
         "flex w-full mb-3",
         role === "user" ? "justify-end" : "justify-start"
       )}
+      aria-label={`${role === "user" ? "You" : "AskSUSSi"} said`}
     >
       <div
         className={cn(
@@ -141,6 +142,6 @@ export default function ChatMessage({
           content
         )}
       </div>
-    </div>
+    </article>
   );
 }
