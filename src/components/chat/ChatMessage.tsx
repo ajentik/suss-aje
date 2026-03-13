@@ -80,7 +80,7 @@ export default function ChatMessage({
     >
       <div
         className={cn(
-          "max-w-[85%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed",
+          "max-w-[85%] rounded-2xl px-4 py-3 text-[0.9375rem] leading-relaxed",
           role === "user"
             ? "bg-surface-brand text-surface-brand-foreground rounded-br-sm"
             : "bg-secondary text-foreground rounded-bl-sm"

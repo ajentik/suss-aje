@@ -45,7 +45,7 @@ export default function EventFilter({
             type="button"
             onClick={() => onDateChange(p.value)}
             className={cn(
-              "flex-1 rounded-md px-2 py-1 text-xs font-medium transition-colors",
+              "flex-1 rounded-md px-3 py-1.5 text-sm font-medium transition-colors",
               dateFilter === p.value
                 ? "bg-background text-foreground shadow-sm"
                 : "text-foreground/60 hover:text-foreground"
@@ -56,7 +56,7 @@ export default function EventFilter({
         ))}
       </div>
       <Select value={categoryFilter} onValueChange={(value) => onCategoryChange(value ?? "")}>
-        <SelectTrigger className="text-xs h-8 rounded-md bg-background px-2 w-[160px]">
+        <SelectTrigger className="text-sm h-9 rounded-md bg-background px-3 w-[160px]">
           <SelectValue placeholder="All categories" />
         </SelectTrigger>
         <SelectContent>
@@ -69,7 +69,7 @@ export default function EventFilter({
         </SelectContent>
       </Select>
       <Select value={schoolFilter} onValueChange={(value) => onSchoolChange(value ?? "")}>
-        <SelectTrigger className="text-xs h-8 rounded-md bg-background px-2 w-[120px]">
+        <SelectTrigger className="text-sm h-9 rounded-md bg-background px-3 w-[120px]">
           <SelectValue placeholder="All schools" />
         </SelectTrigger>
         <SelectContent>
