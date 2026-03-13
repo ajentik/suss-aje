@@ -241,6 +241,9 @@ function Map3DInner() {
   );
 
   useEffect(() => {
+    if (typeof window !== "undefined" && window.speechSynthesis) {
+      window.speechSynthesis.cancel();
+    }
     if (streetViewEvent && streetViewEvent.type !== "Online") {
       const timeoutId = window.setTimeout(() => {
         setStreetViewLocation({ lat: streetViewEvent.lat, lng: streetViewEvent.lng });

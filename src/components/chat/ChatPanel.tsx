@@ -1,9 +1,10 @@
 "use client";
 
 import { useChat } from "@ai-sdk/react";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import type { TextUIPart } from "ai";
+import { toast } from "sonner";
 import ChatMessage from "./ChatMessage";
 import ChatInput from "./ChatInput";
 import { useAppStore } from "@/store/app-store";
@@ -15,6 +16,7 @@ export default function ChatPanel() {
   const endRef = useRef<HTMLDivElement>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const userScrolledUpRef = useRef(false);
+  const [hasNewMessages, setHasNewMessages] = useState(false);
   const setFlyToTarget = useAppStore((s) => s.setFlyToTarget);
   const setSelectedDestination = useAppStore((s) => s.setSelectedDestination);
   const setRouteInfo = useAppStore((s) => s.setRouteInfo);
@@ -55,6 +57,7 @@ export default function ChatPanel() {
                 });
               }
             } catch {
+              toast.error("Could not compute walking route.");
             }
           }
         }
@@ -73,6 +76,7 @@ export default function ChatPanel() {
         }
         if (category) setEventCategoryFilter(category);
         setActivePanel("events");
+        toast.info("Showing matching events.");
       }
     },
     onFinish: ({ message }) => {
@@ -90,8 +94,11 @@ export default function ChatPanel() {
   const isActive = status === "streaming" || status === "submitted";
 
   useEffect(() => {
-    if (!userScrolledUpRef.current) {
+    if (userScrolledUpRef.current) {
+      if (messages.length > 0) setHasNewMessages(true);
+    } else {
       endRef.current?.scrollIntoView({ behavior: "smooth" });
+      setHasNewMessages(false);
     }
   });
 
@@ -108,6 +115,13 @@ export default function ChatPanel() {
     if (!el) return;
     const atBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 80;
     userScrolledUpRef.current = !atBottom;
+    if (atBottom) setHasNewMessages(false);
+  };
+
+  const scrollToBottom = () => {
+    userScrolledUpRef.current = false;
+    setHasNewMessages(false);
+    endRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
   const handleSend = (text: string) => {
@@ -116,7 +130,7 @@ export default function ChatPanel() {
   };
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full relative">
       <div
         role="log"
         aria-label="Chat messages"
@@ -191,6 +205,15 @@ export default function ChatPanel() {
           </div>
         )}
       </div>
+      {hasNewMessages && (
+        <button
+          type="button"
+          onClick={scrollToBottom}
+          className="absolute bottom-16 left-1/2 -translate-x-1/2 z-10 bg-primary text-primary-foreground text-xs font-medium px-3 py-1.5 rounded-full shadow-lg hover:bg-primary/90 transition-colors"
+        >
+          New messages ↓
+        </button>
+      )}
       <ChatInput onSend={handleSend} isLoading={isActive} />
     </div>
   );

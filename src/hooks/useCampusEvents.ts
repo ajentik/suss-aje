@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
+import { toast } from "sonner";
 import type { CampusEvent, DateRangePreset } from "@/types";
 import { getDateRange } from "@/lib/date-utils";
 
@@ -18,7 +19,10 @@ export function useCampusEvents() {
         setEvents(data);
         setIsLoading(false);
       })
-      .catch(() => setIsLoading(false));
+      .catch(() => {
+        toast.error("Failed to load campus events.");
+        setIsLoading(false);
+      });
   }, []);
 
   const filteredEvents = useMemo(() => {

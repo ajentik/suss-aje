@@ -63,6 +63,19 @@ export default function EventsPanel() {
             icon={<CalendarX className="h-8 w-8 text-muted-foreground" />}
             title="No events found"
             description="Try adjusting your filters."
+            action={
+              <button
+                type="button"
+                onClick={() => {
+                  setDateFilter("all");
+                  setCategoryFilter("");
+                  setSchoolFilter("");
+                }}
+                className="mt-1 text-sm text-primary hover:underline font-medium"
+              >
+                Clear all filters
+              </button>
+            }
           />
         ) : (
           <div className="space-y-2">

@@ -12,7 +12,7 @@ export function useSpeechRecognition() {
   const recognitionRef = useRef<ReturnType<typeof createRecognition> | null>(null);
 
   const startListening = useCallback(
-    (onResult: (text: string) => void) => {
+    (onResult: (text: string) => void, onError?: (message: string) => void) => {
       const recognition = createRecognition();
       if (!recognition) return;
 
@@ -28,7 +28,16 @@ export function useSpeechRecognition() {
       };
 
       recognition.onend = () => setIsListening(false);
-      recognition.onerror = () => setIsListening(false);
+      recognition.onerror = (event: { error: string }) => {
+        setIsListening(false);
+        const msg =
+          event.error === "not-allowed"
+            ? "Microphone access denied. Please allow microphone permissions."
+            : event.error === "no-speech"
+              ? "No speech detected. Please try again."
+              : "Voice input failed. Please try again.";
+        onError?.(msg);
+      };
 
       setIsListening(true);
       recognition.start();
