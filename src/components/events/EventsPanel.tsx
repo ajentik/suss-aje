@@ -53,16 +53,17 @@ export default function EventsPanel() {
       />
       <ScrollArea className="flex-1 p-3">
         {isLoading ? (
-          <div className="space-y-2">
+          <div className="space-y-3">
+            <EventCardSkeleton />
             <EventCardSkeleton />
             <EventCardSkeleton />
             <EventCardSkeleton />
           </div>
         ) : events.length === 0 ? (
           <EmptyState
-            icon={<CalendarX className="h-8 w-8 text-muted-foreground" />}
+            icon={<CalendarX className="h-10 w-10 text-muted-foreground/60" />}
             title="No events found"
-            description="Try adjusting your filters."
+            description="Try changing your date range or clearing filters to see more events."
             action={
               <button
                 type="button"
@@ -71,17 +72,19 @@ export default function EventsPanel() {
                   setCategoryFilter("");
                   setSchoolFilter("");
                 }}
-                className="mt-1 text-sm text-primary hover:underline font-medium"
+                className="mt-2 text-sm text-primary hover:underline font-medium min-h-[44px] flex items-center"
               >
                 Clear all filters
               </button>
             }
           />
         ) : (
-          <div className="space-y-2">
-            <p className="text-sm text-muted-foreground px-1 font-medium">{events.length} events</p>
-            {events.map((event) => (
-              <EventCard key={event.id} event={event} />
+          <div className="space-y-3">
+            <p className="text-xs text-muted-foreground px-1 font-medium tracking-wide uppercase">
+              {events.length} event{events.length !== 1 ? "s" : ""}
+            </p>
+            {events.map((event, i) => (
+              <EventCard key={event.id} event={event} index={i} />
             ))}
           </div>
         )}

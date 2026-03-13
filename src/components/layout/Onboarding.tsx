@@ -64,23 +64,24 @@ export default function Onboarding() {
 
   return (
     <div
-      className="fixed inset-0 z-[45] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4"
+      className="fixed inset-0 z-[45] flex items-end sm:items-center justify-center bg-black/50 backdrop-blur-sm p-0 sm:p-4"
       role="dialog"
       aria-modal="true"
       aria-label="Welcome to AskSUSSi"
     >
       <div
         ref={dialogRef}
-        className="relative w-full max-w-md bg-background rounded-2xl shadow-2xl border border-border overflow-hidden animate-hero-fade-in-up"
+        className="relative w-full sm:max-w-md max-h-[90dvh] bg-background rounded-t-2xl sm:rounded-2xl shadow-2xl border border-border overflow-y-auto animate-hero-fade-in-up"
       >
-        <div className="bg-surface-brand px-6 py-5 text-surface-brand-foreground">
+        {/* Header */}
+        <div className="bg-surface-brand px-5 py-5 text-surface-brand-foreground sticky top-0 z-10">
           <button
             type="button"
             onClick={handleDismiss}
             aria-label="Close welcome dialog"
-            className="absolute top-4 right-4 flex items-center justify-center w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 transition-colors text-white/80 hover:text-white"
+            className="absolute top-4 right-4 flex items-center justify-center w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 active:bg-white/30 transition-colors text-white/80 hover:text-white"
           >
-            <X size={16} />
+            <X size={18} />
           </button>
           <div className="flex items-center gap-3 mb-3">
             <Image
@@ -100,28 +101,32 @@ export default function Onboarding() {
           </p>
         </div>
 
-        <div className="px-6 py-4">
+        {/* Capabilities — single-column scrollable list on small screens */}
+        <div className="px-5 py-4">
           <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">
             What I can do
           </p>
-          <div className="grid grid-cols-2 gap-2">
+          <div className="flex flex-col gap-2 sm:grid sm:grid-cols-2">
             {CAPABILITIES.map(({ icon: Icon, label, description }) => (
               <div
                 key={label}
-                className="flex items-start gap-2.5 rounded-lg border border-border/60 bg-muted/40 p-2.5"
+                className="flex items-center gap-3 rounded-xl border border-border/60 bg-muted/40 p-3"
               >
-                <Icon size={16} className="text-primary mt-0.5 shrink-0" aria-hidden="true" />
-                <div>
+                <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-primary/10 shrink-0">
+                  <Icon size={18} className="text-primary" aria-hidden="true" />
+                </div>
+                <div className="min-w-0">
                   <p className="text-sm font-medium text-foreground">{label}</p>
-                  <p className="text-xs text-muted-foreground">{description}</p>
+                  <p className="text-xs text-muted-foreground leading-snug">{description}</p>
                 </div>
               </div>
             ))}
           </div>
         </div>
 
-        <div className="px-6 pb-5">
-          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
+        {/* Try suggestions — larger chips */}
+        <div className="px-5 pb-4">
+          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2.5">
             Try asking...
           </p>
           <div className="flex flex-wrap gap-2">
@@ -130,7 +135,7 @@ export default function Onboarding() {
                 key={text}
                 type="button"
                 onClick={() => handleTrySuggestion(text)}
-                className="text-sm px-3 py-1.5 rounded-full border border-primary/20 text-primary hover:bg-primary hover:text-primary-foreground transition-colors font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                className="text-sm px-4 py-2.5 rounded-xl border border-primary/20 text-primary hover:bg-primary hover:text-primary-foreground active:bg-primary/90 transition-colors font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring min-h-[44px]"
               >
                 {text}
               </button>
@@ -138,11 +143,12 @@ export default function Onboarding() {
           </div>
         </div>
 
-        <div className="px-6 pb-5">
+        {/* CTA */}
+        <div className="px-5 pb-5">
           <button
             type="button"
             onClick={handleDismiss}
-            className="w-full bg-primary text-primary-foreground rounded-lg px-4 py-2.5 text-sm font-semibold hover:bg-primary/90 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            className="w-full bg-primary text-primary-foreground rounded-xl px-4 py-3 text-sm font-semibold hover:bg-primary/90 active:bg-primary/80 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring min-h-[48px]"
           >
             Get Started
           </button>
