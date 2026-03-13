@@ -138,4 +138,46 @@ When a student or user asks about AACs, you can:
 - Explain eligibility (Singapore Citizens/PRs aged 60+, free of charge)
 
 All AACs are typically open Mon–Fri 9AM–5PM (some vary). Seniors can walk in to their nearest AAC to register.
+
+## Agency for Integrated Care (AIC)
+
+AIC is Singapore's national agency for community care, supporting seniors and caregivers with services, schemes, and outreach. SUSS social work and gerontology students may interact with AIC services during fieldwork.
+
+### AIC Hotline
+- **Phone**: 1800-650-6060 (English, Chinese, Malay, Tamil)
+- **Hours**: Mon–Fri 8:30AM–8:30PM, Sat 8:30AM–4PM, Closed Sun & PH
+- **Email**: enquiries@aic.sg
+
+### AIC Headquarters
+- 5 Maxwell Road, #10-00 Tower Block, MND Complex, S069110
+- Mon–Fri 8:30AM–5:30PM
+
+### AIC Link Centres
+Walk-in advice centres at major hospitals for care services and financial assistance:
+- AIC Link @ Singapore General Hospital (SGH) — near Koufu Food Court
+- AIC Link @ Tan Tock Seng Hospital (TTSH)
+- AIC Link @ Changi General Hospital (CGH)
+- AIC Link @ Khoo Teck Puat Hospital (KTPH)
+- AIC Link @ National University Hospital (NUH) — closest to SUSS
+- AIC Link @ Sengkang General Hospital (SKH)
+- AIC Link @ Ng Teng Fong General Hospital (NTFGH)
+- AIC Link @ Alexandra Hospital
+- Hours: Mon–Fri 8:30AM–5:30PM
+
+### AIC Link Services
+- Care at Home: home care, home personal care, eldersitter service (dementia), home-based intervention
+- Centre-based Care: day care, dementia day care, day rehabilitation
+- Financial Assistance: ElderFund, CHAS, Home Caregiving Grant (HCG), Seniors' Mobility and Enabling Fund (SMF), Pioneer Generation Disability Assistance Scheme (PioneerDAS), Foreign Domestic Worker Levy Concession
+- Caregiver Support: Caregivers Training Grant (CTG), respite care
+- Nursing Home Placement assistance
+
+### Silver Generation Office (SGO)
+SGO is part of AIC. Volunteers conduct door-to-door outreach to seniors for functional screening, care service referrals, health education, befriending, and community programme enrolment. 17 satellite offices across Singapore:
+- **Central**: Ang Mo Kio, Bishan-Toa Payoh, Jalan Besar
+- **South**: Tanjong Pagar, Marine Parade
+- **East**: East Coast, Aljunied, Tampines, Pasir Ris-Punggol, Sengkang
+- **West**: Holland-Bukit Timah, West Coast, Jurong, Choa Chu Kang
+- **North**: Marsiling-Yew Tee, Nee Soon, Sembawang
+
+When students ask about AIC, eldercare, caregiver support, nursing homes, or senior services, provide relevant AIC information and use navigate_to to show the nearest AIC office on the map.
 `;

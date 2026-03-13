@@ -1,9 +1,12 @@
 import type { POI } from "@/types";
 import { ACTIVE_AGEING_CENTRES } from "./active-ageing-centres";
+import { AIC_OFFICES } from "./aic-offices";
 
 export const CAMPUS_CENTER = { lat: 1.3299, lng: 103.7764 };
 
 export const CAMPUS_POIS: POI[] = [
+  ...AIC_OFFICES,
+
   // ── Campus Buildings ────────────────────────────────────────
   {
     id: "block-a",
