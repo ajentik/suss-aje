@@ -1,3 +1,5 @@
+export type PriceLevel = 1 | 2 | 3 | 4;
+
 export interface POI {
   id: string;
   name: string;
@@ -10,6 +12,11 @@ export interface POI {
   rating?: number;
   notes?: string;
   cuisine?: string;
+  tags?: string[];
+  distanceFromCampus?: string;
+  contact?: string;
+  website?: string;
+  priceLevel?: PriceLevel;
 }
 
 export interface CampusEvent {
@@ -28,6 +35,8 @@ export interface CampusEvent {
   url?: string;
   venueAddress?: string;
   longDescription?: string;
+  organizerLogo?: string;
+  registrationUrl?: string;
 }
 
 export interface RouteInfo {

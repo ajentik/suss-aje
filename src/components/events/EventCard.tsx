@@ -3,6 +3,7 @@
 import { useState } from "react";
 import type { CampusEvent } from "@/types";
 import { Badge } from "@/components/ui/badge";
+import { ExternalLink } from "lucide-react";
 import { useAppStore } from "@/store/app-store";
 
 interface EventCardProps {
@@ -13,6 +14,16 @@ const TYPE_COLORS: Record<string, string> = {
   "On-Campus": "bg-event-oncampus-bg text-event-oncampus-fg",
   Online: "bg-event-online-bg text-event-online-fg",
   External: "bg-event-external-bg text-event-external-fg",
+};
+
+const CATEGORY_COLORS: Record<string, string> = {
+  "Information Session": "border-blue-500",
+  "Open House": "border-green-500",
+  "Public Lecture / Enrichment Talk": "border-purple-500",
+  Symposium: "border-teal-500",
+  "Competition / Hackathon": "border-orange-500",
+  Career: "border-emerald-500",
+  Social: "border-amber-500",
 };
 
 export default function EventCard({ event }: EventCardProps) {
@@ -40,10 +51,21 @@ export default function EventCard({ event }: EventCardProps) {
       type="button"
       aria-label={`View ${event.title} on map`}
       onClick={handleClick}
-      className="w-full text-left p-3 rounded-lg border hover:bg-muted/50 transition-colors flex flex-col gap-2"
+      className={`w-full text-left p-3 rounded-lg border border-l-4 ${CATEGORY_COLORS[event.category] || "border-gray-300"} hover:bg-muted/50 transition-colors flex flex-col gap-2`}
     >
       <div className="flex items-start justify-between gap-2 w-full">
-        <h3 className="font-semibold text-[0.9375rem] leading-snug">{event.title}</h3>
+        <div className="flex items-center gap-2">
+          {event.organizerLogo && (
+            <img
+              src={event.organizerLogo}
+              alt={`${event.title} organizer`}
+              width={24}
+              height={24}
+              className="w-6 h-6 rounded-full shrink-0 object-cover"
+            />
+          )}
+          <h3 className="font-semibold text-[0.9375rem] leading-snug">{event.title}</h3>
+        </div>
         <Badge variant="secondary" className="text-xs shrink-0">
           {event.category}
         </Badge>
@@ -110,7 +132,19 @@ export default function EventCard({ event }: EventCardProps) {
         </div>
       )}
 
-      <div className="flex items-center justify-end w-full mt-1">
+      <div className="flex items-center justify-end gap-2 w-full mt-1">
+        {event.registrationUrl && (
+          <a
+            href={event.registrationUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={(e) => e.stopPropagation()}
+            className="flex items-center gap-1.5 border border-primary text-primary px-3.5 py-2 rounded-lg text-sm font-medium hover:bg-primary/10 transition-colors"
+          >
+            <ExternalLink className="w-3.5 h-3.5" />
+            Register
+          </a>
+        )}
         {event.type !== "Online" ? (
           <button
             type="button"
