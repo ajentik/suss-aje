@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 import { useAppStore } from "@/store/app-store";
 import { getBuildingInsights, type SolarInsight } from "@/lib/maps/solar-utils";
 
@@ -34,9 +35,13 @@ export default function RouteOverlay() {
       selectedDestination.lat,
       selectedDestination.lng,
       MAPS_API_KEY
-    ).then((result) => {
-      if (!cancelled) setSolar(result);
-    });
+    )
+      .then((result) => {
+        if (!cancelled) setSolar(result);
+      })
+      .catch(() => {
+        if (!cancelled) toast.error("Sun exposure data unavailable.");
+      });
 
     return () => {
       cancelled = true;

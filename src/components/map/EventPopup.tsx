@@ -41,7 +41,7 @@ export default function EventPopup() {
       }`}
       onTransitionEnd={handleTransitionEnd}
     >
-      <div className="bg-white rounded-xl shadow-lg max-w-md w-[380px] p-5 relative border border-gray-100">
+      <div className="bg-white rounded-xl shadow-lg max-w-md w-[calc(100vw-2rem)] sm:w-[380px] p-5 relative border border-gray-100">
         <button type="button"
           onClick={handleClose}
           className="absolute top-3 right-3 text-gray-400 hover:text-gray-600 transition-colors"

@@ -32,7 +32,7 @@ export default function AppShell() {
   const setActivePanel = useAppStore((s) => s.setActivePanel);
   const ttsEnabled = useAppStore((s) => s.ttsEnabled);
   const setTtsEnabled = useAppStore((s) => s.setTtsEnabled);
-  const [mobileSheetOpen, setMobileSheetOpen] = useState(true);
+  const [mobileSheet, setMobileSheet] = useState<"collapsed" | "peek" | "expanded">("expanded");
   const [minimized, setMinimized] = useState(false);
   const [panelWidth, setPanelWidth] = useState(DEFAULT_WIDTH);
   const isResizing = useRef(false);
@@ -51,6 +51,18 @@ export default function AppShell() {
     },
     [panelWidth]
   );
+
+  useEffect(() => {
+    if (typeof window !== "undefined" && window.speechSynthesis) {
+      window.speechSynthesis.cancel();
+    }
+  }, [activePanel]);
+
+  const cycleSheet = useCallback(() => {
+    setMobileSheet((prev) =>
+      prev === "collapsed" ? "peek" : prev === "peek" ? "expanded" : "collapsed"
+    );
+  }, []);
 
   useEffect(() => {
     const handleMove = (e: MouseEvent | TouchEvent) => {
@@ -162,7 +174,7 @@ export default function AppShell() {
         <button
           type="button"
           aria-label="Resize panel"
-          className="hidden md:flex items-center justify-center w-2 cursor-col-resize hover:bg-primary/10 active:bg-primary/20 transition-colors group shrink-0 border-0 bg-transparent p-0"
+          className="hidden md:flex items-center justify-center w-3 px-2 -mx-2 cursor-col-resize hover:bg-primary/10 active:bg-primary/20 transition-colors group shrink-0 border-0 bg-transparent"
           onMouseDown={handleResizeStart}
           onTouchStart={handleResizeStart}
         >
@@ -191,17 +203,17 @@ export default function AppShell() {
         aria-label="Chat and Events (mobile)"
         className={`
           md:hidden fixed bottom-0 left-0 right-0 z-30
-          ${mobileSheetOpen ? "h-[55dvh]" : "h-12"}
+          ${mobileSheet === "expanded" ? "h-[55dvh]" : mobileSheet === "peek" ? "h-[120px]" : "h-12"}
           bg-background/90 backdrop-blur-xl transition-all duration-300
-          flex flex-col
+          flex flex-col overflow-hidden
           rounded-t-2xl shadow-[0_-4px_12px_rgba(0,0,0,0.1)]
         `}
       >
         <button
           type="button"
-          aria-label={mobileSheetOpen ? "Collapse panel" : "Expand panel"}
+          aria-label={mobileSheet === "expanded" ? "Collapse panel" : "Expand panel"}
           className="flex justify-center py-2 shrink-0"
-          onClick={() => setMobileSheetOpen(!mobileSheetOpen)}
+          onClick={cycleSheet}
         >
           <div className="w-8 h-1 rounded-full bg-muted-foreground/30" />
         </button>

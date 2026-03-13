@@ -1,5 +1,6 @@
 "use client";
 
+import { toast } from "sonner";
 import { useSpeechRecognition } from "@/lib/voice/speech-recognition";
 import { Mic } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -15,7 +16,7 @@ export default function VoiceButton({ onTranscript }: VoiceButtonProps) {
     if (isListening) {
       stopListening();
     } else {
-      startListening(onTranscript);
+      startListening(onTranscript, (msg) => toast.error(msg));
     }
   };
 

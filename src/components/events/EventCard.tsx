@@ -17,11 +17,13 @@ const TYPE_COLORS: Record<string, string> = {
 
 export default function EventCard({ event }: EventCardProps) {
   const setFlyToTarget = useAppStore((s) => s.setFlyToTarget);
+  const setSelectedEvent = useAppStore((s) => s.setSelectedEvent);
   const setStreetViewEvent = useAppStore((s) => s.setStreetViewEvent);
   const [isExpanded, setIsExpanded] = useState(false);
 
   const handleClick = () => {
     setFlyToTarget({ lat: event.lat, lng: event.lng });
+    setSelectedEvent(event);
   };
 
   const handleNavigate = (e: React.MouseEvent) => {
