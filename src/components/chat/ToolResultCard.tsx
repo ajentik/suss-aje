@@ -27,11 +27,53 @@ interface CampusInfoOutput {
   venues?: POI[];
 }
 
+/* ── Shimmer Loading Skeleton ── */
+
+function ToolShimmer({ toolName }: { toolName: string }) {
+  const label =
+    toolName === "navigate_to"
+      ? "Finding location..."
+      : toolName === "show_events"
+        ? "Searching events..."
+        : "Looking up info...";
+
+  return (
+    <Card size="sm" className="bg-card/60 animate-tool-card-enter overflow-hidden">
+      <CardContent className="space-y-3">
+        <div className="flex items-center gap-2.5">
+          <div className="w-9 h-9 rounded-xl bg-primary/8 animate-skeleton-wave shrink-0" />
+          <div className="flex-1 space-y-2">
+            <div className="h-3.5 w-3/5 rounded-full bg-muted/60 animate-skeleton-wave" />
+            <div
+              className="h-3 w-2/5 rounded-full bg-muted/60 animate-skeleton-wave"
+              style={{ animationDelay: "0.15s" }}
+            />
+          </div>
+        </div>
+        <div className="flex items-center gap-2 pl-0.5">
+          <span className="inline-flex gap-1.5">
+            {[0, 1, 2].map((i) => (
+              <span
+                key={i}
+                className="w-1.5 h-1.5 rounded-full bg-primary/60 animate-typing-pulse"
+                style={{ animationDelay: `${i * 0.2}s` }}
+              />
+            ))}
+          </span>
+          <span className="text-xs text-muted-foreground italic">{label}</span>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+/* ── Location Card ── */
+
 function LocationCard({ output }: { output: NavigateOutput }) {
   const poi = output.poi;
   if (!poi) {
     return (
-      <Card size="sm" className="bg-destructive/5 ring-destructive/20">
+      <Card size="sm" className="bg-destructive/5 ring-destructive/20 animate-tool-card-enter">
         <CardContent className="flex items-start gap-2.5">
           <MapPin className="w-4 h-4 text-destructive shrink-0 mt-0.5" />
           <p className="text-sm text-destructive">{output.message}</p>
@@ -41,22 +83,22 @@ function LocationCard({ output }: { output: NavigateOutput }) {
   }
 
   return (
-    <Card size="sm" className="bg-surface-brand/5 ring-primary/20">
+    <Card size="sm" className="bg-surface-brand/[0.03] ring-primary/15 animate-tool-card-enter shadow-sm overflow-hidden">
       <CardContent className="flex items-start gap-3">
-        <div className="shrink-0 mt-0.5 flex items-center justify-center w-8 h-8 rounded-full bg-primary/10">
-          <MapPin className="w-4 h-4 text-primary" />
+        <div className="shrink-0 mt-0.5 flex items-center justify-center w-9 h-9 rounded-xl bg-primary/10">
+          <MapPin className="w-[18px] h-[18px] text-primary" />
         </div>
-        <div className="flex-1 min-w-0 space-y-1">
+        <div className="flex-1 min-w-0 space-y-1.5">
           <div className="flex items-center gap-2">
-            <p className="font-semibold text-sm leading-snug">{poi.name}</p>
-            <Badge variant="secondary" className="text-[0.625rem]">
+            <p className="font-semibold text-[0.9375rem] leading-snug">{poi.name}</p>
+            <Badge variant="secondary" className="text-[0.625rem] shrink-0">
               {poi.category}
             </Badge>
           </div>
-          <p className="text-xs text-muted-foreground leading-relaxed">
+          <p className="text-[0.8125rem] text-muted-foreground leading-relaxed">
             {poi.description}
           </p>
-          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground pt-0.5">
             {poi.address && (
               <span className="flex items-center gap-1">
                 <Navigation className="w-3 h-3" />
@@ -82,6 +124,8 @@ function LocationCard({ output }: { output: NavigateOutput }) {
   );
 }
 
+/* ── Event List Card ── */
+
 const EVENT_TYPE_COLORS: Record<string, string> = {
   "On-Campus": "bg-event-oncampus-bg text-event-oncampus-fg",
   Online: "bg-event-online-bg text-event-online-fg",
@@ -93,7 +137,7 @@ function EventListCard({ output }: { output: ShowEventsOutput }) {
 
   if (events.length === 0) {
     return (
-      <Card size="sm" className="bg-muted/30">
+      <Card size="sm" className="bg-muted/20 animate-tool-card-enter">
         <CardContent className="flex items-start gap-2.5">
           <Calendar className="w-4 h-4 text-muted-foreground shrink-0 mt-0.5" />
           <p className="text-sm text-muted-foreground">{message}</p>
@@ -106,10 +150,12 @@ function EventListCard({ output }: { output: ShowEventsOutput }) {
   const remaining = events.length - displayEvents.length;
 
   return (
-    <Card size="sm" className="bg-card">
-      <CardContent className="space-y-2">
+    <Card size="sm" className="bg-card animate-tool-card-enter shadow-sm overflow-hidden">
+      <CardContent className="space-y-2.5">
         <div className="flex items-center gap-2">
-          <Calendar className="w-4 h-4 text-primary shrink-0" />
+          <div className="flex items-center justify-center w-7 h-7 rounded-lg bg-primary/10 shrink-0">
+            <Calendar className="w-3.5 h-3.5 text-primary" />
+          </div>
           <p className="text-xs font-medium text-muted-foreground">{message}</p>
         </div>
         <div className="space-y-1.5">
@@ -120,7 +166,8 @@ function EventListCard({ output }: { output: ShowEventsOutput }) {
             return (
               <div
                 key={event.id}
-                className="flex flex-col gap-1 rounded-lg border p-2.5 text-sm"
+                className="flex flex-col gap-1 rounded-xl border border-border/50 p-3 text-sm
+                  transition-colors duration-150 active:bg-muted/30"
               >
                 <div className="flex items-start justify-between gap-2">
                   <span className="font-medium text-[0.8125rem] leading-snug">
@@ -132,9 +179,9 @@ function EventListCard({ output }: { output: ShowEventsOutput }) {
                 </div>
                 <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs text-muted-foreground">
                   <span>{dateDisplay}</span>
-                  <span>&middot;</span>
+                  <span className="opacity-40">&middot;</span>
                   <span>{event.time}</span>
-                  <span>&middot;</span>
+                  <span className="opacity-40">&middot;</span>
                   <span className="truncate max-w-[140px]">{event.location}</span>
                 </div>
                 <div className="flex items-center gap-1.5">
@@ -169,22 +216,27 @@ function EventListCard({ output }: { output: ShowEventsOutput }) {
   );
 }
 
+/* ── Campus Info Card ── */
+
 function CampusInfoCard({ output }: { output: CampusInfoOutput }) {
   return (
-    <Card size="sm" className="bg-card">
-      <CardContent className="space-y-2">
+    <Card size="sm" className="bg-card animate-tool-card-enter shadow-sm overflow-hidden">
+      <CardContent className="space-y-2.5">
         <div className="flex items-start gap-2.5">
-          <Info className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+          <div className="shrink-0 mt-0.5 flex items-center justify-center w-7 h-7 rounded-lg bg-primary/10">
+            <Info className="w-3.5 h-3.5 text-primary" />
+          </div>
           <p className="text-sm leading-relaxed whitespace-pre-line">
             {output.answer}
           </p>
         </div>
         {output.venues && output.venues.length > 0 && (
-          <div className="space-y-1.5 pl-6">
+          <div className="space-y-1.5 pl-9">
             {output.venues.map((venue) => (
               <div
                 key={venue.id}
-                className="flex items-start gap-2 rounded-lg border p-2 text-xs"
+                className="flex items-start gap-2 rounded-xl border border-border/50 p-2.5 text-xs
+                  transition-colors duration-150 active:bg-muted/30"
               >
                 <MapPin className="w-3 h-3 text-primary shrink-0 mt-0.5" />
                 <div className="flex-1 min-w-0">
@@ -219,6 +271,8 @@ function CampusInfoCard({ output }: { output: CampusInfoOutput }) {
   );
 }
 
+/* ── Main Export ── */
+
 interface ToolResultCardProps {
   toolName: string;
   output: Record<string, unknown>;
@@ -227,32 +281,7 @@ interface ToolResultCardProps {
 
 function ToolResultCardInner({ toolName, output, state }: ToolResultCardProps) {
   if (state !== "output-available") {
-    return (
-      <div className="flex items-center gap-2 text-sm text-muted-foreground py-1">
-        <span className="inline-flex gap-1">
-          <span className="animate-bounce text-primary">&middot;</span>
-          <span
-            className="animate-bounce text-primary"
-            style={{ animationDelay: "0.1s" }}
-          >
-            &middot;
-          </span>
-          <span
-            className="animate-bounce text-primary"
-            style={{ animationDelay: "0.2s" }}
-          >
-            &middot;
-          </span>
-        </span>
-        <span className="text-xs italic">
-          {toolName === "navigate_to"
-            ? "Finding location..."
-            : toolName === "show_events"
-              ? "Searching events..."
-              : "Looking up campus info..."}
-        </span>
-      </div>
-    );
+    return <ToolShimmer toolName={toolName} />;
   }
 
   switch (toolName) {

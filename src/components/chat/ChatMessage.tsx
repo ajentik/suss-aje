@@ -1,6 +1,6 @@
 "use client";
 
-import { memo } from "react";
+import { memo, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { cn } from "@/lib/utils";
@@ -9,6 +9,7 @@ interface ChatMessageProps {
   role: "user" | "assistant";
   content: string;
   isStreaming?: boolean;
+  timestamp?: Date;
 }
 
 const MemoizedMarkdown = memo(function MemoizedMarkdown({
@@ -32,7 +33,7 @@ const MemoizedMarkdown = memo(function MemoizedMarkdown({
         h4: ({ children }) => (
           <h4 className="text-sm font-semibold mb-1 mt-2 first:mt-0">{children}</h4>
         ),
-        p: ({ children }) => <p className="mb-2 last:mb-0">{children}</p>,
+        p: ({ children }) => <p className="mb-2 last:mb-0 leading-relaxed">{children}</p>,
         ul: ({ children }) => (
           <ul className="list-disc pl-4 mb-2 space-y-0.5">{children}</ul>
         ),
@@ -114,32 +115,62 @@ export default function ChatMessage({
   role,
   content,
   isStreaming,
+  timestamp,
 }: ChatMessageProps) {
+  const [showTime, setShowTime] = useState(false);
+
   return (
     <article
       className={cn(
-        "flex w-full mb-3",
+        "flex w-full mb-3 animate-chat-slide-up",
         role === "user" ? "justify-end" : "justify-start"
       )}
       aria-label={`${role === "user" ? "You" : "AskSUSSi"} said`}
     >
-      <div
-        className={cn(
-          "max-w-[85%] rounded-2xl px-4 py-3 text-[0.9375rem] leading-relaxed",
-          role === "user"
-            ? "bg-surface-brand text-surface-brand-foreground rounded-br-sm"
-            : "bg-secondary text-foreground rounded-bl-sm"
-        )}
-      >
-        {role === "assistant" ? (
-          <>
-            <MemoizedMarkdown content={content} />
-            {isStreaming && (
-              <span className="inline-block w-1.5 h-4 ml-0.5 -mb-0.5 bg-current animate-pulse rounded-sm" />
+      <div className={cn(
+        "flex flex-col",
+        role === "user" ? "max-w-[82%]" : "max-w-[88%]"
+      )}>
+        <div
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); !isStreaming && setShowTime((s) => !s); } }}
+          onClick={() => !isStreaming && setShowTime((s) => !s)}
+          className={cn(
+            "px-4 py-2.5 text-base leading-relaxed",
+            "transition-all duration-200",
+            role === "user"
+              ? [
+                  "bg-surface-brand text-surface-brand-foreground",
+                  "rounded-[20px] rounded-br-[6px]",
+                  "shadow-[0_1px_3px_oklch(0_0_0/0.08)]",
+                ]
+              : [
+                  "bg-secondary text-foreground",
+                  "rounded-[20px] rounded-bl-[6px]",
+                ]
+          )}
+        >
+          {role === "assistant" ? (
+            <>
+              <MemoizedMarkdown content={content} />
+              {isStreaming && (
+                <span className="inline-block w-[2px] h-[1em] ml-0.5 -mb-[2px] bg-primary/60 rounded-full animate-pulse" />
+              )}
+            </>
+          ) : (
+            content
+          )}
+        </div>
+        {showTime && timestamp && (
+          <span
+            className={cn(
+              "text-[0.625rem] text-muted-foreground mt-1 animate-chat-fade-in",
+              role === "user" ? "self-end mr-2" : "self-start ml-2"
             )}
-          </>
-        ) : (
-          content
+          >
+            {timestamp.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+          </span>
         )}
       </div>
     </article>

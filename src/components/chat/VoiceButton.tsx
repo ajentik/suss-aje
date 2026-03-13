@@ -25,11 +25,12 @@ export default function VoiceButton({ onTranscript }: VoiceButtonProps) {
       type="button"
       onClick={handleClick}
       className={cn(
-        "flex items-center justify-center w-10 h-10 rounded-full transition-all",
+        "flex items-center justify-center w-11 h-11 rounded-full shrink-0",
+        "transition-all duration-250 ease-out",
         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
         isListening
-          ? "bg-surface-danger text-surface-danger-foreground animate-pulse"
-          : "bg-secondary hover:bg-secondary/80 text-muted-foreground"
+          ? "bg-surface-danger text-surface-danger-foreground shadow-[0_0_0_4px_oklch(0.55_0.22_27/0.15)] animate-pulse"
+          : "bg-secondary/70 hover:bg-secondary text-muted-foreground active:scale-90"
       )}
       title={isListening ? "Stop recording" : "Start voice input"}
       aria-label={isListening ? "Stop recording" : "Start voice input"}
