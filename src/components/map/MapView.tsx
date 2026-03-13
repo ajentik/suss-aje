@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useCallback, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useAppStore } from "@/store/app-store";
 import { CAMPUS_CENTER, CAMPUS_POIS } from "@/lib/maps/campus-pois";
 
@@ -95,63 +95,74 @@ function Map3DInner() {
   } | null>(null);
   const [mapError, setMapError] = useState<string | null>(null);
 
-  const initMap = useCallback(async () => {
+  useEffect(() => {
     if (!containerRef.current || mapRef.current) return;
 
-    try {
-      const map = document.createElement("gmp-map-3d") as HTMLElement;
-      map.setAttribute(
-        "center",
-        `${CAMPUS_CENTER.lat},${CAMPUS_CENTER.lng},300`
-      );
-      map.setAttribute("tilt", "55");
-      map.setAttribute("heading", "0");
-      map.setAttribute("range", "800");
-      map.style.width = "100%";
-      map.style.height = "100%";
+    let cancelled = false;
+    const container = containerRef.current;
 
-      containerRef.current.appendChild(map);
-      mapRef.current = map;
+    (async () => {
+      try {
+        const map = document.createElement("gmp-map-3d") as HTMLElement;
+        map.setAttribute(
+          "center",
+          `${CAMPUS_CENTER.lat},${CAMPUS_CENTER.lng},300`
+        );
+        map.setAttribute("tilt", "55");
+        map.setAttribute("heading", "0");
+        map.setAttribute("range", "800");
+        map.style.width = "100%";
+        map.style.height = "100%";
 
-      // Double-click to enter Street View
-      map.addEventListener("dblclick", (e: Event) => {
-        const customEvent = e as CustomEvent;
-        const detail = customEvent.detail;
-        if (detail?.position) {
-          const { lat, lng } = detail.position;
-          setStreetViewLocation({ lat, lng });
-          setInStreetView(true);
-        } else {
-          const center = map.getAttribute("center");
-          if (center) {
-            const [lat, lng] = center.split(",").map(Number);
-            if (!isNaN(lat) && !isNaN(lng)) {
-              setStreetViewLocation({ lat, lng });
-              setInStreetView(true);
+        if (cancelled) return;
+
+        container.appendChild(map);
+        mapRef.current = map;
+
+        // Double-click to enter Street View
+        map.addEventListener("dblclick", (e: Event) => {
+          const customEvent = e as CustomEvent;
+          const detail = customEvent.detail;
+          if (detail?.position) {
+            const { lat, lng } = detail.position;
+            setStreetViewLocation({ lat, lng });
+            setInStreetView(true);
+          } else {
+            const center = map.getAttribute("center");
+            if (center) {
+              const [lat, lng] = center.split(",").map(Number);
+              if (!isNaN(lat) && !isNaN(lng)) {
+                setStreetViewLocation({ lat, lng });
+                setInStreetView(true);
+              }
             }
           }
+        });
+
+        // Add markers for all POIs
+        for (const poi of CAMPUS_POIS) {
+          const marker = document.createElement(
+            "gmp-marker-3d"
+          ) as HTMLElement;
+          marker.setAttribute("position", `${poi.lat},${poi.lng},20`);
+          marker.setAttribute("altitude-mode", "RELATIVE_TO_GROUND");
+          marker.setAttribute("label", poi.name);
+          marker.setAttribute("title", poi.name);
+          map.appendChild(marker);
         }
-      });
-
-      // Add markers for all POIs
-      for (const poi of CAMPUS_POIS) {
-        const marker = document.createElement("gmp-marker-3d") as HTMLElement;
-        marker.setAttribute("position", `${poi.lat},${poi.lng},20`);
-        marker.setAttribute("altitude-mode", "RELATIVE_TO_GROUND");
-        marker.setAttribute("label", poi.name);
-        marker.setAttribute("title", poi.name);
-        map.appendChild(marker);
+      } catch (err) {
+        if (!cancelled) {
+          setMapError(
+            err instanceof Error ? err.message : "Failed to initialize 3D map"
+          );
+        }
       }
-    } catch (err) {
-      setMapError(
-        err instanceof Error ? err.message : "Failed to initialize 3D map"
-      );
-    }
-  }, []);
+    })();
 
-  useEffect(() => {
-    initMap();
-  }, [initMap]);
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   // Initialize Street View when entering
   useEffect(() => {
