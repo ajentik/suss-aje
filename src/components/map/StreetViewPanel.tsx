@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ArrowLeft } from "lucide-react";
 import type { CampusEvent } from "@/types";
 
@@ -8,6 +8,71 @@ interface StreetViewPanelProps {
   location: { lat: number; lng: number };
   onClose: () => void;
   eventInfo?: CampusEvent;
+}
+
+function EventInfoOverlay({ event }: { event: CampusEvent }) {
+  const [isExpanded, setIsExpanded] = useState(false);
+
+  return (
+    <div className="absolute bottom-4 left-4 z-10 max-w-sm bg-white/95 backdrop-blur rounded-xl shadow-lg border border-gray-100 overflow-hidden">
+      <div className={`p-3 ${isExpanded && event.longDescription ? "max-h-[60vh] overflow-y-auto" : ""}`}>
+        <h3 className="text-sm font-bold text-foreground">{event.title}</h3>
+
+        <div className="mt-1">
+          <p className="text-xs text-muted-foreground">
+            {event.date}{event.endDate ? ` – ${event.endDate}` : ""} • {event.time}
+          </p>
+          <p className="text-xs text-muted-foreground mt-0.5">
+            {event.location}
+          </p>
+          {event.venueAddress && (
+            <p className="text-xs text-muted-foreground">
+              {event.venueAddress}
+            </p>
+          )}
+        </div>
+
+        <p className="text-xs text-muted-foreground mt-1">
+          {event.description}
+        </p>
+
+        {event.longDescription && (
+          <div className="mt-1.5">
+            <div className={`text-xs text-muted-foreground whitespace-pre-line ${isExpanded ? "" : "line-clamp-3"}`}>
+              {event.longDescription}
+            </div>
+            <button
+              type="button"
+              onClick={() => setIsExpanded(!isExpanded)}
+              className="text-primary hover:underline mt-1 font-medium text-[11px]"
+            >
+              {isExpanded ? "Show less" : "Show more"}
+            </button>
+          </div>
+        )}
+
+        <div className="flex flex-wrap gap-1.5 mt-2">
+          <span className="text-[10px] px-1.5 py-0.5 rounded-full font-medium bg-secondary text-secondary-foreground">
+            {event.type}
+          </span>
+          <span className="text-[10px] px-1.5 py-0.5 rounded-full font-medium bg-muted text-muted-foreground">
+            {event.school}
+          </span>
+        </div>
+
+        {event.url && (
+          <a
+            href={event.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-block mt-2 text-xs text-primary hover:underline"
+          >
+            Event Details →
+          </a>
+        )}
+      </div>
+    </div>
+  );
 }
 
 export default function StreetViewPanel({
@@ -44,47 +109,7 @@ export default function StreetViewPanel({
       </button>
 
       {eventInfo && (
-        <div className="absolute bottom-4 left-4 z-10 max-w-xs bg-white/95 backdrop-blur rounded-xl shadow-lg p-3 border border-gray-100">
-          <h3 className="text-sm font-bold text-foreground">{eventInfo.title}</h3>
-
-          <div className="mt-1">
-            <p className="text-xs text-muted-foreground">
-              {eventInfo.date}{eventInfo.endDate ? ` – ${eventInfo.endDate}` : ""} • {eventInfo.time}
-            </p>
-            <p className="text-xs text-muted-foreground mt-0.5">
-              {eventInfo.location}
-            </p>
-            {eventInfo.venueAddress && (
-              <p className="text-xs text-muted-foreground">
-                {eventInfo.venueAddress}
-              </p>
-            )}
-          </div>
-
-          <p className="text-xs text-muted-foreground line-clamp-3 mt-1">
-            {eventInfo.description}
-          </p>
-
-          <div className="flex flex-wrap gap-1.5 mt-2">
-            <span className="text-[10px] px-1.5 py-0.5 rounded-full font-medium bg-secondary text-secondary-foreground">
-              {eventInfo.type}
-            </span>
-            <span className="text-[10px] px-1.5 py-0.5 rounded-full font-medium bg-muted text-muted-foreground">
-              {eventInfo.school}
-            </span>
-          </div>
-
-          {eventInfo.url && (
-            <a
-              href={eventInfo.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-block mt-2 text-xs text-primary hover:underline"
-            >
-              Event Details →
-            </a>
-          )}
-        </div>
+        <EventInfoOverlay event={eventInfo} />
       )}
     </div>
   );

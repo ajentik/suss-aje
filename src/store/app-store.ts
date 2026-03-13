@@ -52,7 +52,7 @@ export const useAppStore = create<AppState>((set) => ({
   activePanel: "chat",
   setActivePanel: (panel) => set({ activePanel: panel }),
 
-  eventDateFilter: "7d",
+  eventDateFilter: "all",
   setEventDateFilter: (preset) => set({ eventDateFilter: preset }),
   eventCategoryFilter: "",
   setEventCategoryFilter: (category) => set({ eventCategoryFilter: category }),
