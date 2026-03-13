@@ -45,6 +45,19 @@
   --radius-2xl: calc(var(--radius) * 1.8);
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
+
+  --color-surface-brand: var(--surface-brand);
+  --color-surface-brand-foreground: var(--surface-brand-foreground);
+  --color-surface-brand-hover: var(--surface-brand-hover);
+  --color-surface-danger: var(--surface-danger);
+  --color-surface-danger-foreground: var(--surface-danger-foreground);
+
+  --color-event-oncampus-bg: var(--event-oncampus-bg);
+  --color-event-oncampus-fg: var(--event-oncampus-fg);
+  --color-event-online-bg: var(--event-online-bg);
+  --color-event-online-fg: var(--event-online-fg);
+  --color-event-external-bg: var(--event-external-bg);
+  --color-event-external-fg: var(--event-external-fg);
 }
 
 :root {
@@ -80,6 +93,43 @@
   --sidebar-accent-foreground: oklch(0.25 0.05 240);
   --sidebar-border: oklch(0.91 0.01 240);
   --sidebar-ring: oklch(0.45 0.06 240);
+
+  /* ── SUSS Brand Tokens ── */
+  --suss-navy: oklch(0.30 0.07 240);        /* #003B5C — SUSS primary navy */
+  --suss-red: oklch(0.55 0.22 27);          /* #DA291C — SUSS accent red */
+  --suss-route-blue: oklch(0.61 0.16 250);  /* #4285F4 — Google blue for polylines */
+
+  /* ── Semantic Surface Tokens ── */
+  --surface-brand: var(--suss-navy);
+  --surface-brand-foreground: oklch(0.99 0 0);
+  --surface-brand-hover: oklch(0.25 0.06 240);
+  --surface-danger: var(--suss-red);
+  --surface-danger-foreground: oklch(0.99 0 0);
+
+  /* ── Event Type Tokens ── */
+  --event-oncampus-bg: oklch(0.94 0.06 142);
+  --event-oncampus-fg: oklch(0.35 0.08 142);
+  --event-online-bg: oklch(0.94 0.04 250);
+  --event-online-fg: oklch(0.35 0.08 250);
+  --event-external-bg: oklch(0.94 0.06 60);
+  --event-external-fg: oklch(0.40 0.12 60);
+
+  /* ── Type Scale ── */
+  --text-hero: clamp(1.875rem, 1.5rem + 1.5vw, 3rem);
+  --text-lg: 1.125rem;
+  --text-base: 0.875rem;
+  --text-sm: 0.75rem;
+  --text-xs: 0.625rem;
+
+  /* ── Z-Index Scale ──
+   * base:       0   — normal flow
+   * dropdown:  10   — dropdowns, popovers
+   * overlay:   20   — route overlay, map controls
+   * sheet:     30   — mobile bottom sheet, aerial video overlay
+   * modal:     40   — modals, dialogs
+   * hero:      50   — hero intro full-screen
+   * toast:     60   — toast notifications
+   */
 }
 
 .dark {
@@ -114,6 +164,23 @@
   --sidebar-accent-foreground: oklch(0.96 0.005 240);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.55 0.08 240);
+
+  --suss-navy: oklch(0.65 0.10 240);
+  --suss-red: oklch(0.65 0.18 27);
+  --suss-route-blue: oklch(0.65 0.14 250);
+
+  --surface-brand: var(--suss-navy);
+  --surface-brand-foreground: oklch(0.15 0.02 240);
+  --surface-brand-hover: oklch(0.70 0.10 240);
+  --surface-danger: var(--suss-red);
+  --surface-danger-foreground: oklch(0.15 0 0);
+
+  --event-oncampus-bg: oklch(0.30 0.05 142);
+  --event-oncampus-fg: oklch(0.85 0.08 142);
+  --event-online-bg: oklch(0.30 0.04 250);
+  --event-online-fg: oklch(0.85 0.06 250);
+  --event-external-bg: oklch(0.30 0.05 60);
+  --event-external-fg: oklch(0.85 0.10 60);
 }
 
 @layer base {
@@ -171,4 +238,13 @@
 @utility animate-hero-line-expand {
   animation: hero-line-expand 0.8s cubic-bezier(0.22, 1, 0.36, 1) forwards;
   width: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

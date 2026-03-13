@@ -2,9 +2,12 @@
 
 import { useEffect } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { EmptyState } from "@/components/ui/empty-state";
+import { CalendarX } from "lucide-react";
 import { useCampusEvents } from "@/hooks/useCampusEvents";
 import { useAppStore } from "@/store/app-store";
 import EventCard from "./EventCard";
+import { EventCardSkeleton } from "./EventCardSkeleton";
 import EventFilter from "./EventFilter";
 
 export default function EventsPanel() {
@@ -44,13 +47,17 @@ export default function EventsPanel() {
       />
       <ScrollArea className="flex-1 p-3">
         {isLoading ? (
-          <p className="text-center text-sm text-muted-foreground py-8">
-            Loading events...
-          </p>
+          <div className="space-y-2">
+            <EventCardSkeleton />
+            <EventCardSkeleton />
+            <EventCardSkeleton />
+          </div>
         ) : events.length === 0 ? (
-          <p className="text-center text-sm text-muted-foreground py-8">
-            No events found. Try adjusting your filters.
-          </p>
+          <EmptyState
+            icon={<CalendarX className="h-8 w-8 text-muted-foreground" />}
+            title="No events found"
+            description="Try adjusting your filters."
+          />
         ) : (
           <div className="space-y-2">
             <p className="text-xs text-muted-foreground px-1">{events.length} events</p>

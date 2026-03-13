@@ -9,9 +9,9 @@ interface EventCardProps {
 }
 
 const TYPE_COLORS: Record<string, string> = {
-  "On-Campus": "bg-green-100 text-green-800",
-  Online: "bg-blue-100 text-blue-800",
-  External: "bg-orange-100 text-orange-800",
+  "On-Campus": "bg-event-oncampus-bg text-event-oncampus-fg",
+  Online: "bg-event-online-bg text-event-online-fg",
+  External: "bg-event-external-bg text-event-external-fg",
 };
 
 export default function EventCard({ event }: EventCardProps) {
@@ -27,6 +27,8 @@ export default function EventCard({ event }: EventCardProps) {
 
   return (
     <button
+      type="button"
+      aria-label={`View ${event.title} on map`}
       onClick={handleClick}
       className="w-full text-left p-3 rounded-lg border hover:bg-muted/50 transition-colors"
     >
@@ -61,7 +63,7 @@ export default function EventCard({ event }: EventCardProps) {
             target="_blank"
             rel="noopener noreferrer"
             onClick={(e) => e.stopPropagation()}
-            className="text-[10px] text-[#003B5C] hover:underline ml-auto"
+            className="text-[10px] text-primary hover:underline ml-auto"
           >
             Details →
           </a>

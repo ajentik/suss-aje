@@ -3,9 +3,11 @@
 import { useChat } from "@ai-sdk/react";
 import { useEffect, useRef } from "react";
 import Image from "next/image";
+import { toast } from "sonner";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import ChatMessage from "./ChatMessage";
 import ChatInput from "./ChatInput";
+import { ChatSkeleton } from "./ChatSkeleton";
 import { useAppStore } from "@/store/app-store";
 import { useSpeechSynthesis } from "@/lib/voice/speech-synthesis";
 import { findPOI } from "@/lib/maps/campus-pois";
@@ -71,16 +73,20 @@ export default function ChatPanel() {
         if (textContent) speak(textContent);
       }
     },
+    onError: (error) => {
+      toast.error("Chat error", { description: error.message });
+    },
   });
 
   const isLoading = status === "streaming" || status === "submitted";
 
   // Auto-scroll to bottom
   useEffect(() => {
+    if (!messages.length) return;
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
-  }, [messages]);
+  }, [messages.length]);
 
   const handleSend = (text: string) => {
     sendMessage({ text });
@@ -97,55 +103,60 @@ export default function ChatPanel() {
 
   return (
     <div className="flex flex-col h-full">
-      <ScrollArea className="flex-1 p-4" ref={scrollRef}>
-        {messages.length === 0 && (
-          <div className="text-center text-sm py-8 px-4">
-            <Image
-              src="/suss-logo.png"
-              alt="SUSS — Singapore University of Social Sciences"
-              width={160}
-              height={56}
-              className="mx-auto mb-4 h-14 w-auto"
-              priority
-            />
-            <p className="font-semibold text-foreground">Welcome to SUSS AJE</p>
-            <p className="mt-1 text-muted-foreground">Your campus intelligent assistant. Ask me about directions, events, or campus services.</p>
-            <div className="mt-5 flex flex-wrap justify-center gap-2">
-              {[
-                "Where is the library?",
-                "What events are today?",
-                "How to get to the canteen?",
-              ].map((q) => (
-                <button
-                  key={q}
-                  onClick={() => handleSend(q)}
-                  className="text-xs px-3.5 py-2 rounded-full border border-[#003B5C]/20 text-[#003B5C] hover:bg-[#003B5C] hover:text-white transition-colors font-medium"
-                >
-                  {q}
-                </button>
-              ))}
+      <div role="log" aria-label="Chat messages" aria-live="polite" className="flex-1 min-h-0">
+        <ScrollArea className="h-full p-4" ref={scrollRef}>
+          {messages.length === 0 && (
+            <div className="text-center text-sm py-8 px-4">
+              <Image
+                src="/suss-logo.png"
+                alt="SUSS — Singapore University of Social Sciences"
+                width={160}
+                height={56}
+                className="mx-auto mb-4 h-14 w-auto"
+                priority
+              />
+              <p className="font-semibold text-foreground">Welcome to SUSS AJE</p>
+              <p className="mt-1 text-muted-foreground">Your campus intelligent assistant. Ask me about directions, events, or campus services.</p>
+              <section aria-label="Suggested questions" className="mt-5 flex flex-wrap justify-center gap-2">
+                {[
+                  "Where is the library?",
+                  "What events are today?",
+                  "How to get to the canteen?",
+                ].map((q) => (
+                  <button
+                    type="button"
+                    key={q}
+                    onClick={() => handleSend(q)}
+                    className="text-xs px-3.5 py-2 rounded-full border border-primary/20 text-primary hover:bg-primary hover:text-primary-foreground transition-colors font-medium"
+                  >
+                    {q}
+                  </button>
+                ))}
+              </section>
             </div>
-          </div>
-        )}
-        {messages.map((msg) => {
-          const text = getMessageText(msg);
-          if (!text) return null;
-          return (
-            <ChatMessage key={msg.id} role={msg.role as "user" | "assistant"} content={text} />
-          );
-        })}
-        {isLoading && (
-          <div className="flex justify-start mb-3">
-            <div className="bg-secondary rounded-2xl rounded-bl-sm px-4 py-2.5 text-sm">
-              <span className="inline-flex gap-1">
-                <span className="animate-bounce">·</span>
-                <span className="animate-bounce" style={{ animationDelay: "0.1s" }}>·</span>
-                <span className="animate-bounce" style={{ animationDelay: "0.2s" }}>·</span>
-              </span>
+          )}
+          {messages.map((msg) => {
+            const text = getMessageText(msg);
+            if (!text) return null;
+            return (
+              <ChatMessage key={msg.id} role={msg.role as "user" | "assistant"} content={text} />
+            );
+          })}
+          {isLoading && messages.length === 0 ? (
+            <ChatSkeleton />
+          ) : isLoading ? (
+            <div className="flex justify-start mb-3">
+              <div className="bg-secondary rounded-2xl rounded-bl-sm px-4 py-2.5 text-sm">
+                <span className="inline-flex gap-1">
+                  <span className="animate-bounce">·</span>
+                  <span className="animate-bounce" style={{ animationDelay: "0.1s" }}>·</span>
+                  <span className="animate-bounce" style={{ animationDelay: "0.2s" }}>·</span>
+                </span>
+              </div>
             </div>
-          </div>
-        )}
-      </ScrollArea>
+          ) : null}
+        </ScrollArea>
+      </div>
       <ChatInput onSend={handleSend} isLoading={isLoading} />
     </div>
   );

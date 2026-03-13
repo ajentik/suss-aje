@@ -49,7 +49,7 @@ export default function RouteOverlay() {
   return (
     <div className="absolute bottom-4 left-4 right-4 md:left-auto md:right-4 md:w-72 bg-white/95 backdrop-blur rounded-xl shadow-lg p-4 z-20">
       <div className="flex items-center gap-2 mb-1">
-        <div className="w-2 h-2 rounded-full bg-[#003B5C]" />
+        <div className="w-2 h-2 rounded-full bg-surface-brand" />
         <p className="font-semibold text-sm">{selectedDestination.name}</p>
       </div>
       <div className="flex items-center gap-3 text-xs text-muted-foreground">

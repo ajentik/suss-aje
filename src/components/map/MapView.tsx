@@ -1,6 +1,9 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { ArrowLeft } from "lucide-react";
+import { ErrorState } from "@/components/ui/error-state";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useAppStore } from "@/store/app-store";
 import { CAMPUS_CENTER, CAMPUS_POIS } from "@/lib/maps/campus-pois";
 
@@ -64,15 +67,19 @@ export default function MapView() {
   if (error) {
     return (
       <div className="w-full h-full flex items-center justify-center bg-muted/80">
-        <p className="text-muted-foreground text-sm">{error}</p>
+        <ErrorState message={error} />
       </div>
     );
   }
 
   if (!loaded) {
     return (
-      <div className="w-full h-full flex items-center justify-center bg-muted/80">
-        <p className="text-muted-foreground text-sm">Loading 3D map...</p>
+      <div className="w-full h-full bg-muted/80 flex items-center justify-center">
+        <div className="space-y-3 w-48">
+          <Skeleton className="h-4 w-full" />
+          <Skeleton className="h-4 w-3/4" />
+          <Skeleton className="h-32 w-full rounded-lg" />
+        </div>
       </div>
     );
   }
@@ -211,7 +218,7 @@ function Map3DInner() {
 
     const polyline = document.createElement("gmp-polyline-3d") as HTMLElement;
     polyline.setAttribute("altitude-mode", "CLAMP_TO_GROUND");
-    polyline.setAttribute("stroke-color", "#4285F4");
+    polyline.setAttribute("stroke-color", "oklch(0.61 0.16 250)");
     polyline.setAttribute("stroke-width", "8");
 
     const coords = routeInfo.polyline
@@ -247,23 +254,12 @@ function Map3DInner() {
         <div className="w-full h-full relative">
           <div ref={streetViewRef} className="w-full h-full" />
           <button
+            type="button"
+            aria-label="Back to 3D map"
             onClick={() => setInStreetView(false)}
             className="absolute top-4 left-4 z-10 flex items-center gap-2 px-3 py-2 bg-white/95 backdrop-blur rounded-lg shadow-lg text-sm font-medium hover:bg-white transition-colors"
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <path d="m12 19-7-7 7-7" />
-              <path d="M19 12H5" />
-            </svg>
+            <ArrowLeft size={16} />
             Back to 3D Map
           </button>
         </div>
@@ -271,9 +267,9 @@ function Map3DInner() {
 
       {/* Street View hint */}
       {!inStreetView && !mapError && (
-        <div className="absolute bottom-3 right-3 z-10 text-[10px] text-white/80 bg-black/40 backdrop-blur px-2 py-1 rounded pointer-events-none">
+        <output aria-label="Street View hint" className="absolute bottom-3 right-3 z-10 text-[10px] text-white/80 bg-black/40 backdrop-blur px-2 py-1 rounded pointer-events-none">
           Double-click to enter Street View
-        </div>
+        </output>
       )}
     </div>
   );

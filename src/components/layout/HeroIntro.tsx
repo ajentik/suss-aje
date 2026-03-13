@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 import Image from "next/image";
+import { ArrowRight } from "lucide-react";
 import { lookupAerialVideo } from "@/lib/maps/aerial-view";
 
 const SUSS_ADDRESS = "463 Clementi Road, Singapore 599494";
@@ -35,14 +36,14 @@ export default function HeroIntro({ onEnter }: HeroIntroProps) {
   }, [onEnter]);
 
   return (
-    <div
+    <header
       className={`fixed inset-0 z-50 flex flex-col items-center justify-center transition-opacity duration-700 ease-out ${
         fadeOut ? "opacity-0 pointer-events-none" : "opacity-100"
       }`}
     >
       {/* Base background — navy, visible during load */}
       <div
-        className={`absolute inset-0 bg-[#003B5C] transition-opacity duration-[2000ms] pointer-events-none ${
+        className={`absolute inset-0 bg-primary transition-opacity duration-[2000ms] pointer-events-none ${
           videoReady ? "opacity-0" : "opacity-100"
         }`}
       />
@@ -105,7 +106,7 @@ export default function HeroIntro({ onEnter }: HeroIntroProps) {
         </h1>
 
         {/* Subtitle */}
-        <p className="text-white/80 text-sm md:text-base mb-10 leading-relaxed drop-shadow animate-hero-fade-in-up [animation-delay:800ms]">
+        <p className="text-white/90 text-sm md:text-base mb-10 leading-relaxed drop-shadow animate-hero-fade-in-up [animation-delay:800ms]">
           Resolve campus affairs with one sentence. Navigate, discover events,
           and explore SUSS in 3D.
         </p>
@@ -114,35 +115,22 @@ export default function HeroIntro({ onEnter }: HeroIntroProps) {
         <div className="animate-hero-fade-in-up [animation-delay:1000ms]">
           <button
             type="button"
+            aria-label="Enter campus assistant"
             onClick={handleEnter}
-            className="inline-flex items-center gap-2.5 px-10 py-3.5 bg-white text-[#003B5C] rounded-full font-semibold text-base shadow-lg shadow-white/20 hover:bg-white/95 hover:shadow-xl hover:shadow-white/30 transition-all duration-300 hover:scale-105 active:scale-95"
+            className="inline-flex items-center gap-2.5 px-10 py-3.5 bg-white text-primary rounded-full font-semibold text-base shadow-lg shadow-white/20 hover:bg-white/95 hover:shadow-xl hover:shadow-white/30 transition-all duration-300 hover:scale-105 active:scale-95"
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              aria-hidden="true"
-            >
-              <path d="M5 12h14" />
-              <path d="m12 5 7 7-7 7" />
-            </svg>
+            <ArrowRight size={20} aria-hidden="true" />
             Explore Campus
           </button>
         </div>
 
         {/* Attribution */}
         {!loading && videoUrl && (
-          <p className="text-white/30 text-[10px] mt-8 tracking-wide uppercase animate-hero-fade-in [animation-delay:1200ms]">
+          <p className="text-white/50 text-[10px] mt-8 tracking-wide uppercase animate-hero-fade-in [animation-delay:1200ms]">
             Aerial flyover powered by Google Maps
           </p>
         )}
       </div>
-    </div>
+    </header>
   );
 }
