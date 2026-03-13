@@ -1,29 +1,34 @@
 import { z } from "zod";
 import { tool } from "ai";
-import { CAMPUS_POIS, findPOI } from "@/lib/maps/campus-pois";
+import { CAMPUS_POIS, findPOI, findPOIs } from "@/lib/maps/campus-pois";
 import campusEvents from "@/../public/campus-events.json";
 import type { CampusEvent } from "@/types";
 
 export const navigateTo = tool({
   description:
-    "Navigate the 3D campus map to a specific destination and show walking directions. Use this when a student asks where something is or how to get somewhere.",
+    "Navigate the 3D campus map to a specific destination and show walking directions. Use this when a student asks where something is or how to get somewhere. Works for on-campus locations and nearby venues (supermarkets, restaurants, malls, bars, hawker centres).",
   inputSchema: z.object({
     destination: z
       .string()
-      .describe("The name or type of place to navigate to, e.g. 'library', 'canteen', 'Lecture Hall A'"),
+      .describe("The name or type of place to navigate to, e.g. 'library', 'FairPrice', 'Clementi Mall', 'Sukiya'"),
   }),
   execute: async ({ destination }) => {
     const poi = findPOI(destination);
     if (!poi) {
+      const categories = [...new Set(CAMPUS_POIS.map((p) => p.category))];
       return {
         success: false as const,
-        message: `I couldn't find "${destination}" on campus. Available locations: ${CAMPUS_POIS.map((p) => p.name).join(", ")}`,
+        message: `I couldn't find "${destination}". Try searching by name or category: ${categories.join(", ")}. Available locations include: ${CAMPUS_POIS.map((p) => p.name).join(", ")}`,
       };
     }
+    let msg = `Navigating to ${poi.name}. ${poi.description}`;
+    if (poi.address) msg += ` Address: ${poi.address}.`;
+    if (poi.hours) msg += ` Hours: ${poi.hours}.`;
+    if (poi.rating) msg += ` Rating: ${poi.rating}/5.`;
     return {
       success: true as const,
       poi,
-      message: `Navigating to ${poi.name}. ${poi.description}`,
+      message: msg,
     };
   },
 });
@@ -74,11 +79,55 @@ export const showEvents = tool({
 
 export const campusInfo = tool({
   description:
-    "Answer general questions about SUSS campus facilities, services, and information. Use this for questions that don't require navigation or event lookup.",
+    "Answer general questions about SUSS campus facilities, services, nearby venues, food, shopping, and nightlife. Use this for questions that don't require navigation or event lookup.",
   inputSchema: z.object({
     query: z.string().describe("The campus-related question to answer"),
   }),
   execute: async ({ query }) => {
+    const q = query.toLowerCase();
+
+    // Check if the query matches a category of nearby venues
+    const categoryKeywords: Record<string, string> = {
+      supermarket: "Supermarket",
+      grocery: "Supermarket",
+      fairprice: "Supermarket",
+      restaurant: "Restaurant",
+      eat: "Restaurant",
+      food: "Restaurant",
+      dining: "Restaurant",
+      mall: "Mall",
+      shopping: "Mall",
+      bar: "Bar",
+      club: "Bar",
+      drink: "Bar",
+      nightlife: "Bar",
+      hawker: "Hawker",
+      "food court": "Hawker",
+      "food centre": "Hawker",
+    };
+
+    const matchedCategory = Object.entries(categoryKeywords).find(([kw]) => q.includes(kw));
+    if (matchedCategory) {
+      const venues = findPOIs(matchedCategory[1]);
+      if (venues.length > 0) {
+        const list = venues
+          .map((v) => {
+            let line = `• ${v.name}`;
+            if (v.address) line += ` — ${v.address}`;
+            if (v.hours) line += ` (${v.hours})`;
+            if (v.rating) line += ` ⭐${v.rating}`;
+            return line;
+          })
+          .join("\n");
+        return {
+          success: true as const,
+          query,
+          answer: `Here are nearby ${matchedCategory[1].toLowerCase()}s:\n${list}`,
+          venues,
+        };
+      }
+    }
+
     const info: Record<string, string> = {
       address: "SUSS is located at 463 Clementi Road, Singapore 599494.",
       shuttle:
@@ -95,7 +144,6 @@ export const campusInfo = tool({
         "The Campus Bookstore is open Mon-Fri 9:00 AM - 6:00 PM. Textbooks, stationery, and SUSS merchandise available.",
     };
 
-    const q = query.toLowerCase();
     const matched = Object.entries(info).find(([key]) => q.includes(key));
 
     return {
@@ -103,7 +151,7 @@ export const campusInfo = tool({
       query,
       answer: matched
         ? matched[1]
-        : `Here's what I know about SUSS campus: It's located at 463 Clementi Road with facilities including a library, canteen, sports complex, lecture halls, IT helpdesk, bookstore, and admin office. The campus shuttle connects to Clementi MRT. Can you ask a more specific question?`,
+        : `Here's what I know about SUSS campus: It's located at 463 Clementi Road with facilities including a library, canteen, sports complex, lecture halls, IT helpdesk, bookstore, and admin office. The campus shuttle connects to Clementi MRT. Nearby you'll find supermarkets (FairPrice), restaurants, malls (Clementi Mall), bars, and hawker centres. Ask me about any of these!`,
     };
   },
 });

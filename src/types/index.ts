@@ -5,6 +5,11 @@ export interface POI {
   lng: number;
   category: string;
   description: string;
+  address?: string;
+  hours?: string;
+  rating?: number;
+  notes?: string;
+  cuisine?: string;
 }
 
 export interface CampusEvent {
