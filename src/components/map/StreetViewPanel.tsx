@@ -56,6 +56,9 @@ function EventInfoOverlay({ event }: { event: CampusEvent }) {
             {event.type}
           </span>
           <span className="text-[10px] px-1.5 py-0.5 rounded-full font-medium bg-muted text-muted-foreground">
+            {event.category}
+          </span>
+          <span className="text-[10px] px-1.5 py-0.5 rounded-full font-medium bg-muted text-muted-foreground">
             {event.school}
           </span>
         </div>
