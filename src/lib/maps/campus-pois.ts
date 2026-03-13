@@ -13,6 +13,9 @@ export const CAMPUS_POIS: POI[] = [
     category: "Building",
     description:
       "Student Lounge (L1), Gym (L1 – A1.11/A1.14/A1.15), FoodClique & Food Gallery (L3), Carpark entrance",
+    tags: ["WiFi", "Wheelchair Accessible", "Gym"],
+    distanceFromCampus: "On campus",
+    website: "https://www.suss.edu.sg/campus-life",
   },
   {
     id: "block-b",
@@ -22,6 +25,9 @@ export const CAMPUS_POIS: POI[] = [
     category: "Building",
     description:
       "Student Hub (L1), Subway & FoodFest (L1, Halal), Study Spaces (L3)",
+    tags: ["WiFi", "Wheelchair Accessible", "Halal", "Study Space"],
+    distanceFromCampus: "On campus",
+    website: "https://www.suss.edu.sg/campus-life",
   },
   {
     id: "block-c",
@@ -31,6 +37,9 @@ export const CAMPUS_POIS: POI[] = [
     category: "Building",
     description:
       "Starbucks (L1), SUSS Library (L2 – C.2.02, 5 discussion rooms, call pods, smart locker), Seminar Rooms (60-120 pax), Study Spaces (L4), Carpark entrance",
+    tags: ["WiFi", "Wheelchair Accessible", "Study Space", "Café"],
+    distanceFromCampus: "On campus",
+    website: "https://www.suss.edu.sg/library",
   },
   {
     id: "block-d",
@@ -40,6 +49,9 @@ export const CAMPUS_POIS: POI[] = [
     category: "Building",
     description:
       "Performing Arts Theatre (L1, 400 seats), Dance Studio, Multi-purpose Sports Hall (badminton, basketball, floorball, netball, volleyball – 50 pax), Sports Therapy & First Aid Room",
+    tags: ["Wheelchair Accessible", "Sports", "Performing Arts"],
+    distanceFromCampus: "On campus",
+    website: "https://www.suss.edu.sg/campus-life",
   },
 
   // ── On-Campus ──────────────────────────────────────────────
@@ -50,6 +62,10 @@ export const CAMPUS_POIS: POI[] = [
     lng: 103.7758,
     category: "Facility",
     description: "Main campus library with study rooms and digital resources",
+    tags: ["WiFi", "Wheelchair Accessible", "Study Space", "Quiet Zone"],
+    distanceFromCampus: "On campus",
+    contact: "+65 6248 0225",
+    website: "https://www.suss.edu.sg/library",
   },
   {
     id: "canteen",
@@ -58,6 +74,8 @@ export const CAMPUS_POIS: POI[] = [
     lng: 103.7770,
     category: "Food",
     description: "Main dining hall with multiple food stalls",
+    tags: ["Halal", "Vegetarian", "Wheelchair Accessible"],
+    distanceFromCampus: "On campus",
   },
   {
     id: "lecture-hall-a",
@@ -66,6 +84,8 @@ export const CAMPUS_POIS: POI[] = [
     lng: 103.7762,
     category: "Academic",
     description: "Large lecture hall seating 300 students",
+    tags: ["WiFi", "Wheelchair Accessible", "AV Equipment"],
+    distanceFromCampus: "On campus",
   },
   {
     id: "lecture-hall-b",
@@ -74,6 +94,8 @@ export const CAMPUS_POIS: POI[] = [
     lng: 103.7768,
     category: "Academic",
     description: "Medium lecture hall seating 150 students",
+    tags: ["WiFi", "Wheelchair Accessible", "AV Equipment"],
+    distanceFromCampus: "On campus",
   },
   {
     id: "lecture-hall-c",
@@ -82,6 +104,8 @@ export const CAMPUS_POIS: POI[] = [
     lng: 103.7755,
     category: "Academic",
     description: "Seminar-style lecture hall seating 80 students",
+    tags: ["WiFi", "Wheelchair Accessible", "AV Equipment"],
+    distanceFromCampus: "On campus",
   },
   {
     id: "admin",
@@ -90,6 +114,10 @@ export const CAMPUS_POIS: POI[] = [
     lng: 103.7760,
     category: "Services",
     description: "Student administration and enrollment services",
+    tags: ["Wheelchair Accessible"],
+    distanceFromCampus: "On campus",
+    contact: "+65 6248 9777",
+    website: "https://www.suss.edu.sg",
   },
   {
     id: "bus-stop",
@@ -98,6 +126,8 @@ export const CAMPUS_POIS: POI[] = [
     lng: 103.7775,
     category: "Transport",
     description: "Main bus stop serving campus shuttle and public buses",
+    tags: ["Wheelchair Accessible", "Sheltered"],
+    distanceFromCampus: "On campus",
   },
   {
     id: "gym",
@@ -106,6 +136,8 @@ export const CAMPUS_POIS: POI[] = [
     lng: 103.7752,
     category: "Facility",
     description: "Gymnasium, fitness centre, and multipurpose sports hall",
+    tags: ["Wheelchair Accessible", "Sports", "Showers"],
+    distanceFromCampus: "On campus",
   },
   {
     id: "it-helpdesk",
@@ -114,6 +146,9 @@ export const CAMPUS_POIS: POI[] = [
     lng: 103.7765,
     category: "Services",
     description: "Technical support for students and staff",
+    tags: ["WiFi"],
+    distanceFromCampus: "On campus",
+    contact: "+65 6248 9393",
   },
   {
     id: "bookstore",
@@ -122,6 +157,7 @@ export const CAMPUS_POIS: POI[] = [
     lng: 103.7772,
     category: "Services",
     description: "Textbooks, stationery, and SUSS merchandise",
+    distanceFromCampus: "On campus",
   },
 
   // ── Supermarkets ───────────────────────────────────────────
@@ -134,6 +170,10 @@ export const CAMPUS_POIS: POI[] = [
     description: "Large 2-floor Finest in the mall",
     address: "3155 Commonwealth Ave W, B1-12/13/14, The Clementi Mall, S129588",
     hours: "7AM–11PM daily",
+    tags: ["Wheelchair Accessible", "Self-Checkout", "Halal Section"],
+    distanceFromCampus: "2.0 km",
+    website: "https://www.fairprice.com.sg",
+    priceLevel: 2,
   },
   {
     id: "fairprice-blk-451",
@@ -144,6 +184,10 @@ export const CAMPUS_POIS: POI[] = [
     description: "Closest 24hr option to SUSS",
     address: "451 Clementi Ave 3, #01-307, S120451",
     hours: "24 hours",
+    tags: ["24 Hours", "Self-Checkout"],
+    distanceFromCampus: "2.0 km",
+    website: "https://www.fairprice.com.sg",
+    priceLevel: 1,
   },
   {
     id: "fairprice-clementi-ave-2",
@@ -154,6 +198,10 @@ export const CAMPUS_POIS: POI[] = [
     description: "Small neighbourhood outlet",
     address: "352 Clementi Ave 2, #01 Shopping Centre, S120352",
     hours: "24 hours",
+    tags: ["24 Hours"],
+    distanceFromCampus: "1.9 km",
+    website: "https://www.fairprice.com.sg",
+    priceLevel: 1,
   },
   {
     id: "fairprice-bukit-timah-plaza",
@@ -164,6 +212,10 @@ export const CAMPUS_POIS: POI[] = [
     description: "Huge store, ~1.5km north of SUSS",
     address: "1 Jalan Anak Bukit, #B1-01 & #B2-01, Bukit Timah Plaza, S588996",
     hours: "24 hours",
+    tags: ["24 Hours", "Wheelchair Accessible", "Self-Checkout"],
+    distanceFromCampus: "1.5 km",
+    website: "https://www.fairprice.com.sg",
+    priceLevel: 2,
   },
   {
     id: "u-stars",
@@ -174,6 +226,9 @@ export const CAMPUS_POIS: POI[] = [
     description: "Neighbourhood minimart on Clementi Ave 5",
     address: "345 Clementi Ave 5, #01-78, S120345",
     hours: "24 hours",
+    tags: ["24 Hours"],
+    distanceFromCampus: "2.2 km",
+    priceLevel: 1,
   },
 
   // ── Restaurants ────────────────────────────────────────────
@@ -188,6 +243,9 @@ export const CAMPUS_POIS: POI[] = [
     hours: "Mon–Fri 7:30AM–8PM, Sat till 2PM",
     cuisine: "Food court",
     rating: 3.5,
+    tags: ["Halal", "Vegetarian", "Wheelchair Accessible", "WiFi"],
+    distanceFromCampus: "On campus",
+    priceLevel: 1,
   },
   {
     id: "hoho-korean",
@@ -200,6 +258,10 @@ export const CAMPUS_POIS: POI[] = [
     hours: "11:30AM–10PM (closed Tue)",
     cuisine: "Korean",
     rating: 4.3,
+    tags: ["Air-Conditioned"],
+    distanceFromCampus: "1.1 km",
+    contact: "+65 6774 9911",
+    priceLevel: 2,
   },
   {
     id: "mariners-corner",
@@ -212,6 +274,9 @@ export const CAMPUS_POIS: POI[] = [
     hours: "11:30AM–10:30PM daily",
     cuisine: "Hainanese Western",
     rating: 4.3,
+    tags: ["Air-Conditioned"],
+    distanceFromCampus: "1.1 km",
+    priceLevel: 2,
   },
   {
     id: "sukiya",
@@ -224,6 +289,10 @@ export const CAMPUS_POIS: POI[] = [
     hours: "10AM–9:30PM daily",
     cuisine: "Japanese",
     rating: 4.4,
+    tags: ["Air-Conditioned", "Wheelchair Accessible"],
+    distanceFromCampus: "2.0 km",
+    website: "https://www.sukiya.com.sg",
+    priceLevel: 1,
   },
 
   // ── Malls ──────────────────────────────────────────────────
@@ -237,6 +306,8 @@ export const CAMPUS_POIS: POI[] = [
     address: "41 Sunset Way, S597071",
     hours: "9AM–10PM",
     rating: 3.8,
+    tags: ["Wheelchair Accessible", "ATM"],
+    distanceFromCampus: "0.9 km",
   },
   {
     id: "clementi-mall",
@@ -248,6 +319,9 @@ export const CAMPUS_POIS: POI[] = [
     address: "3155 Commonwealth Ave W, S129588",
     hours: "10AM–10PM",
     rating: 4.1,
+    tags: ["Wheelchair Accessible", "WiFi", "ATM", "Nursing Room"],
+    distanceFromCampus: "2.0 km",
+    website: "https://www.clementimall.com.sg",
   },
   {
     id: "clementi-town-centre",
@@ -259,6 +333,8 @@ export const CAMPUS_POIS: POI[] = [
     address: "449 Clementi Ave 3, S120449",
     hours: "Varies",
     rating: 4.3,
+    tags: ["ATM"],
+    distanceFromCampus: "2.0 km",
   },
   {
     id: "321-clementi",
@@ -270,6 +346,8 @@ export const CAMPUS_POIS: POI[] = [
     address: "321 Clementi Ave 3, S129905",
     hours: "10AM–10PM",
     rating: 4.0,
+    tags: ["Wheelchair Accessible", "ATM"],
+    distanceFromCampus: "2.5 km",
   },
   {
     id: "west-coast-plaza",
@@ -281,6 +359,8 @@ export const CAMPUS_POIS: POI[] = [
     address: "154 West Coast Road, S127371",
     hours: "10AM–10PM",
     rating: 3.9,
+    tags: ["Wheelchair Accessible", "ATM", "Parking"],
+    distanceFromCampus: "3.5 km",
   },
 
   // ── Bars & Clubs ───────────────────────────────────────────
@@ -294,6 +374,9 @@ export const CAMPUS_POIS: POI[] = [
     address: "727 Clementi West Street 2, #01-282, S120727",
     hours: "Tue–Sun 3PM–12AM",
     rating: 4.8,
+    tags: ["Outdoor Seating", "Craft Beer"],
+    distanceFromCampus: "3.2 km",
+    priceLevel: 2,
   },
   {
     id: "berlin-bar",
@@ -305,6 +388,9 @@ export const CAMPUS_POIS: POI[] = [
     address: "8 Boon Lay Way, #01-27, 8@TradeHub21, S609964",
     hours: "3PM–12AM daily",
     rating: 4.6,
+    tags: ["Pool Table", "Sports Screening"],
+    distanceFromCampus: "3.8 km",
+    priceLevel: 2,
   },
   {
     id: "obar",
@@ -316,6 +402,9 @@ export const CAMPUS_POIS: POI[] = [
     address: "8 Boon Lay Way, #01-32, TradeHub21, S609964",
     hours: "11AM–12AM daily",
     rating: 4.0,
+    tags: ["Live Music", "Outdoor Seating"],
+    distanceFromCampus: "3.8 km",
+    priceLevel: 2,
   },
   {
     id: "le-white-bar",
@@ -327,6 +416,9 @@ export const CAMPUS_POIS: POI[] = [
     address: "27 West Coast Highway, #01-05, S117867",
     hours: "4PM–1/2AM daily",
     rating: 4.8,
+    tags: ["Karaoke", "Live Music", "Dance Floor"],
+    distanceFromCampus: "4.2 km",
+    priceLevel: 3,
   },
 
   // ── Food Courts & Hawker Centres ───────────────────────────
@@ -340,6 +432,9 @@ export const CAMPUS_POIS: POI[] = [
     address: "107 Clementi St 12, #01-K1, S120107",
     hours: "6AM–10PM daily",
     rating: 3.7,
+    tags: ["Halal", "Outdoor Seating"],
+    distanceFromCampus: "1.0 km",
+    priceLevel: 1,
   },
   {
     id: "chang-cheng",
@@ -351,6 +446,9 @@ export const CAMPUS_POIS: POI[] = [
     address: "107 Clementi St 12, Blk 107, S120107",
     hours: "7AM–9:30PM daily",
     rating: 3.3,
+    tags: ["Air-Conditioned", "Halal"],
+    distanceFromCampus: "1.0 km",
+    priceLevel: 1,
   },
   {
     id: "353-food-centre",
@@ -362,6 +460,9 @@ export const CAMPUS_POIS: POI[] = [
     address: "353 Clementi Ave 2, S120353",
     hours: "6:30AM–5:25PM daily",
     rating: 4.0,
+    tags: ["Halal", "Wheelchair Accessible"],
+    distanceFromCampus: "1.9 km",
+    priceLevel: 1,
   },
   {
     id: "448-market",
@@ -373,6 +474,9 @@ export const CAMPUS_POIS: POI[] = [
     address: "448 Clementi Ave 3, S120448",
     hours: "7AM–9PM daily",
     rating: 4.1,
+    tags: ["Halal", "Michelin", "Wheelchair Accessible"],
+    distanceFromCampus: "2.0 km",
+    priceLevel: 1,
   },
   {
     id: "hawkers-street",
@@ -384,6 +488,9 @@ export const CAMPUS_POIS: POI[] = [
     address: "3155 Commonwealth Ave W, #04-20/21/22, S129588",
     hours: "8:30AM–9:30PM daily",
     rating: 4.6,
+    tags: ["Michelin", "Air-Conditioned", "Wheelchair Accessible"],
+    distanceFromCampus: "2.0 km",
+    priceLevel: 1,
   },
   {
     id: "ayer-rajah",
@@ -395,6 +502,9 @@ export const CAMPUS_POIS: POI[] = [
     address: "503 West Coast Dr, S120503",
     hours: "6AM–1AM daily",
     rating: 4.2,
+    tags: ["Halal", "Late Night", "Wheelchair Accessible"],
+    distanceFromCampus: "3.0 km",
+    priceLevel: 1,
   },
   {
     id: "west-coast-market",
@@ -406,6 +516,9 @@ export const CAMPUS_POIS: POI[] = [
     address: "726 Clementi West St 2, S120726",
     hours: "5:30AM–10:30PM daily",
     rating: 4.1,
+    tags: ["Halal", "Wheelchair Accessible"],
+    distanceFromCampus: "3.2 km",
+    priceLevel: 1,
   },
 
   // ── Active Ageing Centres ──────────────────────────────────
