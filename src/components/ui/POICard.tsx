@@ -41,16 +41,16 @@ export default function POICard({ poi }: POICardProps) {
   );
 
   return (
-    <div className="relative bg-white rounded-xl shadow-lg border border-gray-100 w-full text-left p-5 transition-all hover:shadow-xl hover:border-gray-200">
+    <div className="relative bg-card rounded-2xl shadow-lg border border-border w-full text-left p-5 transition-all hover:shadow-xl hover:border-border/80">
       <button
         type="button"
         onClick={handleCardClick}
-        className="absolute inset-0 z-10 rounded-xl cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        className="absolute inset-0 z-10 rounded-2xl cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         aria-label={`Select ${poi.name} and fly to location`}
       />
 
       <div className="flex items-center gap-2 mb-2 flex-wrap">
-        <span className="inline-block bg-blue-50 text-surface-brand text-sm font-semibold px-3 py-1 rounded-full border border-blue-100">
+        <span className="inline-block bg-secondary text-secondary-foreground text-sm font-semibold px-3 py-1 rounded-full">
           {poi.category}
         </span>
         {poi.distanceFromCampus && (
@@ -65,13 +65,15 @@ export default function POICard({ poi }: POICardProps) {
         )}
       </div>
 
-      <h3 className="text-lg font-bold text-gray-900 mb-1.5">{poi.name}</h3>
+      <h3 className="text-lg font-bold text-card-foreground mb-1.5">
+        {poi.name}
+      </h3>
 
-      <p className="text-[0.9375rem] text-gray-600 mb-3 line-clamp-2 leading-relaxed">
+      <p className="text-[0.9375rem] text-muted-foreground mb-3 line-clamp-2 leading-relaxed">
         {poi.description}
       </p>
 
-      <div className="space-y-2 mb-4 text-[0.9375rem] text-gray-500">
+      <div className="space-y-2 mb-4 text-[0.9375rem] text-muted-foreground">
         {poi.address && (
           <div className="flex items-start gap-2">
             <MapPin size={16} className="mt-0.5 shrink-0" aria-hidden="true" />
@@ -123,11 +125,11 @@ export default function POICard({ poi }: POICardProps) {
         </div>
       )}
 
-      <div className="relative z-20 flex items-center gap-2 pt-3 border-t border-gray-100">
+      <div className="relative z-20 flex items-center gap-2 pt-3 border-t border-border">
         <button
           type="button"
           onClick={handleNavigate}
-          className="flex-1 bg-surface-brand text-surface-brand-foreground rounded-lg px-4 py-2.5 text-[0.9375rem] font-semibold hover:bg-surface-brand/90 transition-colors flex items-center justify-center gap-2"
+          className="flex-1 bg-surface-brand text-surface-brand-foreground rounded-xl px-4 py-3 min-h-[44px] text-[0.9375rem] font-semibold hover:bg-surface-brand/90 active:scale-[0.98] transition-all flex items-center justify-center gap-2"
         >
           <Navigation size={16} aria-hidden="true" />
           Navigate here
@@ -138,7 +140,7 @@ export default function POICard({ poi }: POICardProps) {
             target="_blank"
             rel="noopener noreferrer"
             onClick={(e) => e.stopPropagation()}
-            className="relative z-20 inline-flex items-center gap-1.5 rounded-lg border border-gray-200 px-4 py-2.5 text-[0.9375rem] font-semibold text-gray-700 hover:bg-gray-50 transition-colors"
+            className="relative z-20 inline-flex items-center gap-1.5 rounded-xl border border-border px-4 py-3 min-h-[44px] text-[0.9375rem] font-semibold text-card-foreground hover:bg-muted active:scale-[0.98] transition-all"
           >
             <ExternalLink size={16} aria-hidden="true" />
             Website

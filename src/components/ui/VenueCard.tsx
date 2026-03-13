@@ -33,11 +33,14 @@ const categoryIconMap: Record<string, LucideIcon> = {
 };
 
 const categoryColorMap: Record<string, string> = {
-  Restaurant: "bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400",
+  Restaurant:
+    "bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400",
   Bar: "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400",
-  Hawker: "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400",
+  Hawker:
+    "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400",
   Mall: "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400",
-  Supermarket: "bg-teal-100 text-teal-700 dark:bg-teal-900/30 dark:text-teal-400",
+  Supermarket:
+    "bg-teal-100 text-teal-700 dark:bg-teal-900/30 dark:text-teal-400",
 };
 
 function renderPriceLevel(level: PriceLevel): string {
@@ -49,7 +52,8 @@ export default function VenueCard({ venue }: VenueCardProps) {
   const setSelectedPOI = useAppStore((s) => s.setSelectedPOI);
 
   const CategoryIcon = categoryIconMap[venue.category] ?? MapPin;
-  const iconColors = categoryColorMap[venue.category] ?? "bg-muted text-muted-foreground";
+  const iconColors =
+    categoryColorMap[venue.category] ?? "bg-muted text-muted-foreground";
 
   function handleCardClick() {
     setFlyToTarget({ lat: venue.lat, lng: venue.lng });
@@ -80,11 +84,11 @@ export default function VenueCard({ venue }: VenueCardProps) {
     <button
       type="button"
       onClick={handleCardClick}
-      className="group w-full text-left rounded-lg border border-border bg-card p-3 transition-all duration-150 hover:shadow-md hover:border-primary/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+      className="group w-full text-left rounded-xl border border-border bg-card p-3.5 transition-all duration-150 hover:shadow-md hover:border-primary/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
     >
       <div className="flex gap-3">
         <div
-          className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg ${iconColors}`}
+          className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ${iconColors}`}
         >
           <CategoryIcon size={20} aria-hidden="true" />
         </div>
@@ -107,20 +111,23 @@ export default function VenueCard({ venue }: VenueCardProps) {
               )}
               {venue.priceLevel != null && (
                 <span className="text-xs font-medium text-green-700 dark:text-green-400">
-                  <DollarSign size={10} className="inline -mt-px" aria-hidden="true" />
+                  <DollarSign
+                    size={10}
+                    className="inline -mt-px"
+                    aria-hidden="true"
+                  />
                   {renderPriceLevel(venue.priceLevel).slice(1)}
                 </span>
               )}
             </div>
           </div>
 
-
           <div className="mt-0.5 flex items-center gap-2 text-xs text-muted-foreground">
             {venue.cuisine && (
               <span className="truncate">{venue.cuisine}</span>
             )}
             {venue.cuisine && venue.distanceFromCampus && (
-              <span aria-hidden="true">·</span>
+              <span aria-hidden="true">&middot;</span>
             )}
             {venue.distanceFromCampus && (
               <span className="flex shrink-0 items-center gap-0.5">
@@ -130,14 +137,12 @@ export default function VenueCard({ venue }: VenueCardProps) {
             )}
           </div>
 
-
           {venue.hours && (
             <div className="mt-1 flex items-center gap-1 text-xs text-muted-foreground">
               <Clock size={11} className="shrink-0" aria-hidden="true" />
               <span className="truncate">{venue.hours}</span>
             </div>
           )}
-
 
           {venue.tags && venue.tags.length > 0 && (
             <div className="mt-1.5 flex flex-wrap gap-1">
@@ -153,12 +158,11 @@ export default function VenueCard({ venue }: VenueCardProps) {
             </div>
           )}
 
-
-          <div className="mt-2 flex items-center gap-1.5">
+          <div className="mt-2.5 flex items-center gap-1.5">
             <button
               type="button"
               onClick={handleNavigate}
-              className="inline-flex items-center gap-1 rounded-md bg-surface-brand px-2.5 py-1 text-xs font-medium text-surface-brand-foreground transition-colors hover:bg-surface-brand-hover"
+              className="inline-flex items-center gap-1 rounded-lg bg-surface-brand px-3 py-1.5 min-h-[36px] text-xs font-medium text-surface-brand-foreground transition-colors hover:bg-surface-brand-hover active:scale-[0.97]"
             >
               <Navigation size={12} aria-hidden="true" />
               Navigate
@@ -168,7 +172,7 @@ export default function VenueCard({ venue }: VenueCardProps) {
               <button
                 type="button"
                 onClick={handleCall}
-                className="inline-flex items-center gap-1 rounded-md border border-border px-2 py-1 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                className="inline-flex items-center gap-1 rounded-lg border border-border px-2.5 py-1.5 min-h-[36px] text-xs font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground active:scale-[0.97]"
               >
                 <Phone size={12} aria-hidden="true" />
                 Call
@@ -179,7 +183,7 @@ export default function VenueCard({ venue }: VenueCardProps) {
               <button
                 type="button"
                 onClick={handleWebsite}
-                className="inline-flex items-center gap-1 rounded-md border border-border px-2 py-1 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                className="inline-flex items-center gap-1 rounded-lg border border-border px-2.5 py-1.5 min-h-[36px] text-xs font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground active:scale-[0.97]"
               >
                 <ExternalLink size={12} aria-hidden="true" />
                 Web

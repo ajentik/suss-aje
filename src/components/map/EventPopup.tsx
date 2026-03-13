@@ -1,6 +1,7 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useState, useRef } from "react";
+import { X, Calendar, Clock, MapPin, Navigation } from "lucide-react";
 import { useAppStore } from "@/store/app-store";
 import type { CampusEvent } from "@/types";
 
@@ -8,15 +9,37 @@ export default function EventPopup() {
   const selectedEvent = useAppStore((s) => s.selectedEvent);
   const setSelectedEvent = useAppStore((s) => s.setSelectedEvent);
   const setStreetViewEvent = useAppStore((s) => s.setStreetViewEvent);
-  const [fadingOutEvent, setFadingOutEvent] = useState<CampusEvent | null>(null);
+  const [fadingOutEvent, setFadingOutEvent] = useState<CampusEvent | null>(
+    null,
+  );
 
   const displayEvent = selectedEvent ?? fadingOutEvent;
   const isVisible = !!selectedEvent;
+
+  // Swipe-to-dismiss
+  const touchStartY = useRef(0);
+  const touchCurrentY = useRef(0);
+
+  const handleTouchStart = useCallback((e: React.TouchEvent) => {
+    touchStartY.current = e.touches[0].clientY;
+    touchCurrentY.current = e.touches[0].clientY;
+  }, []);
+
+  const handleTouchMove = useCallback((e: React.TouchEvent) => {
+    touchCurrentY.current = e.touches[0].clientY;
+  }, []);
 
   const handleClose = useCallback(() => {
     setFadingOutEvent(useAppStore.getState().selectedEvent);
     setSelectedEvent(null);
   }, [setSelectedEvent]);
+
+  const handleTouchEnd = useCallback(() => {
+    const deltaY = touchCurrentY.current - touchStartY.current;
+    if (deltaY > 60) {
+      handleClose();
+    }
+  }, [handleClose]);
 
   const handleTransitionEnd = useCallback(() => {
     if (!useAppStore.getState().selectedEvent) {
@@ -35,34 +58,25 @@ export default function EventPopup() {
   if (!displayEvent) return null;
 
   return (
-    <div 
-      className={`absolute bottom-20 left-1/2 -translate-x-1/2 z-20 transition-all duration-200 ease-in-out ${
-        isVisible ? "opacity-100 translate-y-0 scale-100" : "opacity-0 translate-y-4 scale-95 pointer-events-none"
+    <div
+      className={`absolute bottom-24 md:bottom-20 left-1/2 -translate-x-1/2 z-20 transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] ${
+        isVisible
+          ? "opacity-100 translate-y-0 scale-100"
+          : "opacity-0 translate-y-6 scale-95 pointer-events-none"
       }`}
       onTransitionEnd={handleTransitionEnd}
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
     >
-      <div className="bg-white rounded-xl shadow-lg max-w-md w-[calc(100vw-2rem)] sm:w-[380px] p-5 relative border border-gray-100">
-        <button type="button"
+      <div className="bg-card rounded-2xl shadow-xl max-w-md w-[calc(100vw-1.5rem)] sm:w-[380px] p-5 relative border border-border">
+        <button
+          type="button"
           onClick={handleClose}
-          className="absolute top-3 right-3 text-gray-400 hover:text-gray-600 transition-colors"
+          className="absolute top-3 right-3 flex items-center justify-center w-9 h-9 rounded-full bg-muted hover:bg-muted/80 text-muted-foreground hover:text-foreground transition-colors"
           aria-label="Close popup"
         >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="20"
-            height="20"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            aria-hidden="true"
-          >
-            <title>Close</title>
-            <path d="M18 6 6 18" />
-            <path d="m6 6 12 12" />
-          </svg>
+          <X size={18} aria-hidden="true" />
         </button>
 
         <div className="mb-2">
@@ -71,7 +85,7 @@ export default function EventPopup() {
           </span>
         </div>
 
-        <h3 className="text-xl font-bold text-foreground mb-1.5 pr-6">
+        <h3 className="text-xl font-bold text-card-foreground mb-1.5 pr-10">
           {displayEvent.title}
         </h3>
 
@@ -81,44 +95,45 @@ export default function EventPopup() {
 
         <div className="space-y-2 mb-4 text-[0.9375rem] text-muted-foreground">
           <div className="flex items-start gap-2">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mt-0.5 shrink-0" aria-hidden="true">
-              <title>Date</title>
-              <rect width="18" height="18" x="3" y="4" rx="2" ry="2"/>
-              <line x1="16" x2="16" y1="2" y2="6"/>
-              <line x1="8" x2="8" y1="2" y2="6"/>
-              <line x1="3" x2="21" y1="10" y2="10"/>
-            </svg>
+            <Calendar
+              size={16}
+              className="mt-0.5 shrink-0"
+              aria-hidden="true"
+            />
             <span className="line-clamp-1">
-              {displayEvent.date}{displayEvent.endDate ? ` – ${displayEvent.endDate}` : ""}
+              {displayEvent.date}
+              {displayEvent.endDate ? ` – ${displayEvent.endDate}` : ""}
             </span>
           </div>
 
           <div className="flex items-start gap-2">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mt-0.5 shrink-0" aria-hidden="true">
-              <title>Time</title>
-              <circle cx="12" cy="12" r="10"/>
-              <polyline points="12 6 12 12 16 14"/>
-            </svg>
+            <Clock
+              size={16}
+              className="mt-0.5 shrink-0"
+              aria-hidden="true"
+            />
             <span className="line-clamp-1">{displayEvent.time}</span>
           </div>
 
           <div className="flex items-start gap-2">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mt-0.5 shrink-0" aria-hidden="true">
-              <title>Location</title>
-              <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/>
-              <circle cx="12" cy="10" r="3"/>
-            </svg>
+            <MapPin
+              size={16}
+              className="mt-0.5 shrink-0"
+              aria-hidden="true"
+            />
             <span className="line-clamp-1">{displayEvent.location}</span>
           </div>
 
           {displayEvent.venueAddress && (
             <div className="flex items-start gap-2">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mt-0.5 shrink-0" aria-hidden="true">
-                <title>Venue Address</title>
-                <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/>
-                <circle cx="12" cy="10" r="3"/>
-              </svg>
-              <span className="line-clamp-1">{displayEvent.venueAddress}</span>
+              <MapPin
+                size={16}
+                className="mt-0.5 shrink-0"
+                aria-hidden="true"
+              />
+              <span className="line-clamp-1">
+                {displayEvent.venueAddress}
+              </span>
             </div>
           )}
         </div>
@@ -134,26 +149,24 @@ export default function EventPopup() {
 
         {displayEvent.url && displayEvent.type !== "Online" && (
           <div className="mb-2 text-right">
-            <a 
-              href={displayEvent.url} 
-              target="_blank" 
+            <a
+              href={displayEvent.url}
+              target="_blank"
               rel="noopener noreferrer"
               className="text-sm text-primary hover:underline font-medium"
             >
-              Details →
+              Details &rarr;
             </a>
           </div>
         )}
 
         {displayEvent.type !== "Online" ? (
-          <button type="button"
+          <button
+            type="button"
             onClick={handleNavigate}
-            className="w-full bg-primary text-primary-foreground rounded-lg px-4 py-2.5 text-[0.9375rem] font-semibold hover:bg-primary/90 transition-colors flex items-center justify-center gap-2"
+            className="w-full bg-primary text-primary-foreground rounded-xl px-4 py-3 text-[0.9375rem] font-semibold hover:bg-primary/90 active:scale-[0.98] transition-all flex items-center justify-center gap-2"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-              <title>Navigate</title>
-              <polygon points="3 11 22 2 13 21 11 13 3 11"/>
-            </svg>
+            <Navigation size={18} aria-hidden="true" />
             Navigate here
           </button>
         ) : displayEvent.url ? (
@@ -161,9 +174,9 @@ export default function EventPopup() {
             href={displayEvent.url}
             target="_blank"
             rel="noopener noreferrer"
-            className="w-full bg-primary text-primary-foreground rounded-lg px-4 py-2.5 text-[0.9375rem] font-semibold hover:bg-primary/90 transition-colors flex items-center justify-center gap-2"
+            className="w-full bg-primary text-primary-foreground rounded-xl px-4 py-3 text-[0.9375rem] font-semibold hover:bg-primary/90 active:scale-[0.98] transition-all flex items-center justify-center gap-2"
           >
-            Join Online →
+            Join Online &rarr;
           </a>
         ) : null}
       </div>
