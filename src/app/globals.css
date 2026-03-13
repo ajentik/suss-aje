@@ -58,6 +58,18 @@
   --color-event-online-fg: var(--event-online-fg);
   --color-event-external-bg: var(--event-external-bg);
   --color-event-external-fg: var(--event-external-fg);
+
+  --color-poi-building: var(--poi-building);
+  --color-poi-academic: var(--poi-academic);
+  --color-poi-facility: var(--poi-facility);
+  --color-poi-food: var(--poi-food);
+  --color-poi-restaurant: var(--poi-restaurant);
+  --color-poi-hawker: var(--poi-hawker);
+  --color-poi-services: var(--poi-services);
+  --color-poi-transport: var(--poi-transport);
+  --color-poi-mall: var(--poi-mall);
+  --color-poi-supermarket: var(--poi-supermarket);
+  --color-poi-bar: var(--poi-bar);
 }
 
 :root {

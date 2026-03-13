@@ -21,17 +21,17 @@ function findUpcomingEventsNear(poi: POI): CampusEvent[] {
 }
 
 const POI_CATEGORY_DOT: Record<string, string> = {
-  Building: "bg-[#003B5C]",
-  Academic: "bg-[#003B5C]",
-  Facility: "bg-[#00796B]",
-  Food: "bg-[#E65100]",
-  Restaurant: "bg-[#D84315]",
-  Hawker: "bg-[#BF360C]",
-  Services: "bg-[#5C6BC0]",
-  Transport: "bg-[#0288D1]",
-  Mall: "bg-[#7B1FA2]",
-  Supermarket: "bg-[#2E7D32]",
-  Bar: "bg-[#AD1457]",
+  Building: "bg-poi-building",
+  Academic: "bg-poi-academic",
+  Facility: "bg-poi-facility",
+  Food: "bg-poi-food",
+  Restaurant: "bg-poi-restaurant",
+  Hawker: "bg-poi-hawker",
+  Services: "bg-poi-services",
+  Transport: "bg-poi-transport",
+  Mall: "bg-poi-mall",
+  Supermarket: "bg-poi-supermarket",
+  Bar: "bg-poi-bar",
 };
 
 export default function POIPopup() {
