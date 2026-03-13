@@ -159,11 +159,10 @@ export default function AppShell() {
 
       {/* Desktop resize handle */}
       {!minimized && (
-        <div
-          role="separator"
-          aria-orientation="vertical"
+        <button
+          type="button"
           aria-label="Resize panel"
-          className="hidden md:flex items-center justify-center w-2 cursor-col-resize hover:bg-primary/10 active:bg-primary/20 transition-colors group shrink-0"
+          className="hidden md:flex items-center justify-center w-2 cursor-col-resize hover:bg-primary/10 active:bg-primary/20 transition-colors group shrink-0 border-0 bg-transparent p-0"
           onMouseDown={handleResizeStart}
           onTouchStart={handleResizeStart}
         >
@@ -171,7 +170,7 @@ export default function AppShell() {
             size={14}
             className="text-muted-foreground/40 group-hover:text-muted-foreground/70 transition-colors"
           />
-        </div>
+        </button>
       )}
 
       {/* Desktop minimize restore button */}
