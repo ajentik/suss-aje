@@ -4,6 +4,9 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import type { POI, RouteInfo, CampusEvent, ChatMessage, DateRangePreset } from "@/types";
 
+type SheetContentMode = "default" | "poi-detail" | "event-detail";
+type MobileSheetState = "collapsed" | "peek" | "expanded";
+
 interface AppState {
   selectedPOI: POI | null;
   setSelectedPOI: (poi: POI | null) => void;
@@ -16,6 +19,11 @@ interface AppState {
 
   activePanel: "chat" | "events";
   setActivePanel: (panel: "chat" | "events") => void;
+
+  sheetContentMode: SheetContentMode;
+  setSheetContentMode: (mode: SheetContentMode) => void;
+  mobileSheetState: MobileSheetState;
+  setMobileSheetState: (state: MobileSheetState) => void;
 
   eventDateFilter: DateRangePreset;
   setEventDateFilter: (preset: DateRangePreset) => void;
@@ -55,7 +63,14 @@ export const useAppStore = create<AppState>()(
   persist(
     (set) => ({
       selectedPOI: null,
-      setSelectedPOI: (poi) => set({ selectedPOI: poi, selectedEvent: null }),
+      setSelectedPOI: (poi) =>
+        set({
+          selectedPOI: poi,
+          selectedEvent: null,
+          ...(poi
+            ? { sheetContentMode: "poi-detail" as const, mobileSheetState: "peek" as const }
+            : { sheetContentMode: "default" as const }),
+        }),
       selectedDestination: null,
       setSelectedDestination: (poi) => set({ selectedDestination: poi }),
       routeInfo: null,
@@ -66,6 +81,11 @@ export const useAppStore = create<AppState>()(
       activePanel: "chat",
       setActivePanel: (panel) => set({ activePanel: panel }),
 
+      sheetContentMode: "default",
+      setSheetContentMode: (mode) => set({ sheetContentMode: mode }),
+      mobileSheetState: "expanded",
+      setMobileSheetState: (state) => set({ mobileSheetState: state }),
+
       eventDateFilter: "all",
       setEventDateFilter: (preset) => set({ eventDateFilter: preset }),
       eventCategoryFilter: "",
@@ -75,7 +95,14 @@ export const useAppStore = create<AppState>()(
       highlightedEventIds: [],
       setHighlightedEventIds: (ids) => set({ highlightedEventIds: ids }),
       selectedEvent: null,
-      setSelectedEvent: (event) => set({ selectedEvent: event, selectedPOI: null }),
+      setSelectedEvent: (event) =>
+        set({
+          selectedEvent: event,
+          selectedPOI: null,
+          ...(event
+            ? { sheetContentMode: "event-detail" as const, mobileSheetState: "peek" as const }
+            : { sheetContentMode: "default" as const }),
+        }),
       streetViewEvent: null,
       setStreetViewEvent: (event) => set({ streetViewEvent: event }),
 
