@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useRef, useState, useCallback } from "react";
-import { Map3D, Marker3D } from "@vis.gl/react-google-maps";
+import { Component, useEffect, useRef, useState, useCallback } from "react";
+import type { ReactNode, ErrorInfo } from "react";
+import { Map3D, Marker3D, Pin } from "@vis.gl/react-google-maps";
 import type { Map3DRef, Map3DClickEvent } from "@vis.gl/react-google-maps";
 import { ErrorState } from "@/components/ui/error-state";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -10,6 +11,29 @@ import { CAMPUS_CENTER, CAMPUS_POIS } from "@/lib/maps/campus-pois";
 import type { POI, CampusEvent } from "@/types";
 import RoutePolyline from "./RoutePolyline";
 import StreetViewPanel from "./StreetViewPanel";
+
+class PinErrorBoundary extends Component<
+  { children: ReactNode; fallback?: ReactNode },
+  { hasError: boolean }
+> {
+  constructor(props: { children: ReactNode; fallback?: ReactNode }) {
+    super(props);
+    this.state = { hasError: false };
+  }
+
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
+
+  componentDidCatch(_error: Error, _info: ErrorInfo) {}
+
+  render() {
+    if (this.state.hasError) {
+      return this.props.fallback ?? null;
+    }
+    return this.props.children;
+  }
+}
 
 let mapsReady: Promise<void> | null = null;
 
@@ -96,6 +120,9 @@ function Map3DInner() {
   const routeInfo = useAppStore((s) => s.routeInfo);
   const mapEventMarkers = useAppStore((s) => s.mapEventMarkers);
   const setSelectedPOI = useAppStore((s) => s.setSelectedPOI);
+  const selectedPOI = useAppStore((s) => s.selectedPOI);
+  const selectedDestination = useAppStore((s) => s.selectedDestination);
+  const highlightedEventIds = useAppStore((s) => s.highlightedEventIds);
   const [inStreetView, setInStreetView] = useState(false);
   const [streetViewLocation, setStreetViewLocation] = useState<{
     lat: number;
@@ -172,26 +199,55 @@ function Map3DInner() {
             defaultHeading={0}
             onClick={handleMapClick}
           >
-            {CAMPUS_POIS.map((poi) => (
-              <Marker3D
-                key={poi.id}
-                position={{ lat: poi.lat, lng: poi.lng, altitude: 20 }}
-                altitudeMode="RELATIVE_TO_GROUND"
-                label={poi.name}
-                title={poi.name}
-                onClick={() => handleMarkerClick(poi)}
-              />
-            ))}
+            {CAMPUS_POIS.map((poi) => {
+              const isSelected =
+                selectedPOI?.id === poi.id ||
+                selectedDestination?.id === poi.id;
+              return (
+                <Marker3D
+                  key={poi.id}
+                  position={{ lat: poi.lat, lng: poi.lng, altitude: 20 }}
+                  altitudeMode="RELATIVE_TO_GROUND"
+                  label={poi.name}
+                  title={poi.name}
+                  onClick={() => handleMarkerClick(poi)}
+                >
+                  <PinErrorBoundary>
+                    <Pin
+                      background={isSelected ? "#003B5C" : "#DA291C"}
+                      borderColor={isSelected ? "#DA291C" : "#003B5C"}
+                      glyphColor={isSelected ? "#fff" : undefined}
+                      scale={isSelected ? 1.4 : 1.0}
+                    />
+                  </PinErrorBoundary>
+                </Marker3D>
+              );
+            })}
 
-            {mapEventMarkers.map((event: CampusEvent) => (
-              <Marker3D
-                key={event.id}
-                position={{ lat: event.lat, lng: event.lng, altitude: 25 }}
-                altitudeMode="RELATIVE_TO_GROUND"
-                label={event.title}
-                title={event.title}
-              />
-            ))}
+            {mapEventMarkers.map((event: CampusEvent) => {
+              const isHighlighted = highlightedEventIds.includes(event.id);
+              return (
+                <Marker3D
+                  key={event.id}
+                  position={{ lat: event.lat, lng: event.lng, altitude: 25 }}
+                  altitudeMode="RELATIVE_TO_GROUND"
+                  label={event.title}
+                  title={event.title}
+                  onClick={() =>
+                    setFlyToTarget({ lat: event.lat, lng: event.lng })
+                  }
+                >
+                  <PinErrorBoundary>
+                    <Pin
+                      background={isHighlighted ? "#D97706" : "#F59E0B"}
+                      borderColor={isHighlighted ? "#003B5C" : undefined}
+                      glyphColor={isHighlighted ? "#fff" : undefined}
+                      scale={isHighlighted ? 1.3 : 0.9}
+                    />
+                  </PinErrorBoundary>
+                </Marker3D>
+              );
+            })}
 
             {routeInfo && routeInfo.polyline.length > 0 && <RoutePolyline />}
           </Map3D>

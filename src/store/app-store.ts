@@ -25,6 +25,8 @@ interface AppState {
   setEventCategoryFilter: (category: string) => void;
   mapEventMarkers: CampusEvent[];
   setMapEventMarkers: (events: CampusEvent[]) => void;
+  highlightedEventIds: string[];
+  setHighlightedEventIds: (ids: string[]) => void;
 
   // Voice
   isSpeaking: boolean;
@@ -52,6 +54,8 @@ export const useAppStore = create<AppState>((set) => ({
   setEventCategoryFilter: (category) => set({ eventCategoryFilter: category }),
   mapEventMarkers: [],
   setMapEventMarkers: (events) => set({ mapEventMarkers: events }),
+  highlightedEventIds: [],
+  setHighlightedEventIds: (ids) => set({ highlightedEventIds: ids }),
 
   isSpeaking: false,
   setIsSpeaking: (speaking) => set({ isSpeaking: speaking }),
