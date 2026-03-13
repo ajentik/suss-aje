@@ -3,12 +3,14 @@
 import { useState } from "react";
 import Image from "next/image";
 import dynamic from "next/dynamic";
+import { APIProvider } from "@vis.gl/react-google-maps";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAppStore } from "@/store/app-store";
 import ChatPanel from "@/components/chat/ChatPanel";
 import EventsPanel from "@/components/events/EventsPanel";
 import RouteOverlay from "@/components/map/RouteOverlay";
 import AerialViewButton from "@/components/map/AerialViewButton";
+import POIPopup from "@/components/map/POIPopup";
 
 const MapView = dynamic(() => import("@/components/map/MapView"), {
   ssr: false,
@@ -104,11 +106,14 @@ export default function AppShell() {
       </div>
 
       {/* Right Panel — 3D Map */}
-      <div className="flex-1 h-full relative">
-        <MapView />
-        <RouteOverlay />
-        <AerialViewButton />
-      </div>
+      <APIProvider apiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || ""} version="alpha">
+        <div className="flex-1 h-full relative">
+          <MapView />
+          <RouteOverlay />
+          <AerialViewButton />
+          <POIPopup />
+        </div>
+      </APIProvider>
     </div>
   );
 }
