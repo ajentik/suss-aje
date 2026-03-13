@@ -113,6 +113,81 @@ export default function MapView() {
   return <Map3DInner />;
 }
 
+// -- Marker style helpers --------------------------------------------------
+
+type PinStyle = {
+  background: string;
+  borderColor: string;
+  glyphColor: string;
+  scale: number;
+};
+
+const POI_CATEGORY_COLORS: Record<string, { bg: string; border: string }> = {
+  Building:    { bg: "#003B5C", border: "#FFD700" },
+  Academic:    { bg: "#003B5C", border: "#4FC3F7" },
+  Facility:    { bg: "#00796B", border: "#B2DFDB" },
+  Food:        { bg: "#E65100", border: "#FFE0B2" },
+  Restaurant:  { bg: "#D84315", border: "#FFCCBC" },
+  Hawker:      { bg: "#BF360C", border: "#FFAB91" },
+  Services:    { bg: "#5C6BC0", border: "#C5CAE9" },
+  Transport:   { bg: "#0288D1", border: "#B3E5FC" },
+  Mall:        { bg: "#7B1FA2", border: "#E1BEE7" },
+  Supermarket: { bg: "#2E7D32", border: "#C8E6C9" },
+  Bar:         { bg: "#AD1457", border: "#F8BBD0" },
+};
+
+const POI_CATEGORY_SCALE: Record<string, number> = {
+  Building: 1.2,
+  Academic: 1.15,
+  Facility: 1.1,
+  Mall: 1.05,
+};
+
+function getPOIPinStyle(category: string, isSelected: boolean): PinStyle {
+  const colors = POI_CATEGORY_COLORS[category] ?? { bg: "#DA291C", border: "#003B5C" };
+  if (isSelected) {
+    return {
+      background: colors.bg,
+      borderColor: "#DA291C",
+      glyphColor: "#fff",
+      scale: 1.4,
+    };
+  }
+  return {
+    background: colors.bg,
+    borderColor: colors.border,
+    glyphColor: "#fff",
+    scale: POI_CATEGORY_SCALE[category] ?? 1.0,
+  };
+}
+
+const EVENT_TYPE_COLORS: Record<string, { bg: string; border: string }> = {
+  "On-Campus": { bg: "#F59E0B", border: "#78350F" },
+  "Online":    { bg: "#8B5CF6", border: "#4C1D95" },
+  "External":  { bg: "#10B981", border: "#064E3B" },
+};
+
+function getEventPinStyle(
+  type: CampusEvent["type"],
+  isHighlighted: boolean,
+): PinStyle {
+  const colors = EVENT_TYPE_COLORS[type] ?? EVENT_TYPE_COLORS["On-Campus"];
+  if (isHighlighted) {
+    return {
+      background: colors.border,
+      borderColor: "#003B5C",
+      glyphColor: "#fff",
+      scale: 1.35,
+    };
+  }
+  return {
+    background: colors.bg,
+    borderColor: colors.border,
+    glyphColor: "#fff",
+    scale: 0.95,
+  };
+}
+
 function Map3DInner() {
   const defaultCamera = {
     center: {
@@ -279,6 +354,7 @@ function Map3DInner() {
               const isSelected =
                 selectedPOI?.id === poi.id ||
                 selectedDestination?.id === poi.id;
+              const pinStyle = getPOIPinStyle(poi.category, isSelected);
               return (
                 <Marker3D
                   key={poi.id}
@@ -290,32 +366,10 @@ function Map3DInner() {
                 >
                   <PinErrorBoundary>
                     <Pin
-                      background={
-                        isSelected
-                          ? "#003B5C"
-                          : poi.category === "Building"
-                            ? "#003B5C"
-                            : "#DA291C"
-                      }
-                      borderColor={
-                        isSelected
-                          ? "#DA291C"
-                          : poi.category === "Building"
-                            ? "#FFD700"
-                            : "#003B5C"
-                      }
-                      glyphColor={
-                        isSelected || poi.category === "Building"
-                          ? "#fff"
-                          : undefined
-                      }
-                      scale={
-                        isSelected
-                          ? 1.4
-                          : poi.category === "Building"
-                            ? 1.2
-                            : 1.0
-                      }
+                      background={pinStyle.background}
+                      borderColor={pinStyle.borderColor}
+                      glyphColor={pinStyle.glyphColor}
+                      scale={pinStyle.scale}
                     />
                   </PinErrorBoundary>
                 </Marker3D>
@@ -324,6 +378,7 @@ function Map3DInner() {
 
             {mapEventMarkers.map((event: CampusEvent) => {
               const isHighlighted = highlightedEventIds.includes(event.id);
+              const eventPin = getEventPinStyle(event.type, isHighlighted);
               return (
                 <Marker3D
                   key={event.id}
@@ -335,10 +390,10 @@ function Map3DInner() {
                 >
                   <PinErrorBoundary>
                     <Pin
-                      background={isHighlighted ? "#D97706" : "#F59E0B"}
-                      borderColor={isHighlighted ? "#003B5C" : undefined}
-                      glyphColor={isHighlighted ? "#fff" : undefined}
-                      scale={isHighlighted ? 1.3 : 0.9}
+                      background={eventPin.background}
+                      borderColor={eventPin.borderColor}
+                      glyphColor={eventPin.glyphColor}
+                      scale={eventPin.scale}
                     />
                   </PinErrorBoundary>
                 </Marker3D>

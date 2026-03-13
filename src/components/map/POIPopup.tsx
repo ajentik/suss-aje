@@ -20,6 +20,20 @@ function findUpcomingEventsNear(poi: POI): CampusEvent[] {
     .slice(0, 2);
 }
 
+const POI_CATEGORY_DOT: Record<string, string> = {
+  Building: "bg-[#003B5C]",
+  Academic: "bg-[#003B5C]",
+  Facility: "bg-[#00796B]",
+  Food: "bg-[#E65100]",
+  Restaurant: "bg-[#D84315]",
+  Hawker: "bg-[#BF360C]",
+  Services: "bg-[#5C6BC0]",
+  Transport: "bg-[#0288D1]",
+  Mall: "bg-[#7B1FA2]",
+  Supermarket: "bg-[#2E7D32]",
+  Bar: "bg-[#AD1457]",
+};
+
 export default function POIPopup() {
   const selectedPOI = useAppStore((s) => s.selectedPOI);
   const setSelectedPOI = useAppStore((s) => s.setSelectedPOI);
@@ -37,9 +51,10 @@ export default function POIPopup() {
     [displayPOI],
   );
 
-  // Swipe-to-dismiss
+  // Swipe-to-dismiss with interactive drag
   const touchStartY = useRef(0);
   const touchCurrentY = useRef(0);
+  const popupRef = useRef<HTMLDivElement>(null);
 
   const handleTouchStart = useCallback((e: React.TouchEvent) => {
     touchStartY.current = e.touches[0].clientY;
@@ -48,6 +63,11 @@ export default function POIPopup() {
 
   const handleTouchMove = useCallback((e: React.TouchEvent) => {
     touchCurrentY.current = e.touches[0].clientY;
+    const deltaY = touchCurrentY.current - touchStartY.current;
+    if (deltaY > 0 && popupRef.current) {
+      popupRef.current.style.transform = `translateX(-50%) translateY(${deltaY}px)`;
+      popupRef.current.style.opacity = `${Math.max(0.4, 1 - deltaY / 200)}`;
+    }
   }, []);
 
   const handleClose = useCallback(() => {
@@ -57,6 +77,10 @@ export default function POIPopup() {
 
   const handleTouchEnd = useCallback(() => {
     const deltaY = touchCurrentY.current - touchStartY.current;
+    if (popupRef.current) {
+      popupRef.current.style.transform = "";
+      popupRef.current.style.opacity = "";
+    }
     if (deltaY > 60) {
       handleClose();
     }
@@ -101,9 +125,12 @@ export default function POIPopup() {
 
   if (!displayPOI) return null;
 
+  const dotClass = POI_CATEGORY_DOT[displayPOI.category] ?? "bg-muted-foreground";
+
   return (
     <div
-      className={`absolute bottom-24 md:bottom-20 left-1/2 -translate-x-1/2 z-20 transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] ${
+      ref={popupRef}
+      className={`absolute bottom-28 md:bottom-20 left-1/2 -translate-x-1/2 z-20 transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] w-[calc(100vw-1.5rem)] max-w-md sm:w-[380px] ${
         isVisible
           ? "opacity-100 translate-y-0 scale-100"
           : "opacity-0 translate-y-6 scale-95 pointer-events-none"
@@ -113,23 +140,29 @@ export default function POIPopup() {
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
     >
-      <div className="bg-card rounded-2xl shadow-xl max-w-md w-[calc(100vw-1.5rem)] sm:w-[380px] p-5 relative border border-border">
+      <div className="bg-card rounded-2xl shadow-lg shadow-black/10 max-h-[calc(100dvh-10rem)] overflow-y-auto overscroll-contain p-5 relative border border-border">
+        {/* Drag handle */}
+        <div className="flex justify-center mb-3 md:hidden" aria-hidden="true">
+          <div className="w-8 h-1 rounded-full bg-muted-foreground/30" />
+        </div>
+
         <button
           type="button"
           onClick={handleClose}
-          className="absolute top-3 right-3 flex items-center justify-center w-9 h-9 rounded-full bg-muted hover:bg-muted/80 text-muted-foreground hover:text-foreground transition-colors"
+          className="absolute top-3 right-3 flex items-center justify-center w-11 h-11 rounded-full bg-muted hover:bg-muted/80 text-muted-foreground hover:text-foreground transition-colors"
           aria-label="Close popup"
         >
           <X size={18} aria-hidden="true" />
         </button>
 
         <div className="mb-2">
-          <span className="inline-block bg-secondary text-secondary-foreground text-sm font-semibold px-3 py-1 rounded-full">
+          <span className="inline-flex items-center gap-1.5 bg-secondary text-secondary-foreground text-sm font-semibold px-3 py-1 rounded-full">
+            <span className={`w-2 h-2 rounded-full ${dotClass}`} aria-hidden="true" />
             {displayPOI.category}
           </span>
         </div>
 
-        <h3 className="text-xl font-bold text-card-foreground mb-1.5 pr-10">
+        <h3 className="text-xl font-bold text-card-foreground mb-1.5 pr-12">
           {displayPOI.name}
         </h3>
 
@@ -201,7 +234,7 @@ export default function POIPopup() {
         <button
           type="button"
           onClick={handleNavigate}
-          className="w-full bg-surface-brand text-surface-brand-foreground rounded-xl px-4 py-3 text-[0.9375rem] font-semibold hover:bg-surface-brand/90 active:scale-[0.98] transition-all flex items-center justify-center gap-2"
+          className="w-full bg-surface-brand text-surface-brand-foreground rounded-xl px-4 min-h-[48px] text-[0.9375rem] font-semibold hover:bg-surface-brand/90 active:scale-[0.98] transition-all flex items-center justify-center gap-2"
         >
           <Navigation size={18} aria-hidden="true" />
           Navigate here
