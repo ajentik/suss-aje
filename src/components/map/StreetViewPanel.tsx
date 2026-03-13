@@ -14,13 +14,18 @@ function EventInfoOverlay({ event }: { event: CampusEvent }) {
   const [isExpanded, setIsExpanded] = useState(false);
 
   return (
-    <div className="absolute bottom-36 md:bottom-4 left-3 right-3 md:left-4 md:right-auto z-10 max-w-sm bg-card/90 backdrop-blur-lg rounded-2xl shadow-xl border border-border/50 overflow-hidden">
+    <div
+      className="absolute left-3 right-3 md:left-4 md:right-auto z-10 max-w-sm bg-card/85 backdrop-blur-xl rounded-2xl shadow-xl border border-border/30 overflow-hidden animate-control-slide-up md:bottom-4"
+      style={{
+        bottom: `calc(var(--sheet-height, 64px) + 16px)`,
+      }}
+    >
       <div className={`p-3.5 ${isExpanded && event.longDescription ? "max-h-[60vh] overflow-y-auto" : ""}`}>
         <h3 className="text-sm font-bold text-foreground">{event.title}</h3>
 
         <div className="mt-1">
           <p className="text-xs text-muted-foreground">
-            {event.date}{event.endDate ? ` – ${event.endDate}` : ""} • {event.time}
+            {event.date}{event.endDate ? ` \u2013 ${event.endDate}` : ""} \u2022 {event.time}
           </p>
           <p className="text-xs text-muted-foreground mt-0.5">
             {event.location}
@@ -44,7 +49,7 @@ function EventInfoOverlay({ event }: { event: CampusEvent }) {
             <button
               type="button"
               onClick={() => setIsExpanded(!isExpanded)}
-              className="text-primary hover:underline mt-1.5 font-medium text-xs min-h-[36px] active:opacity-70 transition-opacity"
+              className="text-primary hover:underline mt-1.5 font-medium text-xs min-h-[44px] active:opacity-70 transition-opacity"
             >
               {isExpanded ? "Show less" : "Show more"}
             </button>
@@ -70,7 +75,7 @@ function EventInfoOverlay({ event }: { event: CampusEvent }) {
             rel="noopener noreferrer"
             className="inline-block mt-2 text-xs text-primary hover:underline"
           >
-            Event Details →
+            Event Details \u2192
           </a>
         )}
       </div>
@@ -84,11 +89,16 @@ export default function StreetViewPanel({
   eventInfo,
 }: StreetViewPanelProps) {
   const containerRef = useRef<HTMLDivElement>(null);
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    // Trigger fade-in after mount
+    requestAnimationFrame(() => setVisible(true));
+  }, []);
 
   useEffect(() => {
     if (!containerRef.current || !window.google?.maps) return;
 
-    // source DEFAULT includes indoor collections for multi-story navigation
     new window.google.maps.StreetViewPanorama(containerRef.current, {
       position: location,
       pov: { heading: 0, pitch: 0 },
@@ -104,16 +114,19 @@ export default function StreetViewPanel({
   }, [location]);
 
   return (
-    <div className="w-full h-full relative">
+    <div
+      className="w-full h-full relative transition-opacity duration-300"
+      style={{ opacity: visible ? 1 : 0 }}
+    >
       <div ref={containerRef} className="w-full h-full" />
       <button
         type="button"
         onClick={onClose}
-        className="absolute left-3 z-10 flex items-center gap-2 px-4 min-h-[44px] bg-card/80 backdrop-blur-lg border border-border/50 rounded-xl shadow-lg text-sm font-medium text-card-foreground hover:bg-card/95 active:scale-95 transition-all"
+        className="absolute left-3 z-10 flex items-center gap-2 px-4 min-h-[44px] bg-card/80 backdrop-blur-xl border border-border/30 rounded-xl shadow-lg text-sm font-medium text-card-foreground hover:bg-card/95 active:scale-95 transition-all duration-200 animate-control-fade-in"
         style={{ top: "max(1rem, env(safe-area-inset-top, 1rem))" }}
       >
         <ArrowLeft size={18} aria-hidden="true" />
-        Back to 3D Map
+        Back to Map
       </button>
 
       {eventInfo && (
