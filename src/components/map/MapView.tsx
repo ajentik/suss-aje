@@ -123,6 +123,9 @@ function Map3DInner() {
   const selectedPOI = useAppStore((s) => s.selectedPOI);
   const selectedDestination = useAppStore((s) => s.selectedDestination);
   const highlightedEventIds = useAppStore((s) => s.highlightedEventIds);
+  const setSelectedEvent = useAppStore((s) => s.setSelectedEvent);
+  const streetViewEvent = useAppStore((s) => s.streetViewEvent);
+  const setStreetViewEvent = useAppStore((s) => s.setStreetViewEvent);
   const [inStreetView, setInStreetView] = useState(false);
   const [streetViewLocation, setStreetViewLocation] = useState<{
     lat: number;
@@ -177,12 +180,34 @@ function Map3DInner() {
     [setSelectedPOI]
   );
 
+  const handleEventMarkerClick = useCallback(
+    (event: CampusEvent) => {
+      setSelectedEvent(event);
+    },
+    [setSelectedEvent]
+  );
+
+  useEffect(() => {
+    if (streetViewEvent && streetViewEvent.type !== "Online") {
+      const timeoutId = window.setTimeout(() => {
+        setStreetViewLocation({ lat: streetViewEvent.lat, lng: streetViewEvent.lng });
+        setInStreetView(true);
+      }, 0);
+
+      return () => window.clearTimeout(timeoutId);
+    }
+  }, [streetViewEvent]);
+
   return (
     <div className="w-full h-full relative">
       {inStreetView && streetViewLocation ? (
         <StreetViewPanel
           location={streetViewLocation}
-          onClose={() => setInStreetView(false)}
+          onClose={() => {
+            setInStreetView(false);
+            setStreetViewEvent(null);
+          }}
+          eventInfo={streetViewEvent ?? undefined}
         />
       ) : (
         <>
@@ -233,9 +258,7 @@ function Map3DInner() {
                   altitudeMode="RELATIVE_TO_GROUND"
                   label={event.title}
                   title={event.title}
-                  onClick={() =>
-                    setFlyToTarget({ lat: event.lat, lng: event.lng })
-                  }
+                  onClick={() => handleEventMarkerClick(event)}
                 >
                   <PinErrorBoundary>
                     <Pin

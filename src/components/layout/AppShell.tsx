@@ -12,6 +12,7 @@ import EventsPanel from "@/components/events/EventsPanel";
 import RouteOverlay from "@/components/map/RouteOverlay";
 import AerialViewButton from "@/components/map/AerialViewButton";
 import POIPopup from "@/components/map/POIPopup";
+import EventPopup from "@/components/map/EventPopup";
 
 const MapView = dynamic(() => import("@/components/map/MapView"), {
   ssr: false,
@@ -31,7 +32,6 @@ export default function AppShell() {
 
   return (
     <div className="h-dvh w-full flex flex-col md:flex-row overflow-hidden">
-      {/* Left Panel — Chat/Events (Desktop: sidebar, Mobile: bottom sheet) */}
       <aside
         aria-label="Chat and Events"
         className={`
@@ -44,7 +44,6 @@ export default function AppShell() {
           rounded-t-2xl md:rounded-none shadow-[0_-4px_12px_rgba(0,0,0,0.1)] md:shadow-none
         `}
       >
-        {/* Mobile drag handle */}
         <button
           type="button"
           aria-label={mobileSheetOpen ? "Collapse panel" : "Expand panel"}
@@ -54,7 +53,6 @@ export default function AppShell() {
           <div className="w-8 h-1 rounded-full bg-muted-foreground/30" />
         </button>
 
-        {/* Header - SUSS branded */}
         <div className="flex items-center justify-between px-4 py-2.5 border-b bg-surface-brand text-surface-brand-foreground shrink-0 md:rounded-none rounded-t-2xl">
           <div className="flex items-center gap-2.5">
             <Image
@@ -97,13 +95,13 @@ export default function AppShell() {
         </Tabs>
       </aside>
 
-      {/* Right Panel — 3D Map */}
       <APIProvider apiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || ""} version="alpha">
         <main id="main-content" className="flex-1 h-full relative">
           <MapView />
           <RouteOverlay />
           <AerialViewButton />
           <POIPopup />
+          <EventPopup />
         </main>
       </APIProvider>
     </div>

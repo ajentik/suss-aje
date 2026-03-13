@@ -2,15 +2,18 @@
 
 import { useEffect, useRef } from "react";
 import { ArrowLeft } from "lucide-react";
+import type { CampusEvent } from "@/types";
 
 interface StreetViewPanelProps {
   location: { lat: number; lng: number };
   onClose: () => void;
+  eventInfo?: CampusEvent;
 }
 
 export default function StreetViewPanel({
   location,
   onClose,
+  eventInfo,
 }: StreetViewPanelProps) {
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -39,6 +42,50 @@ export default function StreetViewPanel({
         <ArrowLeft size={16} aria-hidden="true" />
         Back to 3D Map
       </button>
+
+      {eventInfo && (
+        <div className="absolute bottom-4 left-4 z-10 max-w-xs bg-white/95 backdrop-blur rounded-xl shadow-lg p-3 border border-gray-100">
+          <h3 className="text-sm font-bold text-foreground">{eventInfo.title}</h3>
+
+          <div className="mt-1">
+            <p className="text-xs text-muted-foreground">
+              {eventInfo.date}{eventInfo.endDate ? ` – ${eventInfo.endDate}` : ""} • {eventInfo.time}
+            </p>
+            <p className="text-xs text-muted-foreground mt-0.5">
+              {eventInfo.location}
+            </p>
+            {eventInfo.venueAddress && (
+              <p className="text-xs text-muted-foreground">
+                {eventInfo.venueAddress}
+              </p>
+            )}
+          </div>
+
+          <p className="text-xs text-muted-foreground line-clamp-3 mt-1">
+            {eventInfo.description}
+          </p>
+
+          <div className="flex flex-wrap gap-1.5 mt-2">
+            <span className="text-[10px] px-1.5 py-0.5 rounded-full font-medium bg-secondary text-secondary-foreground">
+              {eventInfo.type}
+            </span>
+            <span className="text-[10px] px-1.5 py-0.5 rounded-full font-medium bg-muted text-muted-foreground">
+              {eventInfo.school}
+            </span>
+          </div>
+
+          {eventInfo.url && (
+            <a
+              href={eventInfo.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-block mt-2 text-xs text-primary hover:underline"
+            >
+              Event Details →
+            </a>
+          )}
+        </div>
+      )}
     </div>
   );
 }
