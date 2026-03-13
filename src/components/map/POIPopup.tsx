@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useState } from "react";
+import { X, MapPin, Clock, Star, Navigation } from "lucide-react";
 import { useAppStore } from "@/store/app-store";
 import type { POI } from "@/types";
 
@@ -47,26 +48,11 @@ export default function POIPopup() {
           className="absolute top-3 right-3 text-gray-400 hover:text-gray-600 transition-colors"
           aria-label="Close popup"
         >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="20"
-            height="20"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            aria-hidden="true"
-          >
-            <title>Close</title>
-            <path d="M18 6 6 18" />
-            <path d="m6 6 12 12" />
-          </svg>
+          <X size={20} aria-hidden="true" />
         </button>
 
         <div className="mb-2">
-          <span className="inline-block bg-blue-50 text-[#003B5C] text-xs font-semibold px-2.5 py-0.5 rounded-full border border-blue-100">
+          <span className="inline-block bg-blue-50 text-surface-brand text-xs font-semibold px-2.5 py-0.5 rounded-full border border-blue-100">
             {displayPOI.category}
           </span>
         </div>
@@ -82,32 +68,21 @@ export default function POIPopup() {
         <div className="space-y-1.5 mb-4 text-sm text-gray-500">
           {displayPOI.address && (
             <div className="flex items-start gap-2">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mt-0.5 shrink-0" aria-hidden="true">
-                <title>Address</title>
-                <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/>
-                <circle cx="12" cy="10" r="3"/>
-              </svg>
+              <MapPin size={16} className="mt-0.5 shrink-0" aria-hidden="true" />
               <span className="line-clamp-1">{displayPOI.address}</span>
             </div>
           )}
           
           {displayPOI.hours && (
             <div className="flex items-start gap-2">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mt-0.5 shrink-0" aria-hidden="true">
-                <title>Hours</title>
-                <circle cx="12" cy="12" r="10"/>
-                <polyline points="12 6 12 12 16 14"/>
-              </svg>
+              <Clock size={16} className="mt-0.5 shrink-0" aria-hidden="true" />
               <span className="line-clamp-1">{displayPOI.hours}</span>
             </div>
           )}
 
           {displayPOI.rating && (
             <div className="flex items-center gap-2">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-yellow-500 fill-yellow-500 shrink-0" aria-hidden="true">
-                <title>Rating</title>
-                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
-              </svg>
+              <Star size={16} className="text-yellow-500 fill-yellow-500 shrink-0" aria-hidden="true" />
               <span>{displayPOI.rating} / 5.0</span>
             </div>
           )}
@@ -115,12 +90,9 @@ export default function POIPopup() {
 
         <button type="button"
           onClick={handleNavigate}
-          className="w-full bg-[#003B5C] text-white rounded-lg px-4 py-2 text-sm font-medium hover:bg-[#002a42] transition-colors flex items-center justify-center gap-2"
+          className="w-full bg-surface-brand text-surface-brand-foreground rounded-lg px-4 py-2 text-sm font-medium hover:bg-surface-brand/90 transition-colors flex items-center justify-center gap-2"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-            <title>Navigate</title>
-            <polygon points="3 11 22 2 13 21 11 13 3 11"/>
-          </svg>
+          <Navigation size={16} aria-hidden="true" />
           Navigate here
         </button>
       </div>

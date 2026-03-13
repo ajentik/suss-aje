@@ -3,6 +3,8 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import { Map3D, Marker3D } from "@vis.gl/react-google-maps";
 import type { Map3DRef, Map3DClickEvent } from "@vis.gl/react-google-maps";
+import { ErrorState } from "@/components/ui/error-state";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useAppStore } from "@/store/app-store";
 import { CAMPUS_CENTER, CAMPUS_POIS } from "@/lib/maps/campus-pois";
 import type { POI, CampusEvent } from "@/types";
@@ -22,16 +24,11 @@ function loadMapsAPI(): Promise<void> {
       );
       if (!existing) {
         const script = document.createElement("script");
-        // NOTE: process.env.NEXT_PUBLIC_* is inlined at build time by Turbopack.
-        // Do NOT guard on the key value — Turbopack dead-code-eliminates the
-        // entire function body when the build-time value is "".
-        // Railway's build has the real key, so this works in production.
         script.src = `https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || ""}&v=alpha&libraries=maps3d,streetView`;
         script.async = true;
         document.head.appendChild(script);
       }
 
-      // Poll until the core API object is available (15s timeout)
       const deadline = Date.now() + 15000;
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       while (!(window as any).google?.maps?.importLibrary) {
@@ -44,7 +41,6 @@ function loadMapsAPI(): Promise<void> {
       }
     }
 
-    // Explicitly load the maps3d library so gmp-map-3d web component is registered
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     await (window as any).google.maps.importLibrary("maps3d");
   })();
@@ -69,15 +65,19 @@ export default function MapView() {
   if (error) {
     return (
       <div className="w-full h-full flex items-center justify-center bg-muted/80">
-        <p className="text-muted-foreground text-sm">{error}</p>
+        <ErrorState message={error} />
       </div>
     );
   }
 
   if (!loaded) {
     return (
-      <div className="w-full h-full flex items-center justify-center bg-muted/80">
-        <p className="text-muted-foreground text-sm">Loading 3D map...</p>
+      <div className="w-full h-full bg-muted/80 flex items-center justify-center">
+        <div className="space-y-3 w-48">
+          <Skeleton className="h-4 w-full" />
+          <Skeleton className="h-4 w-3/4" />
+          <Skeleton className="h-32 w-full rounded-lg" />
+        </div>
       </div>
     );
   }
@@ -196,9 +196,9 @@ function Map3DInner() {
             {routeInfo && routeInfo.polyline.length > 0 && <RoutePolyline />}
           </Map3D>
 
-          <div className="absolute bottom-3 right-3 z-10 text-[10px] text-white/80 bg-black/40 backdrop-blur px-2 py-1 rounded pointer-events-none">
+          <output aria-label="Street View hint" className="absolute bottom-3 right-3 z-10 text-[10px] text-white/80 bg-black/40 backdrop-blur px-2 py-1 rounded pointer-events-none">
             Double-click to enter Street View
-          </div>
+          </output>
         </>
       )}
     </div>

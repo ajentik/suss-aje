@@ -19,7 +19,7 @@ export default function ChatMessage({ role, content }: ChatMessageProps) {
         className={cn(
           "max-w-[85%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed",
           role === "user"
-            ? "bg-[#003B5C] text-white rounded-br-sm"
+            ? "bg-surface-brand text-surface-brand-foreground rounded-br-sm"
             : "bg-secondary text-foreground rounded-bl-sm"
         )}
       >

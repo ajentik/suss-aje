@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
+import { Send } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import VoiceButton from "./VoiceButton";
@@ -31,25 +32,13 @@ export default function ChatInput({ onSend, isLoading }: ChatInputProps) {
       <Input
         value={value}
         onChange={(e) => setValue(e.target.value)}
+        aria-label="Chat message"
         placeholder="Ask about campus..."
         className="flex-1"
         disabled={isLoading}
       />
-      <Button type="submit" size="sm" disabled={isLoading || !value.trim()} className="bg-[#003B5C] hover:bg-[#003B5C]/90 text-white">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="18"
-          height="18"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          <path d="m22 2-7 20-4-9-9-4Z" />
-          <path d="M22 2 11 13" />
-        </svg>
+      <Button aria-label="Send message" type="submit" size="sm" disabled={isLoading || !value.trim()} className="bg-surface-brand hover:bg-surface-brand-hover text-surface-brand-foreground">
+        <Send size={18} />
       </Button>
     </form>
   );
