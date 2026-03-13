@@ -13,7 +13,7 @@ import { Button } from "@/components/ui/button";
 import { useAppStore } from "@/store/app-store";
 import { useSpeechSynthesis } from "@/lib/voice/speech-synthesis";
 import { findPOI } from "@/lib/maps/campus-pois";
-import type { ChatMessage as StoredMessage, DateRangePreset } from "@/types";
+import type { DateRangePreset } from "@/types";
 
 function isToolPart(p: { type: string }): p is DynamicToolUIPart {
   return p.type === "dynamic-tool" || p.type.startsWith("tool-");
@@ -102,15 +102,9 @@ export default function ChatPanel() {
   const mapEventMarkers = useAppStore((s) => s.mapEventMarkers);
   const setHighlightedEventIds = useAppStore((s) => s.setHighlightedEventIds);
   const ttsEnabled = useAppStore((s) => s.ttsEnabled);
-  const setChatMessages = useAppStore((s) => s.setChatMessages);
-  const conversationId = useAppStore((s) => s.conversationId);
-  const newChat = useAppStore((s) => s.newChat);
-  const pendingChatMessage = useAppStore((s) => s.pendingChatMessage);
-  const setPendingChatMessage = useAppStore((s) => s.setPendingChatMessage);
   const { speak } = useSpeechSynthesis();
 
-  const { messages, sendMessage, status, error, setMessages } = useChat({
-    id: conversationId,
+  const { messages, sendMessage, status, error } = useChat({
     onError: (err) => {
       console.error("[AskSUSSi chat error]", err);
     },
@@ -259,20 +253,6 @@ export default function ChatPanel() {
 
   return (
     <div className="flex flex-col h-full relative">
-      {messages.length > 0 && (
-        <div className="flex items-center justify-end px-3 pt-2 shrink-0">
-          <button
-            type="button"
-            onClick={handleNewChat}
-            aria-label="Start new chat"
-            className="inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-foreground px-2 py-1 rounded-md hover:bg-muted transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-          >
-            <SquarePen size={14} aria-hidden="true" />
-            New Chat
-          </button>
-        </div>
-      )}
-
       <div
         role="log"
         aria-label="Chat messages"
@@ -311,7 +291,7 @@ export default function ChatPanel() {
                   type="button"
                   key={q}
                   onClick={() => handleSend(q)}
-                  className="text-sm px-4 py-2.5 rounded-full border border-primary/20 text-primary hover:bg-primary hover:text-primary-foreground transition-colors font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                  className="text-sm px-4 py-2.5 rounded-full border border-primary/20 text-primary hover:bg-primary hover:text-primary-foreground transition-colors font-medium"
                 >
                   {q}
                 </button>
@@ -390,8 +370,8 @@ export default function ChatPanel() {
                   </span>
                 )}
               </span>
-            </span>
-          </output>
+            </div>
+          </div>
         )}
       </div>
 
@@ -399,8 +379,7 @@ export default function ChatPanel() {
         <button
           type="button"
           onClick={scrollToBottom}
-          aria-label="Scroll to new messages"
-          className="absolute bottom-28 left-1/2 -translate-x-1/2 z-10 bg-primary text-primary-foreground text-xs font-medium px-3 py-1.5 rounded-full shadow-lg hover:bg-primary/90 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          className="absolute bottom-16 left-1/2 -translate-x-1/2 z-10 bg-primary text-primary-foreground text-xs font-medium px-3 py-1.5 rounded-full shadow-lg hover:bg-primary/90 transition-colors"
         >
           New messages &darr;
         </button>
