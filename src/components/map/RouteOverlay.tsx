@@ -25,15 +25,23 @@ export default function RouteOverlay() {
 
   useEffect(() => {
     if (!selectedDestination || !MAPS_API_KEY) {
-      setSolar(null);
       return;
     }
+
+    let cancelled = false;
 
     getBuildingInsights(
       selectedDestination.lat,
       selectedDestination.lng,
       MAPS_API_KEY
-    ).then(setSolar);
+    ).then((result) => {
+      if (!cancelled) setSolar(result);
+    });
+
+    return () => {
+      cancelled = true;
+      setSolar(null);
+    };
   }, [selectedDestination]);
 
   if (!routeInfo || !selectedDestination) return null;
