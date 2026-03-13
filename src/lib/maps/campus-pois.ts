@@ -3,6 +3,44 @@ import type { POI } from "@/types";
 export const CAMPUS_CENTER = { lat: 1.3299, lng: 103.7764 };
 
 export const CAMPUS_POIS: POI[] = [
+  // ── Campus Buildings ────────────────────────────────────────
+  {
+    id: "block-a",
+    name: "Block A – Student Hub & Gym",
+    lat: 1.3303,
+    lng: 103.7760,
+    category: "Building",
+    description:
+      "Student Lounge (L1), Gym (L1 – A1.11/A1.14/A1.15), FoodClique & Food Gallery (L3), Carpark entrance",
+  },
+  {
+    id: "block-b",
+    name: "Block B – Student Services",
+    lat: 1.3300,
+    lng: 103.7768,
+    category: "Building",
+    description:
+      "Student Hub (L1), Subway & FoodFest (L1, Halal), Study Spaces (L3)",
+  },
+  {
+    id: "block-c",
+    name: "Block C – Library & Seminar Rooms",
+    lat: 1.3297,
+    lng: 103.7762,
+    category: "Building",
+    description:
+      "Starbucks (L1), SUSS Library (L2 – C.2.02, 5 discussion rooms, call pods, smart locker), Seminar Rooms (60-120 pax), Study Spaces (L4), Carpark entrance",
+  },
+  {
+    id: "block-d",
+    name: "Block D – Arts & Sports",
+    lat: 1.3294,
+    lng: 103.7756,
+    category: "Building",
+    description:
+      "Performing Arts Theatre (L1, 400 seats), Dance Studio, Multi-purpose Sports Hall (badminton, basketball, floorball, netball, volleyball – 50 pax), Sports Therapy & First Aid Room",
+  },
+
   // ── On-Campus ──────────────────────────────────────────────
   {
     id: "library",

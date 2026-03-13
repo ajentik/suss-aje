@@ -3,6 +3,9 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import Image from "next/image";
 import { ArrowRight } from "lucide-react";
+import { lookupAerialVideo } from "@/lib/maps/aerial-view";
+
+const SUSS_ADDRESS = "Singapore University of Social Sciences, 463 Clementi Road, Singapore 599494";
 
 interface HeroIntroProps {
   onEnter: () => void;
@@ -12,7 +15,37 @@ export default function HeroIntro({ onEnter }: HeroIntroProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [progress, setProgress] = useState(0);
   const [videoReady, setVideoReady] = useState(false);
+  const [videoUrl, setVideoUrl] = useState<string | null>(null);
+  const [videoFailed, setVideoFailed] = useState(false);
   const [fadeOut, setFadeOut] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function fetchAerialVideo() {
+      try {
+        const video = await lookupAerialVideo(SUSS_ADDRESS);
+        if (cancelled) return;
+
+        if (video?.uris) {
+          const url =
+            video.uris["VIDEO_MP4_HIGH"] ||
+            video.uris["VIDEO_MP4_MEDIUM"] ||
+            Object.values(video.uris)[0];
+          if (url) {
+            setVideoUrl(url);
+            return;
+          }
+        }
+        setVideoFailed(true);
+      } catch {
+        if (!cancelled) setVideoFailed(true);
+      }
+    }
+
+    fetchAerialVideo();
+    return () => { cancelled = true; };
+  }, []);
 
   useEffect(() => {
     const video = videoRef.current;
@@ -29,7 +62,7 @@ export default function HeroIntro({ onEnter }: HeroIntroProps) {
       video.removeEventListener("progress", updateProgress);
       video.removeEventListener("loadeddata", updateProgress);
     };
-  }, []);
+  }, [videoUrl]);
 
   const handleEnter = useCallback(() => {
     setFadeOut(true);
@@ -48,29 +81,33 @@ export default function HeroIntro({ onEnter }: HeroIntroProps) {
         }`}
       />
 
-      {progress < 100 && (
+      {!videoFailed && !videoReady && (
         <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 w-48">
           <div className="h-1 bg-white/20 rounded-full overflow-hidden">
             <div
               className="h-full bg-white/70 rounded-full transition-all duration-300"
-              style={{ width: `${progress}%` }}
+              style={{ width: `${videoUrl ? progress : 30}%` }}
             />
           </div>
         </div>
       )}
 
-      <video
-        ref={videoRef}
-        src="/suss-aerial.mp4"
-        autoPlay
-        loop
-        muted
-        playsInline
-        onLoadedData={() => setVideoReady(true)}
-        className={`absolute inset-0 w-full h-full object-cover scale-105 transition-opacity duration-[2000ms] ${
-          videoReady ? "opacity-90" : "opacity-0"
-        }`}
-      />
+      {videoUrl && (
+        <video
+          ref={videoRef}
+          src={videoUrl}
+          autoPlay
+          loop
+          muted
+          playsInline
+          crossOrigin="anonymous"
+          onLoadedData={() => setVideoReady(true)}
+          onError={() => setVideoFailed(true)}
+          className={`absolute inset-0 w-full h-full object-cover scale-105 transition-opacity duration-[2000ms] ${
+            videoReady ? "opacity-90" : "opacity-0"
+          }`}
+        />
+      )}
 
       <div className="absolute inset-x-0 top-0 h-[30%] bg-gradient-to-b from-black/25 to-transparent pointer-events-none" />
 
