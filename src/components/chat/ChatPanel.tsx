@@ -63,7 +63,11 @@ export default function ChatPanel() {
   const ttsEnabled = useAppStore((s) => s.ttsEnabled);
   const { speak } = useSpeechSynthesis();
 
-  const { messages, sendMessage, status } = useChat({
+  const { messages, sendMessage, status, error } = useChat({
+    onError: (err) => {
+      console.error("[AskSUSSi chat error]", err);
+      toast.error(err.message || "Chat request failed.");
+    },
     onFinish: ({ message }) => {
       if (ttsEnabled && message.role === "assistant") {
         const { text } = extractMessageContent(message.parts ?? []);
@@ -226,6 +230,12 @@ export default function ChatPanel() {
             />
           );
         })}
+        {error && (
+          <div className="mx-2 mb-3 p-3 rounded-lg bg-destructive/10 text-destructive text-sm">
+            <p className="font-medium">Chat error</p>
+            <p className="mt-1 opacity-80">{error.message}</p>
+          </div>
+        )}
         <div ref={endRef} />
         {isWaiting && (
           <div className="flex justify-start mb-3">
