@@ -1,7 +1,7 @@
 {
-  "name": "SUSS Campus Assistant",
-  "short_name": "SUSS AJE",
-  "description": "Multimodal campus intelligent assistant for SUSS",
+  "name": "AskSUSSi — Campus Intelligent Assistant",
+  "short_name": "AskSUSSi",
+  "description": "AI-powered campus intelligent assistant for SUSS",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",

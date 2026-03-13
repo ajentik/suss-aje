@@ -117,7 +117,7 @@ export default function ChatPanel() {
               className="mx-auto mb-4 h-14 w-auto"
               priority
             />
-            <p className="font-semibold text-foreground">Welcome to SUSS AJE</p>
+            <p className="font-semibold text-foreground">Welcome to AskSUSSi</p>
             <p className="mt-1 text-muted-foreground">Your campus intelligent assistant. Ask me about directions, events, or campus services.</p>
             <div className="mt-5 flex flex-wrap justify-center gap-2">
               {[
