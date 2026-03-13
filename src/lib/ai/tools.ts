@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { tool } from "ai";
 import { CAMPUS_POIS, findPOI, findPOIs } from "@/lib/maps/campus-pois";
+import { getDateRange } from "@/lib/date-utils";
 import campusEvents from "@/../public/campus-events.json";
 import type { CampusEvent } from "@/types";
 
@@ -49,11 +50,23 @@ export const showEvents = tool({
       .string()
       .optional()
       .describe("Filter by school: 'SUSS' or 'SIM'"),
+    range: z
+      .enum(["1d", "3d", "7d", "all"])
+      .optional()
+      .describe("Filter by date range preset: '1d' for today, '3d' for next 3 days, '7d' for next 7 days, 'all' for all events. Prefer this over 'date' for common queries."),
   }),
-  execute: async ({ date, category, school }) => {
+  execute: async ({ date, category, school, range }) => {
     let filtered = campusEvents as unknown as CampusEvent[];
 
-    if (date) {
+    if (range) {
+      const dateRange = getDateRange(range);
+      if (dateRange) {
+        filtered = filtered.filter((e) => {
+          const eventEnd = e.endDate || e.date;
+          return eventEnd >= dateRange.start && e.date <= dateRange.end;
+        });
+      }
+    } else if (date) {
       filtered = filtered.filter((e) => e.date === date || (e.endDate && e.date <= date && e.endDate >= date));
     }
     if (category) {
@@ -68,11 +81,11 @@ export const showEvents = tool({
     return {
       success: true as const,
       events: filtered,
-      filters: { date, category },
+      filters: { date, category, range },
       message:
         filtered.length > 0
-          ? `Found ${filtered.length} event${filtered.length > 1 ? "s" : ""}${date ? ` on ${date}` : ""}${category ? ` in ${category}` : ""}.`
-          : `No events found${date ? ` on ${date}` : ""}${category ? ` in ${category}` : ""}.`,
+          ? `Found ${filtered.length} event${filtered.length > 1 ? "s" : ""}${range ? ` for ${range === "1d" ? "today" : `next ${range}`}` : date ? ` on ${date}` : ""}${category ? ` in ${category}` : ""}.`
+          : `No events found${range ? ` for ${range === "1d" ? "today" : `next ${range}`}` : date ? ` on ${date}` : ""}${category ? ` in ${category}` : ""}.`,
     };
   },
 });

@@ -1,11 +1,12 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
-import type { CampusEvent } from "@/types";
+import type { CampusEvent, DateRangePreset } from "@/types";
+import { getDateRange } from "@/lib/date-utils";
 
 export function useCampusEvents() {
   const [events, setEvents] = useState<CampusEvent[]>([]);
-  const [dateFilter, setDateFilter] = useState("");
+  const [dateFilter, setDateFilter] = useState<DateRangePreset>("7d");
   const [categoryFilter, setCategoryFilter] = useState("");
   const [schoolFilter, setSchoolFilter] = useState("");
   const [isLoading, setIsLoading] = useState(true);
@@ -22,11 +23,15 @@ export function useCampusEvents() {
 
   const filteredEvents = useMemo(() => {
     let result = events;
-    if (dateFilter) {
-      result = result.filter(
-        (e) => e.date === dateFilter || (e.endDate && e.date <= dateFilter && e.endDate >= dateFilter)
-      );
+
+    const range = getDateRange(dateFilter);
+    if (range) {
+      result = result.filter((e) => {
+        const eventEnd = e.endDate || e.date;
+        return eventEnd >= range.start && e.date <= range.end;
+      });
     }
+
     if (categoryFilter) {
       const cat = categoryFilter.toLowerCase();
       result = result.filter((e) => e.category.toLowerCase().includes(cat));

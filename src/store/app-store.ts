@@ -1,10 +1,12 @@
 "use client";
 
 import { create } from "zustand";
-import type { POI, RouteInfo } from "@/types";
+import type { POI, RouteInfo, CampusEvent, DateRangePreset } from "@/types";
 
 interface AppState {
   // Map
+  selectedPOI: POI | null;
+  setSelectedPOI: (poi: POI | null) => void;
   selectedDestination: POI | null;
   setSelectedDestination: (poi: POI | null) => void;
   routeInfo: RouteInfo | null;
@@ -17,10 +19,12 @@ interface AppState {
   setActivePanel: (panel: "chat" | "events") => void;
 
   // Events
-  eventDateFilter: string;
-  setEventDateFilter: (date: string) => void;
+  eventDateFilter: DateRangePreset;
+  setEventDateFilter: (preset: DateRangePreset) => void;
   eventCategoryFilter: string;
   setEventCategoryFilter: (category: string) => void;
+  mapEventMarkers: CampusEvent[];
+  setMapEventMarkers: (events: CampusEvent[]) => void;
 
   // Voice
   isSpeaking: boolean;
@@ -30,6 +34,8 @@ interface AppState {
 }
 
 export const useAppStore = create<AppState>((set) => ({
+  selectedPOI: null,
+  setSelectedPOI: (poi) => set({ selectedPOI: poi }),
   selectedDestination: null,
   setSelectedDestination: (poi) => set({ selectedDestination: poi }),
   routeInfo: null,
@@ -40,10 +46,12 @@ export const useAppStore = create<AppState>((set) => ({
   activePanel: "chat",
   setActivePanel: (panel) => set({ activePanel: panel }),
 
-  eventDateFilter: "",
-  setEventDateFilter: (date) => set({ eventDateFilter: date }),
+  eventDateFilter: "7d",
+  setEventDateFilter: (preset) => set({ eventDateFilter: preset }),
   eventCategoryFilter: "",
   setEventCategoryFilter: (category) => set({ eventCategoryFilter: category }),
+  mapEventMarkers: [],
+  setMapEventMarkers: (events) => set({ mapEventMarkers: events }),
 
   isSpeaking: false,
   setIsSpeaking: (speaking) => set({ isSpeaking: speaking }),

@@ -26,34 +26,4 @@ export async function lookupAerialVideo(
   }
 }
 
-export async function renderAerialVideo(
-  address: string
-): Promise<string | null> {
-  try {
-    // First try lookup
-    const existing = await lookupAerialVideo(address);
-    if (existing?.uris) {
-      return existing.uris["VIDEO_MP4_HIGH"] || existing.uris["VIDEO_MP4_MEDIUM"] || Object.values(existing.uris)[0] || null;
-    }
 
-    // Request render if not available
-    const res = await fetch(
-      `https://aerialview.googleapis.com/v1/videos:renderVideo?key=${API_KEY}`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ address }),
-      }
-    );
-    if (!res.ok) return null;
-
-    // Video is being rendered, won't be available immediately
-    return null;
-  } catch {
-    return null;
-  }
-}
-
-export function getAerialVideoUrl(address: string): string {
-  return `https://aerialview.googleapis.com/v1/videos:lookupVideo?key=${API_KEY}&address=${encodeURIComponent(address)}`;
-}

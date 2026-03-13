@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useCampusEvents } from "@/hooks/useCampusEvents";
 import { useAppStore } from "@/store/app-store";
+import type { DateRangePreset } from "@/types";
 import EventCard from "./EventCard";
 import EventFilter from "./EventFilter";
 
@@ -22,6 +23,7 @@ export default function EventsPanel() {
 
   const storeDate = useAppStore((s) => s.eventDateFilter);
   const storeCategory = useAppStore((s) => s.eventCategoryFilter);
+  const setMapEventMarkers = useAppStore((s) => s.setMapEventMarkers);
 
   useEffect(() => {
     if (storeDate) setDateFilter(storeDate);
@@ -31,11 +33,15 @@ export default function EventsPanel() {
     if (storeCategory) setCategoryFilter(storeCategory);
   }, [storeCategory, setCategoryFilter]);
 
+  useEffect(() => {
+    setMapEventMarkers(events);
+  }, [events, setMapEventMarkers]);
+
   return (
     <div className="flex flex-col h-full">
       <EventFilter
         dateFilter={dateFilter}
-        onDateChange={setDateFilter}
+        onDateChange={(preset: DateRangePreset) => setDateFilter(preset)}
         categoryFilter={categoryFilter}
         onCategoryChange={setCategoryFilter}
         categories={categories}
