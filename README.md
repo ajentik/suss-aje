@@ -1,41 +1,36 @@
-# SUSS-AJE
+This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
-**Singapore Open Source AI Hackathon @ SUSS**
+## Getting Started
 
-## About the Event
+First, run the development server:
 
-The inaugural **Singapore Open Source AI Hackathon** is a single-day event held at **Singapore University of Social Sciences (SUSS)** on **March 13, 2026**. It bridges the gap between classroom learning and real-world technology development, providing participants a dedicated space to build quickly using open-source tools within a community that thrives on building in public.
+```bash
+npm run dev
+# or
+yarn dev
+# or
+pnpm dev
+# or
+bun dev
+```
 
-## Organizers
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-- [Singapore Open Source AI Hub](https://www.linkedin.com/company/yincubator/)
-- Singapore University of Social Sciences (SUSS)
-- WaveSpeedAI
-- SEGA (supporting partner)
+You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
-## Build Categories
+This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
-- **AI Agents** — for enterprises or individuals
-- **Multi-Agent Systems** — collaborative problem-solving
-- **Creative AI** — design, content, and entertainment
+## Learn More
 
-## Key Partners
+To learn more about Next.js, take a look at the following resources:
 
-MiniMax, Alibaba Cloud, Qwen, Z.ai, TiDB (PingCAP), memU, WasmEdge, SmallWOD, Datawhale, and others.
+- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
+- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
 
-## Prizes
+You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
 
-AI compute credits, OpenClaw hardware kits, and Vibekeys keyboards.
+## Deploy on Vercel
 
-## Who Can Participate
+The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
-Students, developers, and aspiring founders.
-
-## Links
-
-- [Event Announcement (LinkedIn)](https://www.linkedin.com/posts/yincubator_singaporeopensourceaihub-opensource-hackathon-activity-7436380224059035648-ZP7Z/)
-- [Registration](https://lnkd.in/gMQF2xma)
-
-## License
-
-This project is licensed under the [MIT License](LICENSE).
+Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
