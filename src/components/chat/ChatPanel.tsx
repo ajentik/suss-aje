@@ -3,7 +3,7 @@
 import { useChat } from "@ai-sdk/react";
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
-import type { TextUIPart } from "ai";
+import type { TextUIPart, DynamicToolUIPart } from "ai";
 import { toast } from "sonner";
 import ChatMessage from "./ChatMessage";
 import ChatInput from "./ChatInput";
@@ -12,11 +12,45 @@ import { useSpeechSynthesis } from "@/lib/voice/speech-synthesis";
 import { findPOI } from "@/lib/maps/campus-pois";
 import type { DateRangePreset } from "@/types";
 
+function isToolPart(p: { type: string }): p is DynamicToolUIPart {
+  return p.type === "dynamic-tool" || p.type.startsWith("tool-");
+}
+
+function extractMessageContent(parts: Array<{ type: string; [key: string]: unknown }>): {
+  text: string;
+  isStreaming: boolean;
+} {
+  // First try text parts
+  const textParts = parts.filter(
+    (p): p is TextUIPart => p.type === "text"
+  );
+  if (textParts.length > 0) {
+    return {
+      text: textParts.map((p) => p.text).join(""),
+      isStreaming: textParts.some((p) => p.state === "streaming"),
+    };
+  }
+
+  // Fall back to tool output messages (when Gemini stops after tool call)
+  const toolParts = parts.filter(isToolPart);
+  for (const tp of toolParts) {
+    if (tp.state === "output-available") {
+      const output = tp.output as Record<string, unknown> | undefined;
+      if (output?.message) {
+        return { text: output.message as string, isStreaming: false };
+      }
+    }
+  }
+
+  return { text: "", isStreaming: false };
+}
+
 export default function ChatPanel() {
   const endRef = useRef<HTMLDivElement>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const userScrolledUpRef = useRef(false);
   const [hasNewMessages, setHasNewMessages] = useState(false);
+  const processedToolsRef = useRef<Set<string>>(new Set());
   const setFlyToTarget = useAppStore((s) => s.setFlyToTarget);
   const setSelectedDestination = useAppStore((s) => s.setSelectedDestination);
   const setRouteInfo = useAppStore((s) => s.setRouteInfo);
@@ -30,65 +64,73 @@ export default function ChatPanel() {
   const { speak } = useSpeechSynthesis();
 
   const { messages, sendMessage, status } = useChat({
-    onToolCall: async ({ toolCall }) => {
-      const { toolName } = toolCall;
-      const args = ("args" in toolCall ? toolCall.args : {}) as Record<string, unknown>;
+    onFinish: ({ message }) => {
+      if (ttsEnabled && message.role === "assistant") {
+        const { text } = extractMessageContent(message.parts ?? []);
+        if (text) speak(text);
+      }
+    },
+  });
 
-      if (toolName === "navigate_to") {
-        const poi = findPOI(args.destination as string);
-        if (poi) {
-          setSelectedDestination(poi);
+  // Process tool results from messages for UI side effects
+  useEffect(() => {
+    for (const msg of messages) {
+      if (msg.role !== "assistant") continue;
+      const parts = msg.parts ?? [];
+      for (const part of parts) {
+        if (!isToolPart(part)) continue;
+        const tp = part as DynamicToolUIPart;
+        if (tp.state !== "output-available") continue;
+        const key = tp.toolCallId;
+        if (processedToolsRef.current.has(key)) continue;
+        processedToolsRef.current.add(key);
+
+        const output = tp.output as Record<string, unknown> | undefined;
+        if (!output) continue;
+
+        if (tp.toolName === "navigate_to" && output.success && output.poi) {
+          const poi = output.poi as { lat: number; lng: number; name: string; id: string; address?: string; category: string; description: string };
+          const localPoi = findPOI(poi.name) ?? poi;
+          setSelectedDestination(localPoi as ReturnType<typeof findPOI> & object);
           setFlyToTarget({ lat: poi.lat, lng: poi.lng });
 
           const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || "";
           if (apiKey) {
-            try {
-              const { computeWalkingRoute } = await import("@/lib/maps/route-utils");
-              const result = await computeWalkingRoute(
+            import("@/lib/maps/route-utils").then(({ computeWalkingRoute }) =>
+              computeWalkingRoute(
                 { lat: 1.3299, lng: 103.7764 },
                 { lat: poi.lat, lng: poi.lng },
                 apiKey
-              );
-              if (result) {
-                setRouteInfo({
-                  polyline: result.polyline,
-                  distanceMeters: result.distanceMeters,
-                  duration: result.durationText,
-                });
-              }
-            } catch {
-              toast.error("Could not compute walking route.");
-            }
+              ).then((route) => {
+                if (route) {
+                  setRouteInfo({
+                    polyline: route.polyline,
+                    distanceMeters: route.distanceMeters,
+                    duration: route.durationText,
+                  });
+                }
+              })
+            ).catch(() => toast.error("Could not compute walking route."));
           }
         }
-      }
 
-      if (toolName === "show_events") {
-        const { date, category, range } = args as {
-          date?: string;
-          category?: string;
-          range?: DateRangePreset;
-        };
-        if (range) {
-          setEventDateFilter(range);
-        } else if (date) {
-          setEventDateFilter("1d");
+        if (tp.toolName === "show_events") {
+          const input = tp.input as Record<string, unknown>;
+          const range = input?.range as DateRangePreset | undefined;
+          const date = input?.date as string | undefined;
+          const category = input?.category as string | undefined;
+          if (range) {
+            setEventDateFilter(range);
+          } else if (date) {
+            setEventDateFilter("1d");
+          }
+          if (category) setEventCategoryFilter(category);
+          setActivePanel("events");
+          toast.info("Showing matching events.");
         }
-        if (category) setEventCategoryFilter(category);
-        setActivePanel("events");
-        toast.info("Showing matching events.");
       }
-    },
-    onFinish: ({ message }) => {
-      if (ttsEnabled && message.role === "assistant") {
-        const textContent = message.parts
-          ?.filter((p): p is { type: "text"; text: string } => p.type === "text")
-          .map((p) => p.text)
-          .join(" ");
-        if (textContent) speak(textContent);
-      }
-    },
-  });
+    }
+  }, [messages, setFlyToTarget, setSelectedDestination, setRouteInfo, setActivePanel, setEventDateFilter, setEventCategoryFilter]);
 
   const isWaiting = status === "submitted";
   const isActive = status === "streaming" || status === "submitted";
@@ -173,12 +215,8 @@ export default function ChatPanel() {
           </div>
         )}
         {messages.map((msg) => {
-          const textParts = (msg.parts ?? []).filter(
-            (p): p is TextUIPart => p.type === "text"
-          );
-          if (textParts.length === 0) return null;
-          const text = textParts.map((p) => p.text).join("");
-          const isStreaming = textParts.some((p) => p.state === "streaming");
+          const { text, isStreaming } = extractMessageContent(msg.parts ?? []);
+          if (!text) return null;
           return (
             <ChatMessage
               key={msg.id}
