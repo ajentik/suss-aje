@@ -3,24 +3,27 @@
 import { useChat } from "@ai-sdk/react";
 import { useEffect, useRef } from "react";
 import Image from "next/image";
-import { toast } from "sonner";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import type { TextUIPart } from "ai";
 import ChatMessage from "./ChatMessage";
 import ChatInput from "./ChatInput";
-import { ChatSkeleton } from "./ChatSkeleton";
 import { useAppStore } from "@/store/app-store";
 import { useSpeechSynthesis } from "@/lib/voice/speech-synthesis";
 import { findPOI } from "@/lib/maps/campus-pois";
 import type { DateRangePreset } from "@/types";
 
 export default function ChatPanel() {
-  const scrollRef = useRef<HTMLDivElement>(null);
+  const endRef = useRef<HTMLDivElement>(null);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const userScrolledUpRef = useRef(false);
   const setFlyToTarget = useAppStore((s) => s.setFlyToTarget);
   const setSelectedDestination = useAppStore((s) => s.setSelectedDestination);
   const setRouteInfo = useAppStore((s) => s.setRouteInfo);
   const setActivePanel = useAppStore((s) => s.setActivePanel);
   const setEventDateFilter = useAppStore((s) => s.setEventDateFilter);
   const setEventCategoryFilter = useAppStore((s) => s.setEventCategoryFilter);
+  const activePanel = useAppStore((s) => s.activePanel);
+  const mapEventMarkers = useAppStore((s) => s.mapEventMarkers);
+  const setHighlightedEventIds = useAppStore((s) => s.setHighlightedEventIds);
   const ttsEnabled = useAppStore((s) => s.ttsEnabled);
   const { speak } = useSpeechSynthesis();
 
@@ -52,7 +55,6 @@ export default function ChatPanel() {
                 });
               }
             } catch {
-              // Route computation failed silently
             }
           }
         }
@@ -82,91 +84,114 @@ export default function ChatPanel() {
         if (textContent) speak(textContent);
       }
     },
-    onError: (error) => {
-      toast.error("Chat error", { description: error.message });
-    },
   });
 
-  const isLoading = status === "streaming" || status === "submitted";
+  const isWaiting = status === "submitted";
+  const isActive = status === "streaming" || status === "submitted";
 
-  // Auto-scroll to bottom
   useEffect(() => {
-    if (!messages.length) return;
-    if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    if (!userScrolledUpRef.current) {
+      endRef.current?.scrollIntoView({ behavior: "smooth" });
     }
-  }, [messages.length]);
+  });
 
-  const handleSend = (text: string) => {
-    sendMessage({ text });
+  useEffect(() => {
+    if (activePanel === "events" && mapEventMarkers.length > 0) {
+      setHighlightedEventIds(mapEventMarkers.map((e) => e.id));
+    } else {
+      setHighlightedEventIds([]);
+    }
+  }, [activePanel, mapEventMarkers, setHighlightedEventIds]);
+
+  const handleScroll = () => {
+    const el = scrollContainerRef.current;
+    if (!el) return;
+    const atBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 80;
+    userScrolledUpRef.current = !atBottom;
   };
 
-  // Extract text content from message parts
-  const getMessageText = (msg: (typeof messages)[0]): string => {
-    if (!msg.parts) return "";
-    return msg.parts
-      .filter((p): p is { type: "text"; text: string } => p.type === "text")
-      .map((p) => p.text)
-      .join(" ");
+  const handleSend = (text: string) => {
+    userScrolledUpRef.current = false;
+    sendMessage({ text });
   };
 
   return (
     <div className="flex flex-col h-full">
-      <div role="log" aria-label="Chat messages" aria-live="polite" className="flex-1 min-h-0">
-        <ScrollArea className="h-full p-4" ref={scrollRef}>
-          {messages.length === 0 && (
-            <div className="text-center text-sm py-8 px-4">
-              <Image
-                src="/suss-logo.png"
-                alt="SUSS — Singapore University of Social Sciences"
-                width={160}
-                height={56}
-                className="mx-auto mb-4 h-14 w-auto"
-                priority
-              />
-              <p className="font-semibold text-foreground">Welcome to AskSUSSi</p>
-              <p className="mt-1 text-muted-foreground">Your campus intelligent assistant. Ask me about directions, events, or campus services.</p>
-              <section aria-label="Suggested questions" className="mt-5 flex flex-wrap justify-center gap-2">
-                {[
-                  "Where is the library?",
-                  "What events are today?",
-                  "How to get to the canteen?",
-                ].map((q) => (
-                  <button
-                    type="button"
-                    key={q}
-                    onClick={() => handleSend(q)}
-                    className="text-xs px-3.5 py-2 rounded-full border border-primary/20 text-primary hover:bg-primary hover:text-primary-foreground transition-colors font-medium"
-                  >
-                    {q}
-                  </button>
-                ))}
-              </section>
-            </div>
-          )}
-          {messages.map((msg) => {
-            const text = getMessageText(msg);
-            if (!text) return null;
-            return (
-              <ChatMessage key={msg.id} role={msg.role as "user" | "assistant"} content={text} />
-            );
-          })}
-          {isLoading && messages.length === 0 ? (
-            <ChatSkeleton />
-          ) : isLoading ? (
-            <div className="flex justify-start mb-3">
-              <div className="bg-secondary rounded-2xl rounded-bl-sm px-4 py-2.5 text-sm">
-                <span className="inline-flex gap-1">
-                  <span className="animate-bounce">·</span>
-                  <span className="animate-bounce" style={{ animationDelay: "0.1s" }}>·</span>
-                  <span className="animate-bounce" style={{ animationDelay: "0.2s" }}>·</span>
+      <div
+        role="log"
+        aria-label="Chat messages"
+        aria-live="polite"
+        ref={scrollContainerRef}
+        onScroll={handleScroll}
+        className="flex-1 overflow-y-auto p-4"
+      >
+        {messages.length === 0 && (
+          <div className="text-center text-sm py-8 px-4">
+            <Image
+              src="/suss-logo.png"
+              alt="SUSS — Singapore University of Social Sciences"
+              width={160}
+              height={56}
+              className="mx-auto mb-4 h-14 w-auto"
+              priority
+            />
+            <p className="font-semibold text-foreground">Welcome to AskSUSSi</p>
+            <p className="mt-1 text-muted-foreground">
+              Your campus intelligent assistant. Ask me about directions, events,
+              or campus services.
+            </p>
+            <section aria-label="Suggested questions" className="mt-5 flex flex-wrap justify-center gap-2">
+              {[
+                "Where is the library?",
+                "What events are today?",
+                "How to get to the canteen?",
+              ].map((q) => (
+                <button
+                  type="button"
+                  key={q}
+                  onClick={() => handleSend(q)}
+                  className="text-xs px-3.5 py-2 rounded-full border border-primary/20 text-primary hover:bg-primary hover:text-primary-foreground transition-colors font-medium"
+                >
+                  {q}
+                </button>
+              ))}
+            </section>
+          </div>
+        )}
+        {messages.map((msg) => {
+          const textParts = (msg.parts ?? []).filter(
+            (p): p is TextUIPart => p.type === "text"
+          );
+          if (textParts.length === 0) return null;
+          const text = textParts.map((p) => p.text).join("");
+          const isStreaming = textParts.some((p) => p.state === "streaming");
+          return (
+            <ChatMessage
+              key={msg.id}
+              role={msg.role as "user" | "assistant"}
+              content={text}
+              isStreaming={isStreaming}
+            />
+          );
+        })}
+        <div ref={endRef} />
+        {isWaiting && (
+          <div className="flex justify-start mb-3">
+            <div className="bg-secondary rounded-2xl rounded-bl-sm px-4 py-2.5 text-sm">
+              <span className="inline-flex gap-1">
+                <span className="animate-bounce">·</span>
+                <span className="animate-bounce" style={{ animationDelay: "0.1s" }}>
+                  ·
                 </span>
-              </div>
+                <span className="animate-bounce" style={{ animationDelay: "0.2s" }}>
+                  ·
+                </span>
+              </span>
             </div>
-          ) : null}
-        </ScrollArea>
+          </div>
+        )}
       </div>
-      <ChatInput onSend={handleSend} isLoading={isLoading} />
+      <ChatInput onSend={handleSend} isLoading={isActive} />
     </div>
   );
 }
