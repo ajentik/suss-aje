@@ -54,10 +54,10 @@ export default function AerialViewButton() {
         aria-label="Aerial flyover"
         onClick={handleClick}
         disabled={loading}
-        className="absolute top-4 right-4 z-10 flex items-center gap-1.5 px-3 py-2 bg-white/95 backdrop-blur rounded-lg shadow-lg text-xs font-medium hover:bg-white transition-colors disabled:opacity-50"
+        className="absolute top-[max(1rem,env(safe-area-inset-top,1rem))] right-3 z-10 flex items-center gap-2 px-3.5 min-h-[44px] bg-card/80 backdrop-blur-lg border border-border/50 rounded-xl shadow-lg text-xs font-medium text-card-foreground hover:bg-card/95 active:scale-95 transition-all disabled:opacity-50 animate-in fade-in duration-300"
       >
-        <Plane size={14} />
-        {loading ? "Loading..." : "Aerial View"}
+        <Plane size={18} aria-hidden="true" />
+        {loading ? "Loading…" : "Aerial View"}
       </button>
 
       {/* Aerial video overlay */}
@@ -67,6 +67,10 @@ export default function AerialViewButton() {
             role="dialog"
             aria-label="Aerial flyover video"
             className="absolute inset-0 z-30 bg-black/90 flex items-center justify-center"
+            style={{
+              paddingTop: "env(safe-area-inset-top, 0px)",
+              paddingBottom: "env(safe-area-inset-bottom, 0px)",
+            }}
           >
             <div className="relative w-full h-full max-w-4xl max-h-[80vh] m-auto">
               <video
@@ -82,9 +86,10 @@ export default function AerialViewButton() {
                 type="button"
                 aria-label="Close aerial view"
                 onClick={() => setShowVideo(false)}
-                className="absolute top-4 right-4 flex items-center justify-center w-8 h-8 bg-white/20 hover:bg-white/30 rounded-full text-white transition-colors"
+                className="absolute top-3 right-3 flex items-center justify-center w-11 h-11 bg-white/20 hover:bg-white/30 active:scale-95 rounded-full text-white transition-all"
+                style={{ marginTop: "env(safe-area-inset-top, 0px)" }}
               >
-                <X size={18} />
+                <X size={20} />
               </button>
               <p className="absolute bottom-4 left-4 text-white/60 text-xs">
                 Aerial flyover of {selectedDestination.name}

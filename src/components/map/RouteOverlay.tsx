@@ -52,18 +52,18 @@ export default function RouteOverlay() {
   if (!routeInfo || !selectedDestination) return null;
 
   return (
-    <aside aria-label="Walking directions" className="absolute bottom-4 left-4 right-4 md:left-auto md:right-4 md:w-72 bg-white/95 backdrop-blur rounded-xl shadow-lg p-4 z-20">
+    <aside aria-label="Walking directions" className="absolute bottom-36 md:bottom-4 left-3 right-3 md:left-auto md:right-4 md:w-72 bg-card/90 backdrop-blur-lg border border-border/50 rounded-xl shadow-lg p-4 z-20 animate-in fade-in slide-in-from-bottom-2 duration-300">
       <div className="flex items-center gap-2 mb-1">
-        <div className="w-2 h-2 rounded-full bg-surface-brand" />
-        <p className="font-semibold text-sm">{selectedDestination.name}</p>
+        <div className="w-2.5 h-2.5 rounded-full bg-surface-brand" />
+        <p className="font-semibold text-sm text-card-foreground">{selectedDestination.name}</p>
       </div>
-      <div className="flex items-center gap-3 text-xs text-muted-foreground">
-        <span>{Math.round(routeInfo.distanceMeters)}m</span>
-        <span>{routeInfo.duration}</span>
+      <div className="flex items-center gap-3 text-sm text-muted-foreground">
+        <span className="font-medium text-card-foreground">{Math.round(routeInfo.distanceMeters)}m</span>
+        <span className="font-medium text-card-foreground">{routeInfo.duration}</span>
         <span>Walking</span>
       </div>
       {solar && (
-        <div className="mt-2 pt-2 border-t flex items-center gap-2 text-xs">
+        <div className="mt-2 pt-2 border-t border-border/50 flex items-center gap-2 text-xs">
           <span>{SUN_ICONS[solar.sunExposure]}</span>
           <span className="text-muted-foreground">{SUN_TIPS[solar.sunExposure]}</span>
         </div>

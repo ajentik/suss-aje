@@ -348,7 +348,7 @@ function Map3DInner() {
             {routeInfo && routeInfo.polyline.length > 0 && <RoutePolyline />}
           </Map3D>
 
-          <output aria-label="Street View hint" className="absolute bottom-3 right-3 z-10 text-[10px] text-white/80 bg-black/40 backdrop-blur px-2 py-1 rounded pointer-events-none">
+          <output aria-label="Street View hint" className="absolute bottom-36 md:bottom-3 right-3 z-10 text-xs text-white/90 bg-black/50 backdrop-blur-lg border border-white/10 px-3 py-1.5 rounded-xl pointer-events-none animate-in fade-in duration-500">
             Double-click to enter Street View
           </output>
         </>

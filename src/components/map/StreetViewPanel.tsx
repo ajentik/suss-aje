@@ -14,8 +14,8 @@ function EventInfoOverlay({ event }: { event: CampusEvent }) {
   const [isExpanded, setIsExpanded] = useState(false);
 
   return (
-    <div className="absolute bottom-4 left-4 z-10 max-w-sm bg-card/95 backdrop-blur rounded-2xl shadow-xl border border-border overflow-hidden">
-      <div className={`p-3 ${isExpanded && event.longDescription ? "max-h-[60vh] overflow-y-auto" : ""}`}>
+    <div className="absolute bottom-36 md:bottom-4 left-3 right-3 md:left-4 md:right-auto z-10 max-w-sm bg-card/90 backdrop-blur-lg rounded-2xl shadow-xl border border-border/50 overflow-hidden">
+      <div className={`p-3.5 ${isExpanded && event.longDescription ? "max-h-[60vh] overflow-y-auto" : ""}`}>
         <h3 className="text-sm font-bold text-foreground">{event.title}</h3>
 
         <div className="mt-1">
@@ -44,7 +44,7 @@ function EventInfoOverlay({ event }: { event: CampusEvent }) {
             <button
               type="button"
               onClick={() => setIsExpanded(!isExpanded)}
-              className="text-primary hover:underline mt-1 font-medium text-[11px]"
+              className="text-primary hover:underline mt-1.5 font-medium text-xs min-h-[36px] active:opacity-70 transition-opacity"
             >
               {isExpanded ? "Show less" : "Show more"}
             </button>
@@ -52,13 +52,13 @@ function EventInfoOverlay({ event }: { event: CampusEvent }) {
         )}
 
         <div className="flex flex-wrap gap-1.5 mt-2">
-          <span className="text-[10px] px-1.5 py-0.5 rounded-full font-medium bg-secondary text-secondary-foreground">
+          <span className="text-[11px] px-2 py-0.5 rounded-full font-medium bg-secondary text-secondary-foreground">
             {event.type}
           </span>
-          <span className="text-[10px] px-1.5 py-0.5 rounded-full font-medium bg-muted text-muted-foreground">
+          <span className="text-[11px] px-2 py-0.5 rounded-full font-medium bg-muted text-muted-foreground">
             {event.category}
           </span>
-          <span className="text-[10px] px-1.5 py-0.5 rounded-full font-medium bg-muted text-muted-foreground">
+          <span className="text-[11px] px-2 py-0.5 rounded-full font-medium bg-muted text-muted-foreground">
             {event.school}
           </span>
         </div>
@@ -109,9 +109,10 @@ export default function StreetViewPanel({
       <button
         type="button"
         onClick={onClose}
-        className="absolute top-4 left-4 z-10 flex items-center gap-2 px-4 py-2.5 min-h-[44px] bg-card/95 backdrop-blur rounded-xl shadow-xl border border-border text-sm font-medium text-card-foreground hover:bg-card transition-colors"
+        className="absolute left-3 z-10 flex items-center gap-2 px-4 min-h-[44px] bg-card/80 backdrop-blur-lg border border-border/50 rounded-xl shadow-lg text-sm font-medium text-card-foreground hover:bg-card/95 active:scale-95 transition-all"
+        style={{ top: "max(1rem, env(safe-area-inset-top, 1rem))" }}
       >
-        <ArrowLeft size={16} aria-hidden="true" />
+        <ArrowLeft size={18} aria-hidden="true" />
         Back to 3D Map
       </button>
 
