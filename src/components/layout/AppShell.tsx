@@ -108,7 +108,7 @@ export default function AppShell() {
               priority
             />
             <div className="h-5 w-px bg-white/25" />
-            <span className="text-xs font-semibold tracking-wide opacity-90">
+            <span className="text-sm font-bold tracking-wide opacity-90">
               AskSUSSi
             </span>
           </div>
@@ -217,7 +217,7 @@ export default function AppShell() {
               priority
             />
             <div className="h-5 w-px bg-white/25" />
-            <span className="text-xs font-semibold tracking-wide opacity-90">
+            <span className="text-sm font-bold tracking-wide opacity-90">
               AskSUSSi
             </span>
           </div>

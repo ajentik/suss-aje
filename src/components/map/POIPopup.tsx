@@ -91,7 +91,7 @@ export default function POIPopup() {
       }`}
       onTransitionEnd={handleTransitionEnd}
     >
-      <div className="bg-white rounded-xl shadow-lg max-w-sm w-[350px] p-4 relative border border-gray-100">
+      <div className="bg-white rounded-xl shadow-lg max-w-md w-[380px] p-5 relative border border-gray-100">
         <button
           type="button"
           onClick={handleClose}
@@ -102,20 +102,20 @@ export default function POIPopup() {
         </button>
 
         <div className="mb-2">
-          <span className="inline-block bg-blue-50 text-surface-brand text-xs font-semibold px-2.5 py-0.5 rounded-full border border-blue-100">
+          <span className="inline-block bg-blue-50 text-surface-brand text-sm font-semibold px-3 py-1 rounded-full border border-blue-100">
             {displayPOI.category}
           </span>
         </div>
 
-        <h3 className="text-lg font-bold text-gray-900 mb-1 pr-6">
+        <h3 className="text-xl font-bold text-gray-900 mb-1.5 pr-6">
           {displayPOI.name}
         </h3>
 
-        <p className="text-sm text-gray-600 mb-3 line-clamp-2">
+        <p className="text-[0.9375rem] text-gray-600 mb-3 line-clamp-2 leading-relaxed">
           {displayPOI.description}
         </p>
 
-        <div className="space-y-1.5 mb-4 text-sm text-gray-500">
+        <div className="space-y-2 mb-4 text-[0.9375rem] text-gray-500">
           {displayPOI.address && (
             <div className="flex items-start gap-2">
               <MapPin
@@ -152,8 +152,8 @@ export default function POIPopup() {
 
         {nearbyEvents.length > 0 && (
           <div className="mb-3 border-t border-gray-100 pt-3">
-            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 flex items-center gap-1.5">
-              <Calendar size={12} aria-hidden="true" />
+            <p className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+              <Calendar size={14} aria-hidden="true" />
               Upcoming Events Nearby
             </p>
             <div className="space-y-1.5">
@@ -162,12 +162,12 @@ export default function POIPopup() {
                   key={evt.id}
                   type="button"
                   onClick={() => handleEventClick(evt)}
-                  className="w-full text-left flex items-center gap-2 bg-amber-50 border border-amber-100 rounded-lg px-3 py-2 hover:bg-amber-100 transition-colors"
+                  className="w-full text-left flex items-center gap-2.5 bg-amber-50 border border-amber-100 rounded-lg px-3.5 py-2.5 hover:bg-amber-100 transition-colors"
                 >
-                  <span className="text-amber-600 text-xs font-medium shrink-0">
+                  <span className="text-amber-600 text-sm font-medium shrink-0">
                     {evt.date}
                   </span>
-                  <span className="text-xs text-gray-700 truncate">
+                  <span className="text-sm text-gray-700 truncate">
                     {evt.title}
                   </span>
                 </button>
@@ -179,7 +179,7 @@ export default function POIPopup() {
         <button
           type="button"
           onClick={handleNavigate}
-          className="w-full bg-surface-brand text-surface-brand-foreground rounded-lg px-4 py-2 text-sm font-medium hover:bg-surface-brand/90 transition-colors flex items-center justify-center gap-2"
+          className="w-full bg-surface-brand text-surface-brand-foreground rounded-lg px-4 py-2.5 text-[0.9375rem] font-semibold hover:bg-surface-brand/90 transition-colors flex items-center justify-center gap-2"
         >
           <Navigation size={16} aria-hidden="true" />
           Navigate here

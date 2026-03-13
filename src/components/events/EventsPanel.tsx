@@ -66,7 +66,7 @@ export default function EventsPanel() {
           />
         ) : (
           <div className="space-y-2">
-            <p className="text-xs text-muted-foreground px-1">{events.length} events</p>
+            <p className="text-sm text-muted-foreground px-1 font-medium">{events.length} events</p>
             {events.map((event) => (
               <EventCard key={event.id} event={event} />
             ))}

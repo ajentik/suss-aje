@@ -41,13 +41,13 @@ export default function EventCard({ event }: EventCardProps) {
       className="w-full text-left p-3 rounded-lg border hover:bg-muted/50 transition-colors flex flex-col gap-2"
     >
       <div className="flex items-start justify-between gap-2 w-full">
-        <h3 className="font-medium text-sm leading-tight">{event.title}</h3>
-        <Badge variant="secondary" className="text-[10px] shrink-0">
+        <h3 className="font-semibold text-[0.9375rem] leading-snug">{event.title}</h3>
+        <Badge variant="secondary" className="text-xs shrink-0">
           {event.category}
         </Badge>
       </div>
 
-      <div className="flex items-center gap-2 text-[11px] text-muted-foreground flex-wrap w-full">
+      <div className="flex items-center gap-2 text-xs text-muted-foreground flex-wrap w-full">
         <span>{dateDisplay}</span>
         <span>·</span>
         <span>{event.time}</span>
@@ -57,21 +57,21 @@ export default function EventCard({ event }: EventCardProps) {
 
       <div className="flex items-center gap-2 w-full">
         {event.type && (
-          <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-medium ${TYPE_COLORS[event.type] || "bg-muted text-muted-foreground"}`}>
+          <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${TYPE_COLORS[event.type] || "bg-muted text-muted-foreground"}`}>
             {event.type}
           </span>
         )}
         {event.school && (
-          <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-muted text-muted-foreground font-medium">
+          <span className="text-xs px-2 py-0.5 rounded-full bg-muted text-muted-foreground font-medium">
             {event.school}
           </span>
         )}
       </div>
 
-      <p className="text-xs text-muted-foreground line-clamp-2 w-full">{event.description}</p>
+      <p className="text-sm text-muted-foreground line-clamp-2 w-full">{event.description}</p>
 
       {event.longDescription && (
-        <div className="w-full text-xs text-muted-foreground mt-1">
+        <div className="w-full text-sm text-muted-foreground mt-1">
           <div className={isExpanded ? "" : "line-clamp-2"}>
             {event.longDescription}
           </div>
@@ -81,7 +81,7 @@ export default function EventCard({ event }: EventCardProps) {
               e.stopPropagation();
               setIsExpanded(!isExpanded);
             }}
-            className="text-primary hover:underline mt-1 font-medium text-[11px]"
+            className="text-primary hover:underline mt-1 font-medium text-xs"
           >
             {isExpanded ? "Show less" : "Show more"}
           </button>
@@ -89,7 +89,7 @@ export default function EventCard({ event }: EventCardProps) {
       )}
 
       {event.venueAddress && (
-        <div className="flex items-start gap-1.5 text-xs text-muted-foreground mt-1 w-full">
+        <div className="flex items-start gap-1.5 text-sm text-muted-foreground mt-1 w-full">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 24 24"
@@ -113,7 +113,7 @@ export default function EventCard({ event }: EventCardProps) {
           <button
             type="button"
             onClick={handleNavigate}
-            className="flex items-center gap-1.5 bg-primary text-primary-foreground px-3 py-1.5 rounded-md text-xs font-medium hover:opacity-90 transition-opacity"
+            className="flex items-center gap-1.5 bg-primary text-primary-foreground px-3.5 py-2 rounded-lg text-sm font-medium hover:opacity-90 transition-opacity"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -137,7 +137,7 @@ export default function EventCard({ event }: EventCardProps) {
             target="_blank"
             rel="noopener noreferrer"
             onClick={(e) => e.stopPropagation()}
-            className="text-[10px] text-primary hover:underline ml-auto"
+            className="text-xs text-primary hover:underline ml-auto"
           >
             Join Online →
           </a>

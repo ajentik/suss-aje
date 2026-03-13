@@ -235,7 +235,7 @@ export default function HeroIntro({ onEnter }: HeroIntroProps) {
       </div>
 
       {/* Bottom label */}
-      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-10 text-white/25 text-[10px] tracking-[0.2em] uppercase animate-hero-fade-in [animation-delay:1400ms]">
+      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-10 text-white/30 text-xs tracking-[0.2em] uppercase animate-hero-fade-in [animation-delay:1400ms]">
         SUSS Campus Intelligent Assistant
       </div>
     </header>

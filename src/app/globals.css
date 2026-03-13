@@ -114,12 +114,12 @@
   --event-external-bg: oklch(0.94 0.06 60);
   --event-external-fg: oklch(0.40 0.12 60);
 
-  /* ── Type Scale ── */
-  --text-hero: clamp(1.875rem, 1.5rem + 1.5vw, 3rem);
-  --text-lg: 1.125rem;
-  --text-base: 0.875rem;
-  --text-sm: 0.75rem;
-  --text-xs: 0.625rem;
+  /* ── Type Scale (hi-res friendly) ── */
+  --text-hero: clamp(2.25rem, 1.8rem + 1.8vw, 3.5rem);
+  --text-lg: 1.25rem;
+  --text-base: 1rem;
+  --text-sm: 0.875rem;
+  --text-xs: 0.75rem;
 
   /* ── Z-Index Scale ──
    * base:       0   — normal flow
@@ -187,11 +187,15 @@
   * {
     @apply border-border outline-ring/50;
   }
-  body {
-    @apply bg-background text-foreground;
-  }
   html {
     @apply font-sans;
+    font-size: clamp(15px, 14px + 0.15vw, 17px);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+  body {
+    @apply bg-background text-foreground leading-relaxed;
   }
 }
 

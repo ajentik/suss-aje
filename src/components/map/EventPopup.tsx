@@ -41,7 +41,7 @@ export default function EventPopup() {
       }`}
       onTransitionEnd={handleTransitionEnd}
     >
-      <div className="bg-white rounded-xl shadow-lg max-w-sm w-[350px] p-4 relative border border-gray-100">
+      <div className="bg-white rounded-xl shadow-lg max-w-md w-[380px] p-5 relative border border-gray-100">
         <button type="button"
           onClick={handleClose}
           className="absolute top-3 right-3 text-gray-400 hover:text-gray-600 transition-colors"
@@ -66,20 +66,20 @@ export default function EventPopup() {
         </button>
 
         <div className="mb-2">
-          <span className="inline-block bg-secondary text-secondary-foreground text-xs font-semibold px-2.5 py-0.5 rounded-full">
+          <span className="inline-block bg-secondary text-secondary-foreground text-sm font-semibold px-3 py-1 rounded-full">
             {displayEvent.category}
           </span>
         </div>
 
-        <h3 className="text-lg font-bold text-foreground mb-1 pr-6">
+        <h3 className="text-xl font-bold text-foreground mb-1.5 pr-6">
           {displayEvent.title}
         </h3>
-        
-        <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
+
+        <p className="text-[0.9375rem] text-muted-foreground mb-3 line-clamp-2 leading-relaxed">
           {displayEvent.description}
         </p>
 
-        <div className="space-y-1.5 mb-4 text-sm text-muted-foreground">
+        <div className="space-y-2 mb-4 text-[0.9375rem] text-muted-foreground">
           <div className="flex items-start gap-2">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mt-0.5 shrink-0" aria-hidden="true">
               <title>Date</title>
@@ -124,10 +124,10 @@ export default function EventPopup() {
         </div>
 
         <div className="flex gap-2 mb-4">
-          <span className="bg-secondary text-secondary-foreground text-[10px] px-1.5 py-0.5 rounded-full font-medium">
+          <span className="bg-secondary text-secondary-foreground text-xs px-2 py-0.5 rounded-full font-medium">
             {displayEvent.type}
           </span>
-          <span className="bg-muted text-muted-foreground text-[10px] px-1.5 py-0.5 rounded-full font-medium">
+          <span className="bg-muted text-muted-foreground text-xs px-2 py-0.5 rounded-full font-medium">
             {displayEvent.school}
           </span>
         </div>
@@ -138,7 +138,7 @@ export default function EventPopup() {
               href={displayEvent.url} 
               target="_blank" 
               rel="noopener noreferrer"
-              className="text-xs text-primary hover:underline font-medium"
+              className="text-sm text-primary hover:underline font-medium"
             >
               Details →
             </a>
@@ -148,20 +148,20 @@ export default function EventPopup() {
         {displayEvent.type !== "Online" ? (
           <button type="button"
             onClick={handleNavigate}
-            className="w-full bg-primary text-primary-foreground rounded-lg px-4 py-2 text-sm font-medium hover:bg-primary/90 transition-colors flex items-center justify-center gap-2"
+            className="w-full bg-primary text-primary-foreground rounded-lg px-4 py-2.5 text-[0.9375rem] font-semibold hover:bg-primary/90 transition-colors flex items-center justify-center gap-2"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
               <title>Navigate</title>
               <polygon points="3 11 22 2 13 21 11 13 3 11"/>
             </svg>
             Navigate here
           </button>
         ) : displayEvent.url ? (
-          <a 
+          <a
             href={displayEvent.url}
             target="_blank"
             rel="noopener noreferrer"
-            className="w-full bg-primary text-primary-foreground rounded-lg px-4 py-2 text-sm font-medium hover:bg-primary/90 transition-colors flex items-center justify-center gap-2"
+            className="w-full bg-primary text-primary-foreground rounded-lg px-4 py-2.5 text-[0.9375rem] font-semibold hover:bg-primary/90 transition-colors flex items-center justify-center gap-2"
           >
             Join Online →
           </a>
