@@ -1,6 +1,5 @@
-/* eslint-disable jsx-a11y/aria-role */
 import { describe, expect, it, vi, beforeEach } from "vitest";
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 
 import type { CampusEvent } from "@/types";
 

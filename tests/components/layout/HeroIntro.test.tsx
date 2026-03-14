@@ -1,12 +1,11 @@
-/* eslint-disable jsx-a11y/aria-role */
 import { describe, expect, it, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 
 vi.mock("next/image", () => ({
   __esModule: true,
-  default: (props: Record<string, unknown>) => {
-    const { priority, fill, ...rest } = props;
-    return <img alt={(rest.alt as string) ?? ""} {...rest} />;
+  default: ({ priority: _priority, fill: _fill, alt, ...rest }: Record<string, unknown>) => {
+    // eslint-disable-next-line @next/next/no-img-element
+    return <img alt={(alt as string) ?? ""} {...rest} />;
   },
 }));
 

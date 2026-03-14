@@ -1,6 +1,5 @@
-/* eslint-disable jsx-a11y/aria-role */
 import { describe, expect, it } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { render } from "@testing-library/react";
 
 import { EventCardSkeleton } from "@/components/events/EventCardSkeleton";
 
