@@ -2,8 +2,19 @@ import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
 import { renderHook, act } from "@testing-library/react";
 import { useSpeechRecognition } from "@/lib/voice/speech-recognition";
 
+interface MockRecognitionInstance {
+  lang: string;
+  interimResults: boolean;
+  continuous: boolean;
+  onresult: ((event: { results: unknown }) => void) | null;
+  onend: (() => void) | null;
+  onerror: ((event: { error: string }) => void) | null;
+  start: ReturnType<typeof vi.fn>;
+  stop: ReturnType<typeof vi.fn>;
+}
+
 function createMockSpeechRecognition() {
-  return vi.fn().mockImplementation(function (this: Record<string, unknown>) {
+  return vi.fn().mockImplementation(function (this: MockRecognitionInstance) {
     this.lang = "";
     this.interimResults = false;
     this.continuous = false;
@@ -13,6 +24,10 @@ function createMockSpeechRecognition() {
     this.start = vi.fn();
     this.stop = vi.fn();
   });
+}
+
+function getInstance(mock: ReturnType<typeof createMockSpeechRecognition>, index = 0): MockRecognitionInstance {
+  return mock.mock.instances[index] as unknown as MockRecognitionInstance;
 }
 
 describe("useSpeechRecognition", () => {
@@ -42,10 +57,10 @@ describe("useSpeechRecognition", () => {
       result.current.startListening(onResult);
     });
 
-    const instance = MockSpeechRecognition.mock.instances[0];
-    expect(instance.lang).toBe("en-SG");
-    expect(instance.interimResults).toBe(false);
-    expect(instance.continuous).toBe(false);
+    const inst = getInstance(MockSpeechRecognition);
+    expect(inst.lang).toBe("en-SG");
+    expect(inst.interimResults).toBe(false);
+    expect(inst.continuous).toBe(false);
   });
 
   it("calls recognition.start() and sets isListening to true", () => {

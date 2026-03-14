@@ -379,6 +379,29 @@ describe("useBottomSheet", () => {
   });
 
   it("onTouchStart cancels running animation", () => {
+    Object.defineProperty(window, "matchMedia", {
+      writable: true,
+      configurable: true,
+      value: vi.fn().mockImplementation((query: string) => ({
+        matches: false,
+        media: query,
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn(),
+        onchange: null,
+        addListener: vi.fn(),
+        removeListener: vi.fn(),
+        dispatchEvent: vi.fn(),
+      })),
+    });
+
+    let frameId = 1;
+    vi.stubGlobal(
+      "requestAnimationFrame",
+      vi.fn(() => frameId++),
+    );
+    const cancelFn = vi.fn();
+    vi.stubGlobal("cancelAnimationFrame", cancelFn);
+
     const { result } = renderHook(() =>
       useBottomSheet({ mini: 64, peek: 200, half: 400, full: 800 }),
     );
@@ -387,10 +410,14 @@ describe("useBottomSheet", () => {
     (result.current.sheetRef as React.MutableRefObject<HTMLDivElement | null>).current = sheetEl;
 
     act(() => {
+      result.current.snapTo("full");
+    });
+
+    act(() => {
       result.current.touchHandlers.onTouchStart(createMockTouchEvent(500));
     });
 
-    expect(cancelAnimationFrame).toHaveBeenCalled();
+    expect(cancelFn).toHaveBeenCalled();
   });
 
   it("resize event re-resolves snap points and re-applies position", () => {
