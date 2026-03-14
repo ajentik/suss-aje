@@ -21,6 +21,7 @@ export default function AACResultCard({ poi, distanceKm, onSelect }: AACResultCa
   return (
     <button
       type="button"
+      aria-label={`Select ${poi.name}`}
       onClick={() => onSelect(poi)}
       className="w-full text-left px-3 py-2.5 rounded-lg border border-border bg-card hover:bg-accent/50 active:bg-accent transition-colors cursor-pointer group relative"
     >
