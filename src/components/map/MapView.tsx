@@ -45,8 +45,7 @@ function loadMapsAPI(): Promise<void> {
   if (mapsReady) return mapsReady;
 
   mapsReady = (async () => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    if (!(window as any).google?.maps) {
+    if (!window.google?.maps) {
       const existing = document.querySelector(
         'script[src*="maps.googleapis.com/maps/api/js"]'
       );
@@ -58,8 +57,7 @@ function loadMapsAPI(): Promise<void> {
       }
 
       const deadline = Date.now() + 15000;
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      while (!(window as any).google?.maps?.importLibrary) {
+      while (!window.google?.maps?.importLibrary) {
         if (Date.now() > deadline) {
           throw new Error(
             "Google Maps API failed to initialize — ensure Maps JavaScript API and Map Tiles API are enabled in your GCP project."
@@ -69,8 +67,7 @@ function loadMapsAPI(): Promise<void> {
       }
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    await (window as any).google.maps.importLibrary("maps3d");
+    await window.google.maps.importLibrary("maps3d");
   })();
 
   mapsReady.catch(() => {
