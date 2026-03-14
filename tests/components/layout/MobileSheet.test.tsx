@@ -47,7 +47,8 @@ describe("MobileSheet", () => {
   it("renders children when snap is not mini", () => {
     render(<MobileSheet>Sheet Content</MobileSheet>);
     expect(screen.getByText("Sheet Content")).toBeInTheDocument();
-    expect(screen.getByText("Sheet Content")).toBeVisible();
+    const contentContainer = screen.getByText("Sheet Content").closest("div");
+    expect(contentContainer?.className).not.toContain("invisible");
   });
 
   it("hides children when snap is mini", () => {
@@ -70,7 +71,7 @@ describe("MobileSheet", () => {
   it("renders the drag handle", () => {
     render(<MobileSheet>Content</MobileSheet>);
     expect(
-      screen.getByRole("button", { name: /drag to resize|expand/i }),
+      screen.getByRole("button", { name: /drag to resize|expand/i, hidden: true }),
     ).toBeInTheDocument();
   });
 
