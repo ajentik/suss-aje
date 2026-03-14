@@ -1,0 +1,83 @@
+import { describe, expect, it, vi, beforeEach } from "vitest";
+import { render, screen } from "@testing-library/react";
+
+vi.mock("@/hooks/useBottomSheet", () => ({
+  useBottomSheet: vi.fn(() => ({
+    sheetRef: { current: null },
+    handleRef: { current: null },
+    currentHeight: 200,
+    snapState: "peek" as const,
+    isDragging: false,
+    snapTo: vi.fn(),
+    touchHandlers: {
+      onTouchStart: vi.fn(),
+      onTouchMove: vi.fn(),
+      onTouchEnd: vi.fn(),
+    },
+  })),
+}));
+
+import { MobileSheet } from "@/components/layout/MobileSheet";
+import { useBottomSheet } from "@/hooks/useBottomSheet";
+
+const mockedUseBottomSheet = vi.mocked(useBottomSheet);
+
+function setSnapState(snap: "mini" | "peek" | "half" | "full") {
+  mockedUseBottomSheet.mockReturnValue({
+    sheetRef: { current: null },
+    handleRef: { current: null },
+    currentHeight: 200,
+    snapState: snap,
+    isDragging: false,
+    snapTo: vi.fn(),
+    touchHandlers: {
+      onTouchStart: vi.fn(),
+      onTouchMove: vi.fn(),
+      onTouchEnd: vi.fn(),
+    },
+  });
+}
+
+describe("MobileSheet", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    setSnapState("peek");
+  });
+
+  it("renders children when snap is not mini", () => {
+    render(<MobileSheet>Sheet Content</MobileSheet>);
+    expect(screen.getByText("Sheet Content")).toBeInTheDocument();
+    expect(screen.getByText("Sheet Content")).toBeVisible();
+  });
+
+  it("hides children when snap is mini", () => {
+    setSnapState("mini");
+    render(<MobileSheet>Hidden Content</MobileSheet>);
+    const contentContainer = screen.getByText("Hidden Content").closest("div");
+    expect(contentContainer?.className).toContain("invisible");
+  });
+
+  it("shows mini content when snap is mini", () => {
+    setSnapState("mini");
+    render(
+      <MobileSheet miniContent={<span>Mini View</span>}>
+        Main Content
+      </MobileSheet>,
+    );
+    expect(screen.getByText("Mini View")).toBeInTheDocument();
+  });
+
+  it("renders the drag handle", () => {
+    render(<MobileSheet>Content</MobileSheet>);
+    expect(
+      screen.getByRole("button", { name: /drag to resize|expand/i }),
+    ).toBeInTheDocument();
+  });
+
+  it("shows default mini content when no miniContent prop and snap is mini", () => {
+    setSnapState("mini");
+    render(<MobileSheet>Content</MobileSheet>);
+    expect(screen.getByText("AskSUSSi")).toBeInTheDocument();
+    expect(screen.getByText("Swipe up")).toBeInTheDocument();
+  });
+});
