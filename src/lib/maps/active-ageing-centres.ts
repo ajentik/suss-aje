@@ -1343,4 +1343,190 @@ export const ACTIVE_AGEING_CENTRES: POI[] = [
     address: "Blk 97 Whampoa Drive #01-01, Singapore 320097",
     hours: "Mon–Fri 9AM–5PM",
   },
+
+  // ── Active Global Senior Care ────────────────────────────────
+  {
+    id: "aac-active-global-fernvale-glades",
+    name: "Active Global Senior Care @ Fernvale Glades",
+    lat: 1.3918,
+    lng: 103.8762,
+    category: "Active Ageing Centre",
+    description:
+      "Operated by Active Global. Programs include gentle aerobics, social activities, health monitoring and community support for seniors aged 60+.",
+    address: "Blk 460 Fernvale Link, Singapore 791460",
+    hours: "Mon–Fri 9AM–5PM",
+  },
+  {
+    id: "aac-active-global-ghim-moh-edge",
+    name: "Active Global Senior Care @ Ghim Moh Edge",
+    lat: 1.3112,
+    lng: 103.7882,
+    category: "Active Ageing Centre",
+    description:
+      "Operated by Active Global. Programs include Zumba Gold, social activities, health screening and community support for seniors aged 60+.",
+    address: "Blk 31A Ghim Moh Link, Singapore 271031",
+    hours: "Mon–Fri 9AM–5PM",
+  },
+  {
+    id: "aac-active-global-telok-blangah-parcview",
+    name: "Active Global Senior Care @ Telok Blangah ParcView",
+    lat: 1.2712,
+    lng: 103.8098,
+    category: "Active Ageing Centre",
+    description:
+      "Operated by Active Global. Programs include Zumba Gold, social activities, health monitoring and community support for seniors aged 60+.",
+    address: "Blk 92 Telok Blangah St 31, Singapore 102092",
+    hours: "Mon–Fri 9AM–5PM",
+  },
+
+  // ── Adventist Active Centre ──────────────────────────────────
+  {
+    id: "aac-adventist-golden-clover",
+    name: "Adventist Active Centre @ Golden Clover",
+    lat: 1.3272,
+    lng: 103.8571,
+    category: "Active Ageing Centre",
+    description:
+      "Operated by Adventist Community Services. Programs include senior fitness, social activities, health screening and community support for seniors aged 60+.",
+    address: "Blk 196 Kim Keat Ave #01-506, Singapore 310196",
+    hours: "Mon–Fri 9AM–5PM",
+  },
+  {
+    id: "aac-adventist-golden-peony",
+    name: "Adventist Active Centre @ Golden Peony",
+    lat: 1.3497,
+    lng: 103.7186,
+    category: "Active Ageing Centre",
+    description:
+      "Operated by Adventist Community Services. Programs include senior fitness, social activities, health monitoring and community support for seniors aged 60+.",
+    address: "Blk 530A Jurong West Ave 1 #01-907, Singapore 641530",
+    hours: "Mon–Fri 9AM–5PM",
+  },
+  {
+    id: "aac-adventist-kallang-trivista",
+    name: "Adventist Active Centre @ Kallang Trivista",
+    lat: 1.3142,
+    lng: 103.8622,
+    category: "Active Ageing Centre",
+    description:
+      "Operated by Adventist Community Services. Programs include senior fitness, social activities, health screening and community support for seniors aged 60+.",
+    address: "Blk 8 Upper Boon Keng Road #01-02, Singapore 380008",
+    hours: "Mon–Fri 9AM–5PM",
+  },
+
+  // ── HNF (Hua Mei / NTUC) ────────────────────────────────────
+  {
+    id: "aac-hnf-wellness-hougang",
+    name: "HNF Wellness @ Hougang",
+    lat: 1.3696,
+    lng: 103.8911,
+    category: "Active Ageing Centre",
+    description:
+      "Operated by Health and Nutrition Foundation. Programs include gentle aerobics, social activities, health monitoring and community support for seniors aged 60+.",
+    address: "35 Hougang Ave 3, #04-01, Singapore 538840",
+    hours: "Mon–Fri 9AM–5PM",
+  },
+  {
+    id: "aac-hnf-wellness-buangkok",
+    name: "HNF Wellness Club @ Buangkok",
+    lat: 1.3835,
+    lng: 103.8828,
+    category: "Active Ageing Centre",
+    description:
+      "Operated by Health and Nutrition Foundation. Programs include chair yoga, stretching, social activities and community support for seniors aged 60+.",
+    address: "Blk 999 Buangkok Crescent #01-01, Singapore 530999",
+    hours: "Mon–Fri 9AM–5PM",
+  },
+
+  // ── Kwong Wai Shiu ───────────────────────────────────────────
+  {
+    id: "aac-kws-ccc-mcnair",
+    name: "KWS CCC @ McNair",
+    lat: 1.3189,
+    lng: 103.8582,
+    category: "Active Ageing Centre",
+    description:
+      "Operated by Kwong Wai Shiu Hospital. Programs include active ageing workouts, social activities, health monitoring and community support for seniors aged 60+.",
+    address: "Blk 113 McNair Road, Singapore 320113",
+    hours: "Mon–Fri 9AM–5PM",
+  },
+  {
+    id: "aac-kwsc-macpherson",
+    name: "KWSC @ MacPherson",
+    lat: 1.3269,
+    lng: 103.8863,
+    category: "Active Ageing Centre",
+    description:
+      "Operated by Kwong Wai Shiu Hospital. Programs include Tai Chi, Qigong, social activities and community support for seniors aged 60+.",
+    address: "82 Circuit Road #01-02, Singapore 370082",
+    hours: "Mon–Fri 9AM–5PM",
+  },
+  {
+    id: "aac-kwsc-st-george",
+    name: "KWSC @ St George",
+    lat: 1.3112,
+    lng: 103.8601,
+    category: "Active Ageing Centre",
+    description:
+      "Operated by Kwong Wai Shiu Hospital. Programs include Tai Chi, exercises, social activities and community support for seniors aged 60+.",
+    address: "25 St George's Lane, Singapore 328048",
+    hours: "Mon–Fri 9AM–5PM",
+  },
+  {
+    id: "aac-kwsh-potong-pasir",
+    name: "KWSH @ Potong Pasir",
+    lat: 1.3306,
+    lng: 103.8681,
+    category: "Active Ageing Centre",
+    description:
+      "Operated by Kwong Wai Shiu Hospital. Programs include exercises, stretching, social activities and community support for seniors aged 60+.",
+    address: "51 Potong Pasir Ave 1, Singapore 358074",
+    hours: "Mon–Fri 9AM–5PM",
+  },
+
+  // ── PCF Sparkle Care ─────────────────────────────────────────
+  {
+    id: "aac-pcf-sparkle-care-braddell-heights",
+    name: "PCF Sparkle Care AAC (Care) (Braddell Heights)",
+    lat: 1.3534,
+    lng: 103.8725,
+    category: "Active Ageing Centre",
+    description:
+      "Operated by PCF Sparkle Care. Programs include strength and balance training, social activities, health monitoring and community support for seniors aged 60+.",
+    address: "Blk 319 Serangoon Ave 2 #01-348, Singapore 550319",
+    hours: "Mon–Fri 9AM–5PM",
+  },
+  {
+    id: "aac-pcf-sparkle-care-eunos",
+    name: "PCF Sparkle Care AAC (Care) (Eunos)",
+    lat: 1.3225,
+    lng: 103.9035,
+    category: "Active Ageing Centre",
+    description:
+      "Operated by PCF Sparkle Care. Programs include strength and balance training, social activities, health screening and community support for seniors aged 60+.",
+    address: "Blk 657 Jalan Tenaga #01-122, Singapore 410657",
+    hours: "Mon–Fri 9AM–5PM",
+  },
+  {
+    id: "aac-pcf-sparkle-care-shunfu",
+    name: "PCF Sparkle Care AAC (Care) (Shunfu)",
+    lat: 1.3515,
+    lng: 103.8375,
+    category: "Active Ageing Centre",
+    description:
+      "Operated by PCF Sparkle Care. Programs include strength and balance training, social activities, health monitoring and community support for seniors aged 60+.",
+    address: "Blk 301 Shunfu Road #01-25, Singapore 570313",
+    hours: "Mon–Fri 9AM–5PM",
+  },
+  {
+    id: "aac-pcf-sparkle-care-yew-tee",
+    name: "PCF Sparkle Care AAC (Care) (Yew Tee)",
+    lat: 1.3971,
+    lng: 103.7472,
+    category: "Active Ageing Centre",
+    description:
+      "Operated by PCF Sparkle Care. Programs include strength and balance training, social activities, health screening and community support for seniors aged 60+.",
+    address: "Blk 625 Choa Chu Kang St 62 #01-206, Singapore 680625",
+    hours: "Mon–Fri 9AM–5PM",
+  },
 ];
