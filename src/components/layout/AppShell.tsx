@@ -15,7 +15,7 @@ import {
 } from "lucide-react";
 import { APIProvider } from "@vis.gl/react-google-maps";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useAppStore } from "@/store/app-store";
+import { useAppStore, type PanelId } from "@/store/app-store";
 import ChatPanel from "@/components/chat/ChatPanel";
 import EventsPanel from "@/components/events/EventsPanel";
 import RouteOverlay from "@/components/map/RouteOverlay";
@@ -293,7 +293,7 @@ export default function AppShell() {
         {/* Tabs */}
         <Tabs
           value={activePanel}
-          onValueChange={(v) => setActivePanel(v as "chat" | "events")}
+          onValueChange={(v) => setActivePanel(v as PanelId)}
           className="flex-1 flex flex-col min-h-0"
         >
           <TabsList className="mx-3 mt-2 shrink-0">
