@@ -284,16 +284,26 @@ function ToolResultCardInner({ toolName, output, state }: ToolResultCardProps) {
     return <ToolShimmer toolName={toolName} />;
   }
 
+  let content: React.ReactNode = null;
   switch (toolName) {
     case "navigate_to":
-      return <LocationCard output={output as unknown as NavigateOutput} />;
+      content = <LocationCard output={output as unknown as NavigateOutput} />;
+      break;
     case "show_events":
-      return <EventListCard output={output as unknown as ShowEventsOutput} />;
+      content = <EventListCard output={output as unknown as ShowEventsOutput} />;
+      break;
     case "campus_info":
-      return <CampusInfoCard output={output as unknown as CampusInfoOutput} />;
+      content = <CampusInfoCard output={output as unknown as CampusInfoOutput} />;
+      break;
     default:
       return null;
   }
+
+  return (
+    <section aria-label={`${toolName} result`}>
+      {content}
+    </section>
+  );
 }
 
 const ToolResultCard = memo(ToolResultCardInner);

@@ -1,3 +1,4 @@
+/* eslint-disable jsx-a11y/aria-role */
 import { describe, expect, it } from "vitest";
 import { render, screen } from "@testing-library/react";
 
