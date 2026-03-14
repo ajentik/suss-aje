@@ -70,6 +70,7 @@
   --color-poi-mall: var(--poi-mall);
   --color-poi-supermarket: var(--poi-supermarket);
   --color-poi-bar: var(--poi-bar);
+  --color-poi-aac: var(--poi-aac);
 }
 
 :root {
@@ -125,6 +126,8 @@
   --event-online-fg: oklch(0.35 0.08 250);
   --event-external-bg: oklch(0.94 0.06 60);
   --event-external-fg: oklch(0.40 0.12 60);
+
+  --poi-aac: oklch(0.55 0.10 175);
 
   /* ── Type Scale (hi-res friendly) ── */
   --text-hero: clamp(2.25rem, 1.8rem + 1.8vw, 3.5rem);

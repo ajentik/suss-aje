@@ -6,6 +6,7 @@ import type { POI, RouteInfo, CampusEvent, ChatMessage, DateRangePreset } from "
 
 type SheetContentMode = "default" | "poi-detail" | "event-detail";
 type MobileSheetState = "collapsed" | "peek" | "expanded";
+export type PanelId = "chat" | "events" | "aac-search";
 
 interface AppState {
   selectedPOI: POI | null;
@@ -17,8 +18,8 @@ interface AppState {
   flyToTarget: { lat: number; lng: number; altitude?: number } | null;
   setFlyToTarget: (target: { lat: number; lng: number; altitude?: number } | null) => void;
 
-  activePanel: "chat" | "events";
-  setActivePanel: (panel: "chat" | "events") => void;
+  activePanel: PanelId;
+  setActivePanel: (panel: PanelId) => void;
 
   sheetContentMode: SheetContentMode;
   setSheetContentMode: (mode: SheetContentMode) => void;

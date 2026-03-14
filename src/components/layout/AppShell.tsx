@@ -11,13 +11,15 @@ import {
   GripVertical,
   MessageSquare,
   Calendar,
+  Building2,
   ChevronUp,
 } from "lucide-react";
 import { APIProvider } from "@vis.gl/react-google-maps";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useAppStore } from "@/store/app-store";
+import { useAppStore, type PanelId } from "@/store/app-store";
 import ChatPanel from "@/components/chat/ChatPanel";
 import EventsPanel from "@/components/events/EventsPanel";
+import AACSearchPanel from "@/components/aac/AACSearchPanel";
 import RouteOverlay from "@/components/map/RouteOverlay";
 import AerialViewButton from "@/components/map/AerialViewButton";
 import POIPopup, { POIDetailCard } from "@/components/map/POIPopup";
@@ -293,7 +295,7 @@ export default function AppShell() {
         {/* Tabs */}
         <Tabs
           value={activePanel}
-          onValueChange={(v) => setActivePanel(v as "chat" | "events")}
+          onValueChange={(v) => setActivePanel(v as PanelId)}
           className="flex-1 flex flex-col min-h-0"
         >
           <TabsList className="mx-3 mt-2 shrink-0">
@@ -302,6 +304,9 @@ export default function AppShell() {
             </TabsTrigger>
             <TabsTrigger value="events" className="flex-1">
               Events
+            </TabsTrigger>
+            <TabsTrigger value="aac-search" className="flex-1">
+              AAC
             </TabsTrigger>
           </TabsList>
           <TabsContent value="chat" className="flex-1 min-h-0 mt-0">
@@ -312,6 +317,12 @@ export default function AppShell() {
             className="flex-1 min-h-0 mt-0 overflow-y-auto"
           >
             <EventsPanel />
+          </TabsContent>
+          <TabsContent
+            value="aac-search"
+            className="flex-1 min-h-0 mt-0 overflow-y-auto"
+          >
+            <AACSearchPanel />
           </TabsContent>
         </Tabs>
       </aside>
@@ -420,7 +431,7 @@ export default function AppShell() {
                 <Tabs
                   value={activePanel}
                   onValueChange={(v) =>
-                    setActivePanel(v as "chat" | "events")
+                    setActivePanel(v as PanelId)
                   }
                   className="flex-1 flex flex-col min-h-0"
                 >
@@ -439,6 +450,13 @@ export default function AppShell() {
                       <Calendar size={15} aria-hidden="true" />
                       Events
                     </TabsTrigger>
+                    <TabsTrigger
+                      value="aac-search"
+                      className="flex-1 min-h-[44px] text-sm gap-1.5 font-medium"
+                    >
+                      <Building2 size={15} aria-hidden="true" />
+                      AAC
+                    </TabsTrigger>
                   </TabsList>
                   <TabsContent value="chat" className="flex-1 min-h-0 mt-0">
                     <ChatPanel />
@@ -448,6 +466,12 @@ export default function AppShell() {
                     className="flex-1 min-h-0 mt-0 overflow-y-auto"
                   >
                     <EventsPanel />
+                  </TabsContent>
+                  <TabsContent
+                    value="aac-search"
+                    className="flex-1 min-h-0 mt-0 overflow-y-auto"
+                  >
+                    <AACSearchPanel />
                   </TabsContent>
                 </Tabs>
               </>
