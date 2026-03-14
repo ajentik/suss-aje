@@ -2,9 +2,10 @@
 
 import { useEffect, useState, useRef, useCallback } from "react";
 import { toast } from "sonner";
-import { Footprints, X } from "lucide-react";
+import { Footprints, X, ChevronUp, ChevronDown } from "lucide-react";
 import { useAppStore } from "@/store/app-store";
 import { getBuildingInsights, type SolarInsight } from "@/lib/maps/solar-utils";
+import type { RouteStep } from "@/types";
 
 const MAPS_API_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || "";
 
@@ -22,12 +23,57 @@ const SUN_TIPS: Record<SolarInsight["sunExposure"], string> = {
 
 const SWIPE_THRESHOLD = 80;
 
+const MANEUVER_ICONS: Record<string, string> = {
+  STRAIGHT: "\u2191",
+  TURN_LEFT: "\u2190",
+  TURN_RIGHT: "\u2192",
+  TURN_SLIGHT_LEFT: "\u2196",
+  TURN_SLIGHT_RIGHT: "\u2197",
+  TURN_SHARP_LEFT: "\u2199",
+  TURN_SHARP_RIGHT: "\u2198",
+  UTURN_LEFT: "\u21BA",
+  UTURN_RIGHT: "\u21BB",
+  ROUNDABOUT_LEFT: "\u21BA",
+  ROUNDABOUT_RIGHT: "\u21BB",
+  FERRY: "\u26F4",
+  DEFAULT: "\u2022",
+};
+
+function getManeuverIcon(maneuver?: string): string {
+  if (!maneuver) return MANEUVER_ICONS.DEFAULT;
+  return MANEUVER_ICONS[maneuver] ?? MANEUVER_ICONS.DEFAULT;
+}
+
+function StepRow({ step }: { step: RouteStep }) {
+  return (
+    <div className="flex items-start gap-2.5 py-1.5">
+      <span
+        className="w-5 h-5 flex items-center justify-center text-sm shrink-0 mt-0.5"
+        aria-hidden="true"
+      >
+        {getManeuverIcon(step.maneuver)}
+      </span>
+      <div className="flex-1 min-w-0">
+        <p className="text-xs text-card-foreground leading-relaxed">
+          {step.instruction}
+        </p>
+      </div>
+      <span className="text-xs text-muted-foreground shrink-0 tabular-nums">
+        {step.distanceMeters < 1000
+          ? `${Math.round(step.distanceMeters)}m`
+          : `${(step.distanceMeters / 1000).toFixed(1)}km`}
+      </span>
+    </div>
+  );
+}
+
 export default function RouteOverlay() {
   const routeInfo = useAppStore((s) => s.routeInfo);
   const selectedDestination = useAppStore((s) => s.selectedDestination);
   const [solar, setSolar] = useState<SolarInsight | null>(null);
   const [dismissedId, setDismissedId] = useState<string | null>(null);
   const [swipeY, setSwipeY] = useState(0);
+  const [expanded, setExpanded] = useState(false);
   const dismissed = dismissedId === selectedDestination?.id;
   const touchStartRef = useRef(0);
 
@@ -105,14 +151,30 @@ export default function RouteOverlay() {
               </span>
             </div>
           </div>
-          <button
-            type="button"
-            aria-label="Dismiss route"
-            onClick={handleDismiss}
-            className="flex items-center justify-center w-8 h-8 rounded-full hover:bg-muted/60 active:scale-90 transition-all duration-200 shrink-0"
-          >
-            <X size={16} className="text-muted-foreground" />
-          </button>
+          <div className="flex items-center gap-1 shrink-0">
+            {routeInfo.steps.length > 0 && (
+              <button
+                type="button"
+                aria-label={expanded ? "Collapse itinerary" : "Expand itinerary"}
+                onClick={() => setExpanded((v) => !v)}
+                className="flex items-center justify-center w-8 h-8 rounded-full hover:bg-muted/60 active:scale-90 transition-all duration-200"
+              >
+                {expanded ? (
+                  <ChevronDown size={16} className="text-muted-foreground" />
+                ) : (
+                  <ChevronUp size={16} className="text-muted-foreground" />
+                )}
+              </button>
+            )}
+            <button
+              type="button"
+              aria-label="Dismiss route"
+              onClick={handleDismiss}
+              className="flex items-center justify-center w-8 h-8 rounded-full hover:bg-muted/60 active:scale-90 transition-all duration-200"
+            >
+              <X size={16} className="text-muted-foreground" />
+            </button>
+          </div>
         </div>
         {solar && (
           <div className="mt-2 pt-2 border-t border-border/30 flex items-center gap-2 text-xs">
@@ -120,6 +182,16 @@ export default function RouteOverlay() {
             <span className="text-muted-foreground">{SUN_TIPS[solar.sunExposure]}</span>
           </div>
         )}
+        <div
+          className="overflow-hidden transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]"
+          style={{ maxHeight: expanded ? "280px" : "0px" }}
+        >
+          <div className="pt-2 border-t border-border/30 mt-2 overflow-y-auto max-h-[264px] overscroll-contain">
+            {routeInfo.steps.map((step, i) => (
+              <StepRow key={`${step.instruction}-${step.distanceMeters}-${i}`} step={step} />
+            ))}
+          </div>
+        </div>
       </div>
     </aside>
   );

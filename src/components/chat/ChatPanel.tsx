@@ -118,6 +118,7 @@ export default function ChatPanel() {
   const mapEventMarkers = useAppStore((s) => s.mapEventMarkers);
   const setHighlightedEventIds = useAppStore((s) => s.setHighlightedEventIds);
   const ttsEnabled = useAppStore((s) => s.ttsEnabled);
+  const userLocation = useAppStore((s) => s.userLocation);
   const { speak } = useSpeechSynthesis();
 
   const { messages, sendMessage, status, error } = useChat({
@@ -166,10 +167,11 @@ export default function ChatPanel() {
 
           const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || "";
           if (apiKey) {
+            const origin = userLocation ?? { lat: 1.3299, lng: 103.7764 };
             import("@/lib/maps/route-utils")
               .then(({ computeWalkingRoute }) =>
                 computeWalkingRoute(
-                  { lat: 1.3299, lng: 103.7764 },
+                  origin,
                   { lat: poi.lat, lng: poi.lng },
                   apiKey
                 ).then((route) => {
@@ -178,6 +180,7 @@ export default function ChatPanel() {
                       polyline: route.polyline,
                       distanceMeters: route.distanceMeters,
                       duration: route.durationText,
+                      steps: route.steps,
                     });
                   }
                 })
@@ -210,6 +213,7 @@ export default function ChatPanel() {
     setActivePanel,
     setEventDateFilter,
     setEventCategoryFilter,
+    userLocation,
   ]);
 
   const isWaiting = status === "submitted";

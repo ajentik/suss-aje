@@ -140,6 +140,7 @@ describe("app-store", () => {
       polyline: [{ lat: 1.33, lng: 103.77 }],
       distanceMeters: 500,
       duration: "5 mins",
+      steps: [],
     };
     useAppStore.getState().setRouteInfo(route);
     expect(useAppStore.getState().routeInfo).toEqual(route);
@@ -188,6 +189,7 @@ describe("app-store", () => {
       polyline: [{ lat: 1.33, lng: 103.77 }],
       distanceMeters: 100,
       duration: "1 min",
+      steps: [],
     });
     const oldId = useAppStore.getState().conversationId;
 
