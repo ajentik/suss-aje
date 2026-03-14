@@ -138,6 +138,30 @@ describe("AACSearchPanel", () => {
       btn.textContent?.includes("AAC"),
     );
     expect(cards[0]).toHaveTextContent("Beta AAC");
+    expect(mockSetFlyToTarget).toHaveBeenCalledWith({
+      lat: 1.314,
+      lng: 103.764,
+      altitude: 3000,
+    });
+  });
+
+  it("flies map to user location on geolocation success", () => {
+    setGeoState({ lat: 1.29, lng: 103.85, status: "success" });
+    render(<AACSearchPanel />);
+
+    expect(mockSetFlyToTarget).toHaveBeenCalledOnce();
+    expect(mockSetFlyToTarget).toHaveBeenCalledWith({
+      lat: 1.29,
+      lng: 103.85,
+      altitude: 3000,
+    });
+  });
+
+  it("does not fly map when geolocation is idle", () => {
+    setGeoState({ status: "idle" });
+    render(<AACSearchPanel />);
+
+    expect(mockSetFlyToTarget).not.toHaveBeenCalled();
   });
 
   it("calls requestLocation when button is clicked", () => {
