@@ -27,7 +27,7 @@ echo "  ESLint errors: $LINT_ERRORS, warnings: $LINT_WARNINGS → score: $LINT_S
 # Test coverage
 echo "▶ Test coverage..."
 COV_OUT=$(npm run test:coverage 2>&1)
-COVERAGE=$(echo "$COV_OUT" | grep "All files" | awk '{print $2}' | head -1)
+COVERAGE=$(echo "$COV_OUT" | grep "All files" | awk -F'|' '{gsub(/ /,"",$2); print $2}' | head -1)
 COVERAGE=${COVERAGE%.*}
 if [ -z "$COVERAGE" ]; then COVERAGE=0; fi
 echo "  Line coverage: ${COVERAGE}% → score: $COVERAGE/100"
