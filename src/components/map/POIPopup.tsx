@@ -12,9 +12,9 @@ import {
   ExternalLink,
 } from "lucide-react";
 import { useAppStore } from "@/store/app-store";
-import type { POI } from "@/types";
+import type { POI, CampusEvent } from "@/types";
 import campusEvents from "@/../public/campus-events.json";
-import type { CampusEvent } from "@/types";
+import AACEventsSection from "@/components/ui/AACEventsSection";
 
 function findUpcomingEventsNear(poi: POI): CampusEvent[] {
   const today = new Date().toISOString().slice(0, 10);
@@ -56,7 +56,11 @@ export function POIDetailCard({
   compact?: boolean;
 }) {
   const setSelectedEvent = useAppStore((s) => s.setSelectedEvent);
-  const nearbyEvents = useMemo(() => findUpcomingEventsNear(poi), [poi]);
+  const isAAC = poi.category === "Active Ageing Centre";
+  const nearbyEvents = useMemo(
+    () => (isAAC ? [] : findUpcomingEventsNear(poi)),
+    [poi, isAAC],
+  );
   const dotClass = POI_CATEGORY_DOT[poi.category] ?? "bg-muted-foreground";
 
   const handleEventClick = useCallback(
@@ -199,7 +203,13 @@ export function POIDetailCard({
               </div>
             )}
 
-            {nearbyEvents.length > 0 && (
+            {isAAC && (
+              <div className="mt-4">
+                <AACEventsSection poi={poi} />
+              </div>
+            )}
+
+            {!isAAC && nearbyEvents.length > 0 && (
               <div className="mt-4 border-t border-border pt-3">
                 <p className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-2 flex items-center gap-1.5">
                   <Calendar size={14} aria-hidden="true" />
@@ -243,10 +253,11 @@ export default function POIPopup() {
 
   const displayPOI = selectedPOI ?? fadingOutPOI;
   const isVisible = !!selectedPOI;
+  const isAAC = displayPOI?.category === "Active Ageing Centre";
 
   const nearbyEvents = useMemo(
-    () => (displayPOI ? findUpcomingEventsNear(displayPOI) : []),
-    [displayPOI],
+    () => (displayPOI && !isAAC ? findUpcomingEventsNear(displayPOI) : []),
+    [displayPOI, isAAC],
   );
 
   // Swipe-to-dismiss with interactive drag
@@ -384,7 +395,13 @@ export default function POIPopup() {
           )}
         </div>
 
-        {nearbyEvents.length > 0 && (
+        {isAAC && displayPOI && (
+          <div className="mb-3">
+            <AACEventsSection poi={displayPOI} />
+          </div>
+        )}
+
+        {!isAAC && nearbyEvents.length > 0 && (
           <div className="mb-3 border-t border-border pt-3">
             <p className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-2 flex items-center gap-1.5">
               <Calendar size={14} aria-hidden="true" />
