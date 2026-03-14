@@ -4,6 +4,7 @@ import { MapPin, ExternalLink } from "lucide-react";
 import type { CampusEvent } from "@/types";
 import { isOffSiteEvent } from "@/lib/maps/aac-events";
 import { formatEventDate, formatEventDateRange } from "@/lib/date-utils";
+import { CATEGORY_ICON, DEFAULT_EVENT_ICON, CATEGORY_ICON_BG, DEFAULT_ICON_BG } from "@/lib/event-icons";
 
 interface EventRowProps {
   event: CampusEvent;
@@ -29,6 +30,8 @@ export default function EventRow({
     ? formatEventDate(event.date)
     : formatEventDateRange(event.date, event.endDate);
 
+  const CategoryIcon = CATEGORY_ICON[event.category] ?? DEFAULT_EVENT_ICON;
+
   return (
     <div className="flex items-start gap-2.5 min-h-[44px]">
       <button
@@ -36,14 +39,10 @@ export default function EventRow({
         onClick={() => onEventClick(event)}
         className="flex-1 min-w-0 text-left flex items-start gap-2.5 bg-secondary/50 border border-secondary rounded-lg px-3.5 py-2.5 hover:bg-secondary/80 active:bg-secondary transition-colors"
       >
-        {!compact && event.organizerLogo && (
-          <img
-            src={event.organizerLogo}
-            alt=""
-            width={24}
-            height={24}
-            className="w-6 h-6 rounded-md shrink-0 object-cover border border-border/40 mt-0.5"
-          />
+        {!compact && (
+          <div className={`w-6 h-6 rounded-md shrink-0 flex items-center justify-center mt-0.5 ${CATEGORY_ICON_BG[event.category] ?? DEFAULT_ICON_BG}`}>
+            <CategoryIcon className="w-3.5 h-3.5" aria-hidden="true" />
+          </div>
         )}
         <span className="text-primary text-xs font-medium shrink-0 mt-0.5 min-w-[52px]">
           {dateLabel}
