@@ -38,7 +38,6 @@ export interface CampusEvent {
   url?: string;
   venueAddress?: string;
   longDescription?: string;
-  organizerLogo?: string;
   registrationUrl?: string;
 }
 

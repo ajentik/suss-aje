@@ -1,10 +1,11 @@
 "use client";
 
-import { useRef, useState, useCallback, useEffect } from "react";
+import { useRef, useState, useEffect } from "react";
 import type { CampusEvent } from "@/types";
 import { Badge } from "@/components/ui/badge";
 import { ExternalLink } from "lucide-react";
 import { useAppStore } from "@/store/app-store";
+import { CATEGORY_ICON, DEFAULT_EVENT_ICON, CATEGORY_ICON_BG, DEFAULT_ICON_BG } from "@/lib/event-icons";
 
 interface EventCardProps {
   event: CampusEvent;
@@ -61,6 +62,9 @@ export default function EventCard({ event, index = 0 }: EventCardProps) {
     ? `${event.date} – ${event.endDate}`
     : event.date;
 
+  const CategoryIcon = CATEGORY_ICON[event.category] ?? DEFAULT_EVENT_ICON;
+  const iconBg = CATEGORY_ICON_BG[event.category] ?? DEFAULT_ICON_BG;
+
   return (
     <button
       type="button"
@@ -69,27 +73,11 @@ export default function EventCard({ event, index = 0 }: EventCardProps) {
       style={{ "--card-index": index } as React.CSSProperties}
       className={`animate-card-slide-in w-full text-left rounded-2xl border border-border/60 border-l-4 ${CATEGORY_ACCENT[event.category] || "border-l-gray-300"} bg-card hover:bg-muted/30 active:bg-muted/50 active:scale-[0.985] transition-all duration-200 ease-out flex flex-col gap-3 shadow-[0_1px_3px_rgba(0,0,0,0.06)] hover:shadow-[0_4px_12px_rgba(0,0,0,0.08)] p-5`}
     >
-      {/* Header: logo + title + type indicator */}
+      {/* Header: icon + title + type indicator */}
       <div className="flex items-start gap-3.5 w-full">
-        {event.organizerLogo ? (
-          <img
-            src={event.organizerLogo}
-            alt={`${event.title} organizer`}
-            width={40}
-            height={40}
-            className="w-10 h-10 rounded-xl shrink-0 object-cover border border-border/40 shadow-sm"
-          />
-        ) : (
-          <div className="w-10 h-10 rounded-xl shrink-0 bg-muted flex items-center justify-center border border-border/40">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5 text-muted-foreground/60">
-              <title>Event</title>
-              <rect width="18" height="18" x="3" y="4" rx="2" ry="2" />
-              <line x1="16" x2="16" y1="2" y2="6" />
-              <line x1="8" x2="8" y1="2" y2="6" />
-              <line x1="3" x2="21" y1="10" y2="10" />
-            </svg>
-          </div>
-        )}
+        <div className={`w-10 h-10 rounded-xl shrink-0 flex items-center justify-center border border-border/40 ${iconBg}`}>
+          <CategoryIcon className="w-5 h-5" aria-hidden="true" />
+        </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-start justify-between gap-2">
             <h3 className="font-bold text-[0.938rem] leading-snug tracking-[-0.01em] text-foreground">{event.title}</h3>
