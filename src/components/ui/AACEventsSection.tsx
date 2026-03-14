@@ -1,17 +1,19 @@
 "use client";
 
 import { useState, useMemo, useCallback } from "react";
-import { Calendar, MapPin, ExternalLink } from "lucide-react";
+import { Calendar } from "lucide-react";
 import type { POI, CampusEvent } from "@/types";
 import { useAppStore } from "@/store/app-store";
 import {
   getAACEventsForPOI,
-  isOffSiteEvent,
   type AACEventKind,
+  type AACEventsByKind,
 } from "@/lib/maps/aac-events";
+import EventRow from "@/components/ui/EventRow";
 
 interface AACEventsSectionProps {
   poi: POI;
+  precomputedEvents?: AACEventsByKind;
 }
 
 const TAB_LABELS: Record<AACEventKind, string> = {
@@ -19,60 +21,15 @@ const TAB_LABELS: Record<AACEventKind, string> = {
   special: "Special",
 };
 
-function EventRow({
-  event,
-  poi,
-  onEventClick,
-}: {
-  event: CampusEvent;
-  poi: POI;
-  onEventClick: (event: CampusEvent) => void;
-}) {
-  const offSite = isOffSiteEvent(event, poi.lat, poi.lng);
-
-  return (
-    <button
-      type="button"
-      onClick={() => onEventClick(event)}
-      className="w-full text-left flex items-start gap-2.5 bg-secondary/50 border border-secondary rounded-lg px-3.5 py-2.5 min-h-[44px] hover:bg-secondary/80 active:bg-secondary transition-colors"
-    >
-      <span className="text-primary text-xs font-medium shrink-0 mt-0.5 min-w-[68px]">
-        {event.date}
-      </span>
-      <div className="flex-1 min-w-0">
-        <span className="text-sm text-card-foreground line-clamp-1">
-          {event.title}
-        </span>
-        <span className="text-xs text-muted-foreground/70 block mt-0.5">
-          {event.time}
-          {event.endDate && event.endDate !== event.date && (
-            <> &mdash; {event.endDate}</>
-          )}
-        </span>
-        {offSite && event.venueAddress && (
-          <span className="inline-flex items-center gap-1 text-[0.6875rem] text-amber-600 dark:text-amber-400 mt-1">
-            <MapPin size={10} aria-hidden="true" />
-            {event.venueAddress}
-          </span>
-        )}
-      </div>
-      {event.url && (
-        <ExternalLink
-          size={12}
-          className="shrink-0 mt-1.5 text-muted-foreground/50"
-          aria-hidden="true"
-        />
-      )}
-    </button>
-  );
-}
-
-export default function AACEventsSection({ poi }: AACEventsSectionProps) {
+export default function AACEventsSection({ poi, precomputedEvents }: AACEventsSectionProps) {
   const setSelectedEvent = useAppStore((s) => s.setSelectedEvent);
   const setFlyToTarget = useAppStore((s) => s.setFlyToTarget);
   const [activeTab, setActiveTab] = useState<AACEventKind>("regular");
 
-  const eventsByKind = useMemo(() => getAACEventsForPOI(poi.name), [poi.name]);
+  const eventsByKind = useMemo(
+    () => precomputedEvents ?? getAACEventsForPOI(poi.name),
+    [precomputedEvents, poi.name],
+  );
 
   const totalCount =
     eventsByKind.regular.length + eventsByKind.special.length;
@@ -119,15 +76,28 @@ export default function AACEventsSection({ poi }: AACEventsSectionProps) {
         })}
       </div>
 
-      <div className="space-y-1.5 max-h-[200px] overflow-y-auto overscroll-contain">
-        {activeEvents.map((evt) => (
-          <EventRow
-            key={evt.id}
-            event={evt}
-            poi={poi}
-            onEventClick={handleEventClick}
-          />
-        ))}
+      <div
+        key={activeTab}
+        className="animate-aac-tab-fade-in space-y-1.5 max-h-[200px] overflow-y-auto overscroll-contain"
+        style={{
+          maskImage: "linear-gradient(to bottom, transparent 0, black 8px, black calc(100% - 12px), transparent 100%)",
+        }}
+      >
+        {activeEvents.length === 0 ? (
+          <p className="text-xs text-muted-foreground/60 text-center py-4">
+            No {TAB_LABELS[activeTab].toLowerCase()} events scheduled
+          </p>
+        ) : (
+          activeEvents.map((evt) => (
+            <EventRow
+              key={evt.id}
+              event={evt}
+              poiLat={poi.lat}
+              poiLng={poi.lng}
+              onEventClick={handleEventClick}
+            />
+          ))
+        )}
       </div>
     </div>
   );

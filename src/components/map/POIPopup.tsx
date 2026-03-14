@@ -13,12 +13,39 @@ import {
 } from "lucide-react";
 import { useAppStore } from "@/store/app-store";
 import type { POI, CampusEvent } from "@/types";
-import campusEvents from "@/../public/campus-events.json";
+import campusEventsData from "@/../public/campus-events.json";
 import AACEventsSection from "@/components/ui/AACEventsSection";
+import EventRow from "@/components/ui/EventRow";
+
+function validateCampusEvents(data: typeof campusEventsData): CampusEvent[] {
+  return data.map((e) => ({
+    ...e,
+    type: e.type as CampusEvent["type"],
+    school: e.school as CampusEvent["school"],
+  }));
+}
+
+const campusEvents = validateCampusEvents(campusEventsData);
+
+function createStreetViewEventFromPOI(poi: POI): CampusEvent {
+  return {
+    id: `poi-${poi.id}`,
+    title: poi.name,
+    date: "",
+    time: "",
+    location: poi.address || poi.name,
+    category: poi.category,
+    description: poi.description,
+    type: "On-Campus",
+    school: "SUSS",
+    lat: poi.lat,
+    lng: poi.lng,
+  };
+}
 
 function findUpcomingEventsNear(poi: POI): CampusEvent[] {
   const today = new Date().toISOString().slice(0, 10);
-  const allEvents = campusEvents as unknown as CampusEvent[];
+  const allEvents = campusEvents;
   return allEvents
     .filter((e) => {
       const endDate = e.endDate || e.date;
@@ -217,19 +244,12 @@ export function POIDetailCard({
                 </p>
                 <div className="space-y-1.5">
                   {nearbyEvents.map((evt) => (
-                    <button
+                    <EventRow
                       key={evt.id}
-                      type="button"
-                      onClick={() => handleEventClick(evt)}
-                      className="w-full text-left flex items-center gap-2.5 bg-secondary/50 border border-secondary rounded-lg px-3.5 py-2.5 min-h-[44px] hover:bg-secondary/80 active:bg-secondary transition-colors"
-                    >
-                      <span className="text-primary text-sm font-medium shrink-0">
-                        {evt.date}
-                      </span>
-                      <span className="text-sm text-card-foreground truncate">
-                        {evt.title}
-                      </span>
-                    </button>
+                      event={evt}
+                      onEventClick={handleEventClick}
+                      compact
+                    />
                   ))}
                 </div>
               </div>
@@ -304,19 +324,7 @@ export default function POIPopup() {
   const handleNavigate = useCallback(() => {
     if (displayPOI) {
       setSelectedDestination(displayPOI);
-      setStreetViewEvent({
-        id: `poi-${displayPOI.id}`,
-        title: displayPOI.name,
-        date: "",
-        time: "",
-        location: displayPOI.address || displayPOI.name,
-        category: displayPOI.category,
-        description: displayPOI.description,
-        type: "On-Campus",
-        school: "SUSS",
-        lat: displayPOI.lat,
-        lng: displayPOI.lng,
-      } as CampusEvent);
+      setStreetViewEvent(createStreetViewEventFromPOI(displayPOI));
     }
     setSelectedPOI(null);
     setFadingOutPOI(null);
@@ -409,19 +417,12 @@ export default function POIPopup() {
             </p>
             <div className="space-y-1.5">
               {nearbyEvents.map((evt) => (
-                <button
+                <EventRow
                   key={evt.id}
-                  type="button"
-                  onClick={() => handleEventClick(evt)}
-                  className="w-full text-left flex items-center gap-2.5 bg-secondary/50 border border-secondary rounded-lg px-3.5 py-2.5 min-h-[44px] hover:bg-secondary/80 active:bg-secondary transition-colors"
-                >
-                  <span className="text-primary text-sm font-medium shrink-0">
-                    {evt.date}
-                  </span>
-                  <span className="text-sm text-card-foreground truncate">
-                    {evt.title}
-                  </span>
-                </button>
+                  event={evt}
+                  onEventClick={handleEventClick}
+                  compact
+                />
               ))}
             </div>
           </div>
