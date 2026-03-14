@@ -1,7 +1,17 @@
 import type { CampusEvent } from "@/types";
 import aacEventsData from "@/../public/aac-events.json";
 
-const allAacEvents = aacEventsData as unknown as CampusEvent[];
+function validateAACEvents(data: typeof aacEventsData): CampusEvent[] {
+  return data.map((e) => ({
+    ...e,
+    type: e.type as CampusEvent["type"],
+    school: e.school as CampusEvent["school"],
+    endDate: e.endDate ?? undefined,
+    recurrence: e.recurrence ?? undefined,
+  }));
+}
+
+const allAacEvents = validateAACEvents(aacEventsData);
 
 const SPECIAL_KEYWORDS = [
   "workshop",

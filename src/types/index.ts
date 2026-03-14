@@ -25,6 +25,9 @@ export interface CampusEvent {
   date: string;
   endDate?: string;
   time: string;
+  endTime?: string;
+  recurrence?: string;
+  tags?: string[];
   location: string;
   category: string;
   description: string;
