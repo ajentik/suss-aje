@@ -134,6 +134,7 @@ const POI_CATEGORY_COLORS: Record<string, { bg: string; border: string }> = {
   Mall:        { bg: "#7B1FA2", border: "#E1BEE7" },
   Supermarket: { bg: "#2E7D32", border: "#C8E6C9" },
   Bar:         { bg: "#AD1457", border: "#F8BBD0" },
+  "Active Ageing Centre": { bg: "#00897B", border: "#E0F2F1" },
 };
 
 const POI_CATEGORY_SCALE: Record<string, number> = {

@@ -68,6 +68,7 @@ const POI_CATEGORY_DOT: Record<string, string> = {
   Mall: "bg-poi-mall",
   Supermarket: "bg-poi-supermarket",
   Bar: "bg-poi-bar",
+  "Active Ageing Centre": "bg-poi-aac",
 };
 
 /** Standalone detail card — rendered inside the bottom sheet on mobile */
