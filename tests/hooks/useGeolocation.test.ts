@@ -49,6 +49,11 @@ describe("useGeolocation", () => {
     act(() => result.current.requestLocation());
 
     expect(geo.getCurrentPosition).toHaveBeenCalledOnce();
+    expect(geo.getCurrentPosition).toHaveBeenCalledWith(
+      expect.any(Function),
+      expect.any(Function),
+      expect.objectContaining({ enableHighAccuracy: true }),
+    );
     expect(result.current.status).toBe("success");
     expect(result.current.lat).toBe(1.314);
     expect(result.current.lng).toBe(103.765);

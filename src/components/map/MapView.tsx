@@ -228,14 +228,15 @@ function Map3DInner() {
 
   useEffect(() => {
     if (!flyToTarget || !mapRef.current) return;
+    const altitude = flyToTarget.altitude || 200;
     mapRef.current.flyCameraTo({
       endCamera: {
         center: {
           lat: flyToTarget.lat,
           lng: flyToTarget.lng,
-          altitude: flyToTarget.altitude || 200,
+          altitude,
         },
-        range: 400,
+        range: altitude * 2,
         tilt: 60,
         heading: 0,
       },
