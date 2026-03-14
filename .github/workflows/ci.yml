@@ -26,6 +26,8 @@ jobs:
 
       - run: npm run lint
 
+      - run: npm test
+
       - name: No hard-coded colors
         run: |
           if grep -rn --include='*.tsx' --include='*.ts' 'bg-\[#\|text-\[#\|border-\[#' src/; then
