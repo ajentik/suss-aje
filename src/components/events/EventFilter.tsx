@@ -43,14 +43,14 @@ export default function EventFilter({
     (schoolFilter !== "" ? 1 : 0);
 
   return (
-    <div className="flex flex-col gap-2.5 px-4 py-3 border-b border-border/60 bg-background/80 backdrop-blur-sm">
+    <div role="search" aria-label="Event filters" className="flex flex-col gap-2.5 px-4 py-3 border-b border-border/60 bg-background/80 backdrop-blur-sm">
       {/* Section header with filter count */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <SlidersHorizontal className="w-3.5 h-3.5 text-muted-foreground/70" />
           <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Filters</span>
           {activeCount > 0 && (
-            <span className="animate-hero-fade-in flex items-center justify-center w-5 h-5 rounded-full bg-primary text-primary-foreground text-[0.625rem] font-bold">
+             <span aria-live="polite" className="animate-hero-fade-in flex items-center justify-center w-5 h-5 rounded-full bg-primary text-primary-foreground text-[0.625rem] font-bold">
               {activeCount}
             </span>
           )}
@@ -58,6 +58,7 @@ export default function EventFilter({
         {activeCount > 0 && (
           <button
             type="button"
+            aria-label="Clear all filters"
             onClick={() => {
               onDateChange("all");
               onCategoryChange("");
@@ -72,11 +73,12 @@ export default function EventFilter({
       </div>
 
       {/* Date segmented control */}
-      <div className="flex w-full rounded-xl bg-muted/70 p-1">
+      <div role="group" aria-label="Date range" className="flex w-full rounded-xl bg-muted/70 p-1">
         {DATE_PRESETS.map((p) => (
           <button
             key={p.value}
             type="button"
+            aria-pressed={dateFilter === p.value}
             onClick={() => onDateChange(p.value)}
             className={cn(
               "flex-1 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 min-h-[44px]",
