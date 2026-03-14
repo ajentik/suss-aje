@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Search, MapPin, Navigation, Loader2 } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { EmptyState } from "@/components/ui/empty-state";
@@ -28,6 +28,12 @@ export default function AACSearchPanel() {
   const { lat, lng, status, error, requestLocation } = useGeolocation();
 
   const hasLocation = status === "success" && lat !== null && lng !== null;
+
+  useEffect(() => {
+    if (status === "success" && lat !== null && lng !== null) {
+      setFlyToTarget({ lat, lng, altitude: 3000 });
+    }
+  }, [status, lat, lng, setFlyToTarget]);
 
   const results: AACWithDistance[] = useMemo(() => {
     const query = searchQuery.trim().toLowerCase();
