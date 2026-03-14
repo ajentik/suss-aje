@@ -1,7 +1,7 @@
 "use client";
 
 import { Component, useEffect, useRef, useState, useCallback } from "react";
-import type { ReactNode, ErrorInfo } from "react";
+import type { ReactNode } from "react";
 import { Map3D, Marker3D, Pin } from "@vis.gl/react-google-maps";
 import type {
   Map3DRef,
@@ -29,7 +29,7 @@ class PinErrorBoundary extends Component<
     return { hasError: true };
   }
 
-  componentDidCatch(_error: Error, _info: ErrorInfo) {}
+  componentDidCatch() {}
 
   render() {
     if (this.state.hasError) {
