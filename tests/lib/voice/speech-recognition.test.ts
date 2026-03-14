@@ -71,8 +71,8 @@ describe("useSpeechRecognition", () => {
       result.current.startListening(onResult);
     });
 
-    const instance = MockSpeechRecognition.mock.instances[0];
-    expect(instance.start).toHaveBeenCalledOnce();
+    const inst = getInstance(MockSpeechRecognition);
+    expect(inst.start).toHaveBeenCalledOnce();
     expect(result.current.isListening).toBe(true);
   });
 
@@ -84,10 +84,10 @@ describe("useSpeechRecognition", () => {
       result.current.startListening(onResult);
     });
 
-    const instance = MockSpeechRecognition.mock.instances[0];
+    const inst = getInstance(MockSpeechRecognition);
 
     act(() => {
-      instance.onresult({
+      inst.onresult!({
         results: [[{ transcript: "Where is the library?" }]],
       });
     });
@@ -105,9 +105,9 @@ describe("useSpeechRecognition", () => {
 
     expect(result.current.isListening).toBe(true);
 
-    const instance = MockSpeechRecognition.mock.instances[0];
+    const inst = getInstance(MockSpeechRecognition);
     act(() => {
-      instance.onend();
+      inst.onend!();
     });
 
     expect(result.current.isListening).toBe(false);
@@ -121,9 +121,9 @@ describe("useSpeechRecognition", () => {
       result.current.startListening(vi.fn(), onError);
     });
 
-    const instance = MockSpeechRecognition.mock.instances[0];
+    const inst = getInstance(MockSpeechRecognition);
     act(() => {
-      instance.onerror({ error: "not-allowed" });
+      inst.onerror!({ error: "not-allowed" });
     });
 
     expect(onError).toHaveBeenCalledWith(
@@ -140,9 +140,9 @@ describe("useSpeechRecognition", () => {
       result.current.startListening(vi.fn(), onError);
     });
 
-    const instance = MockSpeechRecognition.mock.instances[0];
+    const inst = getInstance(MockSpeechRecognition);
     act(() => {
-      instance.onerror({ error: "no-speech" });
+      inst.onerror!({ error: "no-speech" });
     });
 
     expect(onError).toHaveBeenCalledWith(
@@ -158,9 +158,9 @@ describe("useSpeechRecognition", () => {
       result.current.startListening(vi.fn(), onError);
     });
 
-    const instance = MockSpeechRecognition.mock.instances[0];
+    const inst = getInstance(MockSpeechRecognition);
     act(() => {
-      instance.onerror({ error: "network" });
+      inst.onerror!({ error: "network" });
     });
 
     expect(onError).toHaveBeenCalledWith(
@@ -175,13 +175,13 @@ describe("useSpeechRecognition", () => {
       result.current.startListening(vi.fn());
     });
 
-    const instance = MockSpeechRecognition.mock.instances[0];
+    const inst = getInstance(MockSpeechRecognition);
 
     act(() => {
       result.current.stopListening();
     });
 
-    expect(instance.stop).toHaveBeenCalledOnce();
+    expect(inst.stop).toHaveBeenCalledOnce();
     expect(result.current.isListening).toBe(false);
   });
 
