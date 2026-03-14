@@ -6,6 +6,24 @@ interface SpeechRecognitionEvent {
   results: SpeechRecognitionResultList;
 }
 
+interface SpeechRecognitionInstance {
+  lang: string;
+  interimResults: boolean;
+  continuous: boolean;
+  onresult: ((event: SpeechRecognitionEvent) => void) | null;
+  onend: (() => void) | null;
+  onerror: ((event: { error: string }) => void) | null;
+  start: () => void;
+  stop: () => void;
+}
+
+declare global {
+  interface Window {
+    SpeechRecognition?: new () => SpeechRecognitionInstance;
+    webkitSpeechRecognition?: new () => SpeechRecognitionInstance;
+  }
+}
+
 export function useSpeechRecognition() {
   const [isListening, setIsListening] = useState(false);
   const [transcript, setTranscript] = useState("");
@@ -53,11 +71,10 @@ export function useSpeechRecognition() {
   return { isListening, transcript, startListening, stopListening };
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function createRecognition(): any | null {
+function createRecognition(): SpeechRecognitionInstance | null {
   if (typeof window === "undefined") return null;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+  const SpeechRecognition =
+    window.SpeechRecognition || window.webkitSpeechRecognition;
   if (!SpeechRecognition) return null;
   return new SpeechRecognition();
 }
