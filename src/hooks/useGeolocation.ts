@@ -47,7 +47,7 @@ export function useGeolocation(): GeolocationState {
           setError("Unable to retrieve your location. Please try again.");
         }
       },
-      { enableHighAccuracy: false, timeout: 10000, maximumAge: 300000 },
+      { enableHighAccuracy: true, timeout: 15000, maximumAge: 60000 },
     );
   }, []);
 
