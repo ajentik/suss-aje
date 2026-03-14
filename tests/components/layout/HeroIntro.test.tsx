@@ -5,7 +5,7 @@ vi.mock("next/image", () => ({
   __esModule: true,
   default: (props: Record<string, unknown>) => {
     const { priority, fill, ...rest } = props;
-    return <img {...rest} />;
+    return <img alt={(rest.alt as string) ?? ""} {...rest} />;
   },
 }));
 

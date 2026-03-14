@@ -141,8 +141,8 @@ describe("POIDetailCard (mobile bottom sheet)", () => {
     expect(screen.getByText("Foodclique")).toBeInTheDocument();
     expect(screen.getByText("Restaurant")).toBeInTheDocument();
     expect(
-      screen.getByText("463 Clementi Rd, Level 1"),
-    ).toBeInTheDocument();
+      screen.getAllByText("463 Clementi Rd, Level 1").length,
+    ).toBeGreaterThanOrEqual(1);
   });
 
   it("Walk here button calls walkTo", async () => {

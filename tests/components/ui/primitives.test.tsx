@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { EmptyState } from "@/components/ui/empty-state";
 import { ErrorState } from "@/components/ui/error-state";
 
@@ -107,6 +108,40 @@ describe("Skeleton", () => {
     const el = container.firstElementChild as HTMLElement;
     expect(el.className).toContain("animate-pulse");
     expect(el.className).toContain("bg-muted");
+  });
+});
+
+describe("Tabs", () => {
+  it("renders tab triggers and content", () => {
+    render(
+      <Tabs defaultValue="one">
+        <TabsList>
+          <TabsTrigger value="one">Tab One</TabsTrigger>
+          <TabsTrigger value="two">Tab Two</TabsTrigger>
+        </TabsList>
+        <TabsContent value="one">Content One</TabsContent>
+        <TabsContent value="two">Content Two</TabsContent>
+      </Tabs>,
+    );
+    expect(screen.getByText("Tab One")).toBeInTheDocument();
+    expect(screen.getByText("Tab Two")).toBeInTheDocument();
+    expect(screen.getByText("Content One")).toBeInTheDocument();
+  });
+
+  it("switches tab content on click", () => {
+    render(
+      <Tabs defaultValue="one">
+        <TabsList>
+          <TabsTrigger value="one">Tab One</TabsTrigger>
+          <TabsTrigger value="two">Tab Two</TabsTrigger>
+        </TabsList>
+        <TabsContent value="one">Content One</TabsContent>
+        <TabsContent value="two">Content Two</TabsContent>
+      </Tabs>,
+    );
+
+    fireEvent.click(screen.getByText("Tab Two"));
+    expect(screen.getByText("Content Two")).toBeInTheDocument();
   });
 });
 

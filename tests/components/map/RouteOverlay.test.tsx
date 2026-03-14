@@ -148,7 +148,6 @@ describe("RouteOverlay", () => {
 
     await renderRouteOverlay();
 
-    // Expand the itinerary
     fireEvent.click(
       screen.getByRole("button", { name: "Expand itinerary" }),
     );
@@ -176,7 +175,6 @@ describe("RouteOverlay", () => {
     });
     fireEvent.click(dismissBtn);
 
-    // After dismiss, the component returns null (dismissed state matches destination id)
     expect(container.querySelector("aside")).toBeNull();
   });
 });
