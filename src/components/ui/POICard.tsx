@@ -33,11 +33,14 @@ export default function POICard({ poi }: POICardProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const isAAC = poi.category === "Active Ageing Centre";
 
-  const eventCount = useMemo(() => {
-    if (!isAAC) return 0;
-    const events = getAACEventsForPOI(poi.name);
-    return events.regular.length + events.special.length;
+  const eventsByKind = useMemo(() => {
+    if (!isAAC) return null;
+    return getAACEventsForPOI(poi.name);
   }, [isAAC, poi.name]);
+
+  const eventCount = eventsByKind
+    ? eventsByKind.regular.length + eventsByKind.special.length
+    : 0;
 
   const handleShowOnMap = useCallback(
     (e: React.MouseEvent) => {
@@ -155,9 +158,9 @@ export default function POICard({ poi }: POICardProps) {
               </div>
             )}
 
-            {isAAC && (
+            {isAAC && eventsByKind && (
               <div className="mb-4">
-                <AACEventsSection poi={poi} />
+                <AACEventsSection poi={poi} precomputedEvents={eventsByKind} />
               </div>
             )}
 
