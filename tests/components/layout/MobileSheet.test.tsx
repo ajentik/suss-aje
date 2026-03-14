@@ -69,10 +69,10 @@ describe("MobileSheet", () => {
   });
 
   it("renders the drag handle", () => {
-    render(<MobileSheet>Content</MobileSheet>);
-    expect(
-      screen.getByRole("button", { name: /drag to resize|expand/i, hidden: true }),
-    ).toBeInTheDocument();
+    const { container } = render(<MobileSheet>Content</MobileSheet>);
+    const handle = container.querySelector("[role='button'][aria-roledescription='drag handle']");
+    expect(handle).toBeInTheDocument();
+    expect(handle).toHaveAttribute("aria-label", "Drag to resize or tap to cycle");
   });
 
   it("shows default mini content when no miniContent prop and snap is mini", () => {
