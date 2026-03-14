@@ -134,7 +134,7 @@ export default function ChatMessage({
         <div
           role="button"
           tabIndex={0}
-          onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); !isStreaming && setShowTime((s) => !s); } }}
+          onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); if (!isStreaming) { setShowTime((s) => !s); } } }}
           onClick={() => !isStreaming && setShowTime((s) => !s)}
           className={cn(
             "px-4 py-2.5 text-base leading-relaxed",
