@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useState, useMemo } from "react";
 import {
   MapPin,
   Clock,
@@ -9,12 +9,15 @@ import {
   ExternalLink,
   Phone,
   Tag,
+  Calendar,
   ChevronDown,
   ChevronUp,
 } from "lucide-react";
 import { useAppStore } from "@/store/app-store";
 import type { POI } from "@/types";
 import { Badge } from "@/components/ui/badge";
+import AACEventsSection from "@/components/ui/AACEventsSection";
+import { getAACEventsForPOI } from "@/lib/maps/aac-events";
 
 interface POICardProps {
   poi: POI;
@@ -28,6 +31,13 @@ export default function POICard({ poi }: POICardProps) {
   const setFlyToTarget = useAppStore((s) => s.setFlyToTarget);
   const setSelectedPOI = useAppStore((s) => s.setSelectedPOI);
   const [isExpanded, setIsExpanded] = useState(false);
+  const isAAC = poi.category === "Active Ageing Centre";
+
+  const eventCount = useMemo(() => {
+    if (!isAAC) return 0;
+    const events = getAACEventsForPOI(poi.name);
+    return events.regular.length + events.special.length;
+  }, [isAAC, poi.name]);
 
   const handleShowOnMap = useCallback(
     (e: React.MouseEvent) => {
@@ -59,6 +69,12 @@ export default function POICard({ poi }: POICardProps) {
           <h3 className="text-sm font-bold text-card-foreground truncate">
             {poi.name}
           </h3>
+          {eventCount > 0 && (
+            <Badge variant="outline" className="text-[0.6875rem] text-primary shrink-0 gap-0.5">
+              <Calendar size={10} aria-hidden="true" />
+              {eventCount}
+            </Badge>
+          )}
           {poi.distanceFromCampus && (
             <Badge variant="outline" className="text-[0.6875rem] text-muted-foreground shrink-0">
               {poi.distanceFromCampus}
@@ -136,6 +152,12 @@ export default function POICard({ poi }: POICardProps) {
                     {tag}
                   </span>
                 ))}
+              </div>
+            )}
+
+            {isAAC && (
+              <div className="mb-4">
+                <AACEventsSection poi={poi} />
               </div>
             )}
 
