@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useRef, useEffect, useSyncExternalStore } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import Image from "next/image";
 import dynamic from "next/dynamic";
 import {
@@ -13,10 +13,8 @@ import {
   Calendar,
   Building2,
   SquarePen,
-  Sun,
-  Moon,
 } from "lucide-react";
-import { useTheme } from "next-themes";
+
 import { APIProvider } from "@vis.gl/react-google-maps";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAppStore, type PanelId } from "@/store/app-store";
@@ -56,13 +54,6 @@ function BrandHeader({
   onNewChat?: () => void;
   extraButtons?: React.ReactNode;
 }) {
-  const { resolvedTheme, setTheme } = useTheme();
-  const mounted = useSyncExternalStore(
-    () => () => undefined,
-    () => true,
-    () => false,
-  );
-
   return (
     <div className="flex items-center justify-between px-4 py-2.5 border-b bg-surface-brand/90 backdrop-blur text-surface-brand-foreground shrink-0">
       <div className="flex items-center gap-2.5">
@@ -89,17 +80,6 @@ function BrandHeader({
             aria-label="New chat"
           >
             <SquarePen size={18} />
-          </button>
-        )}
-        {mounted && (
-          <button
-            type="button"
-            onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
-            className="flex items-center justify-center w-11 h-11 rounded-full bg-white/10 hover:bg-white/20 active:bg-white/25 transition-colors text-white/80 hover:text-white"
-            title={resolvedTheme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
-            aria-label={resolvedTheme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
-          >
-            {resolvedTheme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
           </button>
         )}
         <button
@@ -388,24 +368,24 @@ export default function AppShell() {
               onValueChange={(v) => setActivePanel(v as PanelId)}
               className="flex-1 flex flex-col min-h-0"
             >
-              <TabsList className="mx-3 mt-2 shrink-0 h-12">
+              <TabsList className="mx-3 mt-2 shrink-0 h-14">
                 <TabsTrigger
                   value="chat"
-                  className="flex-1 min-h-[44px] text-sm gap-1.5 font-medium"
+                  className="flex-1 min-h-[56px] text-lg gap-1.5 font-medium"
                 >
                   <MessageSquare size={15} aria-hidden="true" />
                   Chat
                 </TabsTrigger>
                 <TabsTrigger
                   value="events"
-                  className="flex-1 min-h-[44px] text-sm gap-1.5 font-medium"
+                  className="flex-1 min-h-[56px] text-lg gap-1.5 font-medium"
                 >
                   <Calendar size={15} aria-hidden="true" />
                   Events
                 </TabsTrigger>
                 <TabsTrigger
                   value="aac-search"
-                  className="flex-1 min-h-[44px] text-sm gap-1.5 font-medium"
+                  className="flex-1 min-h-[56px] text-lg gap-1.5 font-medium"
                 >
                   <Building2 size={15} aria-hidden="true" />
                   AAC
