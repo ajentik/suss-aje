@@ -4,7 +4,6 @@ import type { LatLng } from "@/lib/maps/route-utils";
 
 const ORIGIN: LatLng = { lat: 1.3299, lng: 103.7764 };
 const DESTINATION: LatLng = { lat: 1.3148, lng: 103.7649 };
-const API_KEY = "test-api-key";
 
 const MOCK_ROUTE_RESPONSE = {
   routes: [
@@ -58,50 +57,34 @@ describe("computeWalkingRoute", () => {
     vi.restoreAllMocks();
   });
 
-  it("sends correct headers including X-Goog-Api-Key and X-Goog-FieldMask", async () => {
+  it("posts origin and destination to the local route proxy", async () => {
     fetchMock.mockResolvedValueOnce({
       ok: true,
       json: () => Promise.resolve(MOCK_ROUTE_RESPONSE),
     });
 
-    await computeWalkingRoute(ORIGIN, DESTINATION, API_KEY);
+    await computeWalkingRoute(ORIGIN, DESTINATION);
 
     expect(fetchMock).toHaveBeenCalledOnce();
     const [url, options] = fetchMock.mock.calls[0];
-    expect(url).toBe(
-      "https://routes.googleapis.com/directions/v2:computeRoutes"
-    );
+    expect(url).toBe("/api/route");
     expect(options.method).toBe("POST");
     expect(options.headers["Content-Type"]).toBe("application/json");
-    expect(options.headers["X-Goog-Api-Key"]).toBe(API_KEY);
-    expect(options.headers["X-Goog-FieldMask"]).toContain(
-      "routes.duration"
-    );
-    expect(options.headers["X-Goog-FieldMask"]).toContain(
-      "routes.distanceMeters"
-    );
-    expect(options.headers["X-Goog-FieldMask"]).toContain(
-      "routes.polyline.encodedPolyline"
-    );
-    expect(options.headers["X-Goog-FieldMask"]).toContain(
-      "routes.legs.steps"
-    );
   });
 
-  it("sends correct request body with origin, destination, and travelMode WALK", async () => {
+  it("sends correct request body with origin and destination", async () => {
     fetchMock.mockResolvedValueOnce({
       ok: true,
       json: () => Promise.resolve(MOCK_ROUTE_RESPONSE),
     });
 
-    await computeWalkingRoute(ORIGIN, DESTINATION, API_KEY);
+    await computeWalkingRoute(ORIGIN, DESTINATION);
 
     const body = JSON.parse(fetchMock.mock.calls[0][1].body);
-    expect(body.origin.location.latLng.latitude).toBe(ORIGIN.lat);
-    expect(body.origin.location.latLng.longitude).toBe(ORIGIN.lng);
-    expect(body.destination.location.latLng.latitude).toBe(DESTINATION.lat);
-    expect(body.destination.location.latLng.longitude).toBe(DESTINATION.lng);
-    expect(body.travelMode).toBe("WALK");
+    expect(body).toEqual({
+      origin: ORIGIN,
+      destination: DESTINATION,
+    });
   });
 
   it("parses successful response into RouteResult with correct fields", async () => {
@@ -110,7 +93,7 @@ describe("computeWalkingRoute", () => {
       json: () => Promise.resolve(MOCK_ROUTE_RESPONSE),
     });
 
-    const result = await computeWalkingRoute(ORIGIN, DESTINATION, API_KEY);
+    const result = await computeWalkingRoute(ORIGIN, DESTINATION);
 
     expect(result).not.toBeNull();
     expect(result!.distanceMeters).toBe(1850);
@@ -131,7 +114,7 @@ describe("computeWalkingRoute", () => {
       json: () => Promise.resolve(MOCK_ROUTE_RESPONSE),
     });
 
-    const result = await computeWalkingRoute(ORIGIN, DESTINATION, API_KEY);
+    const result = await computeWalkingRoute(ORIGIN, DESTINATION);
 
     expect(result).not.toBeNull();
     expect(result!.steps).toHaveLength(3);
@@ -165,7 +148,7 @@ describe("computeWalkingRoute", () => {
       status: 403,
     });
 
-    const result = await computeWalkingRoute(ORIGIN, DESTINATION, API_KEY);
+    const result = await computeWalkingRoute(ORIGIN, DESTINATION);
     expect(result).toBeNull();
   });
 
@@ -175,7 +158,7 @@ describe("computeWalkingRoute", () => {
       json: () => Promise.resolve({ routes: [] }),
     });
 
-    const result = await computeWalkingRoute(ORIGIN, DESTINATION, API_KEY);
+    const result = await computeWalkingRoute(ORIGIN, DESTINATION);
     expect(result).toBeNull();
   });
 
@@ -185,14 +168,14 @@ describe("computeWalkingRoute", () => {
       json: () => Promise.resolve({}),
     });
 
-    const result = await computeWalkingRoute(ORIGIN, DESTINATION, API_KEY);
+    const result = await computeWalkingRoute(ORIGIN, DESTINATION);
     expect(result).toBeNull();
   });
 
   it("returns null when fetch throws a network error", async () => {
     fetchMock.mockRejectedValueOnce(new Error("Network error"));
 
-    const result = await computeWalkingRoute(ORIGIN, DESTINATION, API_KEY);
+    const result = await computeWalkingRoute(ORIGIN, DESTINATION);
     expect(result).toBeNull();
   });
 
@@ -213,7 +196,7 @@ describe("computeWalkingRoute", () => {
       json: () => Promise.resolve(responseNoLegs),
     });
 
-    const result = await computeWalkingRoute(ORIGIN, DESTINATION, API_KEY);
+    const result = await computeWalkingRoute(ORIGIN, DESTINATION);
     expect(result).not.toBeNull();
     expect(result!.steps).toEqual([]);
   });

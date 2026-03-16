@@ -50,7 +50,6 @@ vi.mock("@/lib/maps/route-utils", () => ({
 
 describe("useWalkingRoute", () => {
   beforeEach(() => {
-    vi.stubEnv("NEXT_PUBLIC_GOOGLE_MAPS_API_KEY", "test-api-key");
     mockUserLocation = null;
     mockComputeWalkingRoute.mockResolvedValue(MOCK_ROUTE);
 
@@ -72,7 +71,6 @@ describe("useWalkingRoute", () => {
 
   afterEach(() => {
     vi.restoreAllMocks();
-    vi.unstubAllEnvs();
     mockSetRouteInfo.mockReset();
     mockSetSelectedDestination.mockReset();
     mockSetFlyToTarget.mockReset();
@@ -111,7 +109,6 @@ describe("useWalkingRoute", () => {
     expect(mockComputeWalkingRoute).toHaveBeenCalledWith(
       { lat: 1.314, lng: 103.765 },
       DESTINATION,
-      "test-api-key",
     );
     expect(mockSetRouteInfo).toHaveBeenCalledWith({
       polyline: MOCK_ROUTE.polyline,
@@ -152,7 +149,6 @@ describe("useWalkingRoute", () => {
     expect(mockComputeWalkingRoute).toHaveBeenCalledWith(
       { lat: 1.3299, lng: 103.7764 },
       DESTINATION,
-      "test-api-key",
     );
     expect(mockSetRouteInfo).toHaveBeenCalledWith({
       polyline: MOCK_ROUTE.polyline,
@@ -176,13 +172,10 @@ describe("useWalkingRoute", () => {
     expect(mockComputeWalkingRoute).toHaveBeenCalledWith(
       { lat: 1.32, lng: 103.76 },
       DESTINATION,
-      "test-api-key",
     );
   });
 
-  it("skips route computation when API key is missing", async () => {
-    vi.stubEnv("NEXT_PUBLIC_GOOGLE_MAPS_API_KEY", "");
-
+  it("still computes route when browser API key is missing", async () => {
     const { useWalkingRoute } = await import("@/hooks/useWalkingRoute");
     const { result } = renderHook(() => useWalkingRoute());
 
@@ -190,7 +183,7 @@ describe("useWalkingRoute", () => {
       await result.current.walkTo(DESTINATION);
     });
 
-    expect(mockComputeWalkingRoute).not.toHaveBeenCalled();
+    expect(mockComputeWalkingRoute).toHaveBeenCalledOnce();
     expect(result.current.isLoading).toBe(false);
   });
 });
