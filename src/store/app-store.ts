@@ -3,7 +3,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import type { StateCreator } from "zustand";
-import type { POI, RouteInfo, CampusEvent, ChatMessage, DateRangePreset } from "@/types";
+import type { POI, RouteInfo, CampusEvent, ChatMessage, DateRangePreset, MobilityLevel } from "@/types";
 
 type SheetContentMode = "default" | "poi-detail" | "event-detail";
 type MobileSheetState = "collapsed" | "peek" | "expanded";
@@ -61,6 +61,9 @@ export interface AppState {
 
   pendingChatMessage: string | null;
   setPendingChatMessage: (message: string | null) => void;
+
+  mobilityLevel: MobilityLevel;
+  setMobilityLevel: (level: MobilityLevel) => void;
 }
 
 type MapSlice = Pick<
@@ -75,6 +78,8 @@ type MapSlice = Pick<
   | "setFlyToTarget"
   | "userLocation"
   | "setUserLocation"
+  | "mobilityLevel"
+  | "setMobilityLevel"
 >;
 
 type UiSlice = Pick<
@@ -143,6 +148,8 @@ const createMapSlice: StateCreator<AppState, [], [], MapSlice> = (set) => ({
   setFlyToTarget: (target) => set({ flyToTarget: target }),
   userLocation: null,
   setUserLocation: (loc) => set({ userLocation: loc }),
+  mobilityLevel: "normal",
+  setMobilityLevel: (level) => set({ mobilityLevel: level }),
 });
 
 const createUiSlice: StateCreator<AppState, [], [], UiSlice> = (set) => ({
@@ -223,6 +230,7 @@ export const useAppStore = create<AppState>()(
         activePanel: state.activePanel,
         onboardingDismissed: state.onboardingDismissed,
         introDismissed: state.introDismissed,
+        mobilityLevel: state.mobilityLevel,
       }),
     }
   )
