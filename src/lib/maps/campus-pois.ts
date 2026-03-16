@@ -1,5 +1,6 @@
 import type { POI } from "@/types";
 import { ACTIVE_AGEING_CENTRES } from "./active-ageing-centres";
+import { ACTIVE_AGEING_CENTRES_NEW } from "./active-ageing-centres-new";
 import { AIC_OFFICES } from "./aic-offices";
 
 export const CAMPUS_CENTER = { lat: 1.3299, lng: 103.7764 };
@@ -526,6 +527,7 @@ export const CAMPUS_POIS: POI[] = [
 
   // ── Active Ageing Centres ──────────────────────────────────
   ...ACTIVE_AGEING_CENTRES,
+  ...ACTIVE_AGEING_CENTRES_NEW,
 ];
 
 export function findPOI(query: string): POI | undefined {
