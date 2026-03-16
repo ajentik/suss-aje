@@ -164,27 +164,40 @@ export default function POICard({ poi }: POICardProps) {
               </div>
             )}
 
-            <div className="flex items-center gap-2 pt-3 border-t border-border">
-              <button
-                type="button"
-                onClick={handleShowOnMap}
-                className="flex-1 bg-surface-brand text-surface-brand-foreground rounded-xl px-4 py-3 min-h-[44px] text-[0.9375rem] font-semibold hover:bg-surface-brand/90 active:scale-[0.98] transition-all flex items-center justify-center gap-2"
-              >
-                <Navigation size={16} aria-hidden="true" />
-                Show on map
-              </button>
-              {poi.website && (
+            <div className="flex flex-col gap-2 pt-3 border-t border-border">
+              {isAAC && poi.contact && (
                 <a
-                  href={poi.website}
-                  target="_blank"
-                  rel="noopener noreferrer"
+                  href={`tel:${poi.contact.replace(/\s/g, "")}`}
+                  aria-label={`Call ${poi.name}`}
                   onClick={(e) => e.stopPropagation()}
-                  className="inline-flex items-center gap-1.5 rounded-xl border border-border px-4 py-3 min-h-[44px] text-[0.9375rem] font-semibold text-card-foreground hover:bg-muted active:scale-[0.98] transition-all"
+                  className="flex items-center justify-center gap-2.5 w-full h-14 rounded-xl bg-green-600 hover:bg-green-700 active:bg-green-800 text-white font-semibold text-base transition-colors active:scale-[0.98]"
                 >
-                  <ExternalLink size={16} aria-hidden="true" />
-                  Website
+                  <Phone size={22} aria-hidden="true" />
+                  📞 Call This Centre
                 </a>
               )}
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={handleShowOnMap}
+                  className="flex-1 bg-surface-brand text-surface-brand-foreground rounded-xl px-4 py-3 min-h-[44px] text-[0.9375rem] font-semibold hover:bg-surface-brand/90 active:scale-[0.98] transition-all flex items-center justify-center gap-2"
+                >
+                  <Navigation size={16} aria-hidden="true" />
+                  Show on map
+                </button>
+                {poi.website && (
+                  <a
+                    href={poi.website}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={(e) => e.stopPropagation()}
+                    className="inline-flex items-center gap-1.5 rounded-xl border border-border px-4 py-3 min-h-[44px] text-[0.9375rem] font-semibold text-card-foreground hover:bg-muted active:scale-[0.98] transition-all"
+                  >
+                    <ExternalLink size={16} aria-hidden="true" />
+                    Website
+                  </a>
+                )}
+              </div>
             </div>
           </div>
         </div>

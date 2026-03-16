@@ -11,6 +11,7 @@ export const ACTIVE_AGEING_CENTRES: POI[] = [
       "Operated by Allkin. Programs include exercises, social activities, befriending, digital literacy workshops and community support for seniors aged 60+.",
     address: "Blk 604 Yishun St 61 #01-328, Singapore 760604",
     hours: "Mon–Fri 9AM–5PM",
+    contact: "+65 6757 4495",
   },
   {
     id: "aac-amkfsc-ang-mo-kio-226d",
@@ -22,6 +23,7 @@ export const ACTIVE_AGEING_CENTRES: POI[] = [
       "Operated by AMKFSC Community Services. Programs include exercise sessions, social activities, health monitoring, befriending and community support for seniors aged 60+.",
     address: "Blk 226D Ang Mo Kio Ave 1 #01-02, Singapore 564226",
     hours: "Mon–Fri 9AM–5PM",
+    contact: "+65 6453 6899",
   },
   {
     id: "aac-amkfsc-ang-mo-kio-645",
@@ -33,6 +35,7 @@ export const ACTIVE_AGEING_CENTRES: POI[] = [
       "Operated by AMKFSC Community Services. Programs include Tai Chi and strength training, social activities, befriending and outreach support for seniors aged 60+.",
     address: "Blk 645 Ang Mo Kio Ave 6 #01-4802, Singapore 560645",
     hours: "Mon–Fri 9AM–5PM",
+    contact: "+65 6453 2495",
   },
   {
     id: "aac-amkfsc-cheng-san",
@@ -44,6 +47,7 @@ export const ACTIVE_AGEING_CENTRES: POI[] = [
       "Operated by AMKFSC Community Services. Programs include exercise classes, art and craft, health screening and community support for seniors aged 60+.",
     address: "Blk 528 Ang Mo Kio Ave 10 #01-2439, Singapore 560528",
     hours: "Mon–Fri 9AM–5PM",
+    contact: "+65 6459 8887",
   },
   {
     id: "aac-amkfsc-kebun-baru",
@@ -55,6 +59,7 @@ export const ACTIVE_AGEING_CENTRES: POI[] = [
       "Operated by AMKFSC Community Services. Programs include exercise programmes, social activities, digital literacy and buddying support for seniors aged 60+.",
     address: "Blk 165 Ang Mo Kio Ave 4 #01-454, Singapore 560165",
     hours: "Mon–Fri 9AM–5PM",
+    contact: "+65 6456 1601",
   },
   {
     id: "aac-amkfsc-sengkang",
