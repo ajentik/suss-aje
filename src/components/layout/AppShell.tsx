@@ -27,6 +27,7 @@ import AerialViewButton from "@/components/map/AerialViewButton";
 import POIPopup, { POIDetailCard } from "@/components/map/POIPopup";
 import EventPopup, { EventDetailCard } from "@/components/map/EventPopup";
 import Onboarding from "@/components/layout/Onboarding";
+import SOSButton from "@/components/senior/SOSButton";
 import { MobileSheet, type SnapName } from "@/components/layout/MobileSheet";
 import { createStreetViewEventFromPOI } from "@/lib/maps/poi-utils";
 
@@ -440,6 +441,7 @@ export default function AppShell() {
       </APIProvider>
 
       <Onboarding />
+      <SOSButton />
     </div>
   );
 }
