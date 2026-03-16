@@ -1,6 +1,9 @@
 "use client";
 
-import { useState, useCallback, useRef } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
+import { useGoogleSpeechToText } from "@/hooks/useGoogleSpeechToText";
+
+export type SpeechProvider = "browser" | "google";
 
 interface SpeechRecognitionEvent {
   results: SpeechRecognitionResultList;
@@ -24,12 +27,31 @@ declare global {
   }
 }
 
-export function useSpeechRecognition() {
-  const [isListening, setIsListening] = useState(false);
-  const [transcript, setTranscript] = useState("");
-  const recognitionRef = useRef<ReturnType<typeof createRecognition> | null>(null);
+interface UseSpeechRecognitionOptions {
+  provider?: SpeechProvider;
+}
 
-  const startListening = useCallback(
+export function useSpeechRecognition(
+  options: UseSpeechRecognitionOptions = {}
+) {
+  const { provider = "browser" } = options;
+
+  const [browserListening, setBrowserListening] = useState(false);
+  const [browserTranscript, setBrowserTranscript] = useState("");
+  const recognitionRef = useRef<SpeechRecognitionInstance | null>(null);
+
+  // Google STT hook — always called (rules of hooks), only used when provider is "google"
+  const google = useGoogleSpeechToText();
+
+  const onResultRef = useRef<((text: string) => void) | null>(null);
+  const onErrorRef = useRef<((message: string) => void) | null>(null);
+  const prevGoogleTranscriptRef = useRef("");
+  const prevGoogleErrorRef = useRef<string | null>(null);
+  const fallbackTriggeredRef = useRef(false);
+
+  const fallbackActive = provider === "google" && google.error !== null;
+
+  const startBrowserListening = useCallback(
     (onResult: (text: string) => void, onError?: (message: string) => void) => {
       const recognition = createRecognition();
       if (!recognition) return;
@@ -41,13 +63,13 @@ export function useSpeechRecognition() {
 
       recognition.onresult = (event: SpeechRecognitionEvent) => {
         const text = event.results[0][0].transcript;
-        setTranscript(text);
+        setBrowserTranscript(text);
         onResult(text);
       };
 
-      recognition.onend = () => setIsListening(false);
+      recognition.onend = () => setBrowserListening(false);
       recognition.onerror = (event: { error: string }) => {
-        setIsListening(false);
+        setBrowserListening(false);
         const msg =
           event.error === "not-allowed"
             ? "Microphone access denied. Please allow microphone permissions."
@@ -57,16 +79,78 @@ export function useSpeechRecognition() {
         onError?.(msg);
       };
 
-      setIsListening(true);
+      setBrowserListening(true);
       recognition.start();
     },
     []
   );
 
+  // Bridge Google STT results to the callback API via ref comparison
+  useEffect(() => {
+    if (provider !== "google") return;
+
+    if (
+      google.transcript &&
+      google.transcript !== prevGoogleTranscriptRef.current &&
+      onResultRef.current
+    ) {
+      prevGoogleTranscriptRef.current = google.transcript;
+      onResultRef.current(google.transcript);
+    }
+  }, [provider, google.transcript]);
+
+  // Auto-fallback: if Google errors, try browser
+  useEffect(() => {
+    if (provider !== "google") return;
+    if (!google.error || google.error === prevGoogleErrorRef.current) return;
+    if (fallbackTriggeredRef.current) return;
+
+    prevGoogleErrorRef.current = google.error;
+    fallbackTriggeredRef.current = true;
+    const onResult = onResultRef.current;
+    const onError = onErrorRef.current;
+
+    if (onResult) {
+      startBrowserListening(onResult, onError ?? undefined);
+    } else {
+      onError?.(google.error);
+    }
+  }, [provider, google.error, startBrowserListening]);
+
+  const startListening = useCallback(
+    (onResult: (text: string) => void, onError?: (message: string) => void) => {
+      onResultRef.current = onResult;
+      onErrorRef.current = onError ?? null;
+      fallbackTriggeredRef.current = false;
+      prevGoogleTranscriptRef.current = "";
+      prevGoogleErrorRef.current = null;
+
+      if (provider === "google") {
+        void google.startRecording();
+      } else {
+        startBrowserListening(onResult, onError);
+      }
+    },
+    [provider, google, startBrowserListening]
+  );
+
   const stopListening = useCallback(() => {
+    if (provider === "google" || fallbackActive) {
+      google.stopRecording();
+    }
     recognitionRef.current?.stop();
-    setIsListening(false);
-  }, []);
+    setBrowserListening(false);
+  }, [provider, google, fallbackActive]);
+
+  const isListening =
+    provider === "google"
+      ? google.isRecording || (fallbackActive && browserListening)
+      : browserListening;
+
+  const transcript =
+    provider === "google"
+      ? google.transcript || browserTranscript
+      : browserTranscript;
 
   return { isListening, transcript, startListening, stopListening };
 }
