@@ -1,6 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { render, screen } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
+import { render, screen, fireEvent } from "@testing-library/react";
 
 vi.mock("@/components/chat/VoiceButton", () => ({
   default: () => <button type="button" aria-label="Mock voice" />,
@@ -17,21 +16,20 @@ describe("ChatInput", () => {
   });
 
   it("typing into textarea updates value", async () => {
-    const user = userEvent.setup();
     render(<ChatInput onSend={vi.fn()} isLoading={false} />);
 
     const textarea = screen.getByLabelText("Chat message");
-    await user.type(textarea, "hello");
+    fireEvent.change(textarea, { target: { value: "hello" } });
     expect(textarea).toHaveValue("hello");
   });
 
   it("pressing Enter submits the message", async () => {
     const onSend = vi.fn();
-    const user = userEvent.setup();
     render(<ChatInput onSend={onSend} isLoading={false} />);
 
     const textarea = screen.getByLabelText("Chat message");
-    await user.type(textarea, "test message{Enter}");
+    fireEvent.change(textarea, { target: { value: "test message" } });
+    fireEvent.keyDown(textarea, { key: "Enter", code: "Enter" });
 
     expect(onSend).toHaveBeenCalledOnce();
     expect(onSend).toHaveBeenCalledWith("test message");
@@ -39,47 +37,51 @@ describe("ChatInput", () => {
 
   it("Shift+Enter does not submit", async () => {
     const onSend = vi.fn();
-    const user = userEvent.setup();
     render(<ChatInput onSend={onSend} isLoading={false} />);
 
     const textarea = screen.getByLabelText("Chat message");
-    await user.type(textarea, "line one{Shift>}{Enter}{/Shift}line two");
+    fireEvent.change(textarea, { target: { value: "line one" } });
+    fireEvent.keyDown(textarea, {
+      key: "Enter",
+      code: "Enter",
+      shiftKey: true,
+    });
+    fireEvent.change(textarea, { target: { value: "line one\nline two" } });
 
     expect(onSend).not.toHaveBeenCalled();
   });
 
   it("submit button click calls onSend", async () => {
     const onSend = vi.fn();
-    const user = userEvent.setup();
     render(<ChatInput onSend={onSend} isLoading={false} />);
 
     const textarea = screen.getByLabelText("Chat message");
-    await user.type(textarea, "click send");
+    fireEvent.change(textarea, { target: { value: "click send" } });
 
     const sendBtn = screen.getByLabelText("Send message");
-    await user.click(sendBtn);
+    fireEvent.click(sendBtn);
 
     expect(onSend).toHaveBeenCalledOnce();
     expect(onSend).toHaveBeenCalledWith("click send");
   });
 
   it("clears input after successful send", async () => {
-    const user = userEvent.setup();
     render(<ChatInput onSend={vi.fn()} isLoading={false} />);
 
     const textarea = screen.getByLabelText("Chat message");
-    await user.type(textarea, "will be cleared{Enter}");
+    fireEvent.change(textarea, { target: { value: "will be cleared" } });
+    fireEvent.keyDown(textarea, { key: "Enter", code: "Enter" });
 
     expect(textarea).toHaveValue("");
   });
 
   it("does not send empty or whitespace-only input", async () => {
     const onSend = vi.fn();
-    const user = userEvent.setup();
     render(<ChatInput onSend={onSend} isLoading={false} />);
 
     const textarea = screen.getByLabelText("Chat message");
-    await user.type(textarea, "   {Enter}");
+    fireEvent.change(textarea, { target: { value: "   " } });
+    fireEvent.keyDown(textarea, { key: "Enter", code: "Enter" });
 
     expect(onSend).not.toHaveBeenCalled();
   });
@@ -91,14 +93,13 @@ describe("ChatInput", () => {
   });
 
   it("disables send button when isLoading is true", async () => {
-    const user = userEvent.setup();
     const onSend = vi.fn();
 
     const { rerender } = render(
       <ChatInput onSend={onSend} isLoading={false} />,
     );
     const textarea = screen.getByLabelText("Chat message");
-    await user.type(textarea, "loading test");
+    fireEvent.change(textarea, { target: { value: "loading test" } });
 
     rerender(<ChatInput onSend={onSend} isLoading={true} />);
 

@@ -70,9 +70,12 @@ describe("MobileSheet", () => {
 
   it("renders the drag handle", () => {
     const { container } = render(<MobileSheet>Content</MobileSheet>);
-    const handle = container.querySelector("[role='button'][aria-roledescription='drag handle']");
+    const handle = container.querySelector(
+      "button[aria-roledescription='drag handle']",
+    );
     expect(handle).toBeInTheDocument();
     expect(handle).toHaveAttribute("aria-label", "Drag to resize or tap to cycle");
+    expect(handle).toHaveAttribute("aria-roledescription", "drag handle");
   });
 
   it("shows default mini content when no miniContent prop and snap is mini", () => {

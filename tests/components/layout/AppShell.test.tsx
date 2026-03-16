@@ -1,6 +1,75 @@
 import { describe, expect, it, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 
+let currentMobileSheetState: MockStoreState["mobileSheetState"] = "expanded";
+
+type MockStoreState = {
+  activePanel: "chat" | "events" | "aac-search";
+  ttsEnabled: boolean;
+  mobileSheetState: "collapsed" | "peek" | "expanded";
+  sheetContentMode: "default" | "poi-detail" | "event-detail";
+  selectedPOI: null;
+  selectedEvent: null;
+  setActivePanel: (panel: MockStoreState["activePanel"]) => void;
+  setTtsEnabled: (enabled: boolean) => void;
+  newChat: () => void;
+  setMobileSheetState: (state: MockStoreState["mobileSheetState"]) => void;
+  setSheetContentMode: (mode: MockStoreState["sheetContentMode"]) => void;
+  setSelectedPOI: (poi: null) => void;
+  setSelectedEvent: (event: null) => void;
+  setSelectedDestination: (destination: unknown) => void;
+  setStreetViewEvent: (event: unknown) => void;
+};
+
+const mockStoreState: MockStoreState = {
+  activePanel: "chat",
+  ttsEnabled: false,
+  mobileSheetState: "expanded",
+  sheetContentMode: "default",
+  selectedPOI: null,
+  selectedEvent: null,
+  setActivePanel: (panel) => {
+    mockStoreState.activePanel = panel;
+  },
+  setTtsEnabled: (enabled) => {
+    mockStoreState.ttsEnabled = enabled;
+  },
+  newChat: vi.fn(),
+  setMobileSheetState: (state) => {
+    mockStoreState.mobileSheetState = state;
+  },
+  setSheetContentMode: (mode) => {
+    mockStoreState.sheetContentMode = mode;
+  },
+  setSelectedPOI: (poi) => {
+    mockStoreState.selectedPOI = poi;
+  },
+  setSelectedEvent: (event) => {
+    mockStoreState.selectedEvent = event;
+  },
+  setSelectedDestination: vi.fn(),
+  setStreetViewEvent: vi.fn(),
+};
+
+const useAppStore = Object.assign(
+  <T,>(selector: (state: MockStoreState) => T) => selector(mockStoreState),
+  {
+    getState: () => mockStoreState,
+    setState: (partial: Partial<MockStoreState>) => {
+      Object.assign(mockStoreState, partial);
+      if (partial.mobileSheetState) {
+        currentMobileSheetState = partial.mobileSheetState;
+      }
+    },
+  },
+);
+
+vi.mock("@/store/app-store", () => ({ useAppStore }));
+
+vi.mock("next-themes", () => ({
+  useTheme: () => ({ resolvedTheme: "light", setTheme: vi.fn() }),
+}));
+
 vi.mock("@vis.gl/react-google-maps", () => ({
   useMap: vi.fn(() => null),
   useMapsLibrary: vi.fn(() => null),
@@ -23,7 +92,7 @@ vi.mock("next/dynamic", () => ({
 }));
 
 vi.mock("next/image", () => ({
-  default: ({ alt, ...props }: { alt: string; [key: string]: unknown }) => (
+  default: ({ alt, priority: _priority, ...props }: { alt: string; priority?: boolean; [key: string]: unknown }) => (
     // eslint-disable-next-line @next/next/no-img-element
     <img alt={alt} {...props} />
   ),
@@ -85,11 +154,32 @@ vi.mock("@/components/layout/Onboarding", () => ({
   default: () => <div data-testid="onboarding" />,
 }));
 
-import { useAppStore } from "@/store/app-store";
+vi.mock("@/components/layout/MobileSheet", () => ({
+  MobileSheet: ({ children, miniContent }: { children?: React.ReactNode; miniContent?: React.ReactNode }) => (
+    <div data-testid="mobile-sheet">
+      <button
+        type="button"
+        aria-label={currentMobileSheetState === "collapsed" ? "Expand panel" : "Collapse panel"}
+      >
+        Handle
+      </button>
+      {currentMobileSheetState === "collapsed" ? miniContent : children}
+    </div>
+  ),
+}));
 
 describe("AppShell", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    Object.defineProperty(window, "matchMedia", {
+      value: vi.fn().mockImplementation(() => ({
+        matches: false,
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn(),
+      })),
+      writable: true,
+      configurable: true,
+    });
     useAppStore.setState({
       activePanel: "chat",
       ttsEnabled: false,
@@ -98,6 +188,7 @@ describe("AppShell", () => {
       selectedPOI: null,
       selectedEvent: null,
     });
+    currentMobileSheetState = "expanded";
     Object.defineProperty(window, "speechSynthesis", {
       value: { cancel: vi.fn() },
       writable: true,
