@@ -38,5 +38,7 @@ export default function RoutePolyline() {
     };
   }, [routeInfo, map3d]);
 
-  return null;
+  return routeInfo && routeInfo.polyline.length > 0 ? (
+    <output aria-label="Walking route displayed on map" className="sr-only" />
+  ) : null;
 }

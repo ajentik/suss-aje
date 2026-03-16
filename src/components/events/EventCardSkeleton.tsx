@@ -5,6 +5,9 @@ interface EventCardSkeletonProps {
 export function EventCardSkeleton({ index = 0 }: EventCardSkeletonProps) {
   return (
     <div
+      role="progressbar"
+      aria-label="Loading event card"
+      aria-busy="true"
       className="p-5 rounded-2xl border border-l-4 border-l-muted flex flex-col gap-3"
       style={{
         animationDelay: `${index * 100}ms`,

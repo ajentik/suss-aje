@@ -41,10 +41,18 @@ export interface CampusEvent {
   registrationUrl?: string;
 }
 
+export interface RouteStep {
+  instruction: string;
+  distanceMeters: number;
+  durationText: string;
+  maneuver?: string;
+}
+
 export interface RouteInfo {
   polyline: google.maps.LatLngLiteral[];
   distanceMeters: number;
   duration: string;
+  steps: RouteStep[];
 }
 
 export interface ChatMessage {

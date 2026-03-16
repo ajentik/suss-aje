@@ -1,14 +1,14 @@
 import { describe, expect, it, beforeEach, vi } from "vitest";
 import type { POI, CampusEvent } from "@/types";
 
+const _lsStore: Record<string, string> = {};
 vi.stubGlobal("localStorage", {
-  store: {} as Record<string, string>,
-  getItem(key: string) { return this.store[key] ?? null; },
-  setItem(key: string, value: string) { this.store[key] = value; },
-  removeItem(key: string) { delete this.store[key]; },
-  clear() { this.store = {}; },
-  get length() { return Object.keys(this.store).length; },
-  key(index: number) { return Object.keys(this.store)[index] ?? null; },
+  getItem(key: string) { return _lsStore[key] ?? null; },
+  setItem(key: string, value: string) { _lsStore[key] = value; },
+  removeItem(key: string) { delete _lsStore[key]; },
+  clear() { for (const k of Object.keys(_lsStore)) delete _lsStore[k]; },
+  get length() { return Object.keys(_lsStore).length; },
+  key(index: number) { return Object.keys(_lsStore)[index] ?? null; },
 });
 
 const { useAppStore } = await import("@/store/app-store");
@@ -140,6 +140,7 @@ describe("app-store", () => {
       polyline: [{ lat: 1.33, lng: 103.77 }],
       distanceMeters: 500,
       duration: "5 mins",
+      steps: [],
     };
     useAppStore.getState().setRouteInfo(route);
     expect(useAppStore.getState().routeInfo).toEqual(route);
@@ -188,6 +189,7 @@ describe("app-store", () => {
       polyline: [{ lat: 1.33, lng: 103.77 }],
       distanceMeters: 100,
       duration: "1 min",
+      steps: [],
     });
     const oldId = useAppStore.getState().conversationId;
 

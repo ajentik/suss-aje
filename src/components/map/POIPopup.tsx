@@ -10,9 +10,12 @@ import {
   Calendar,
   ArrowLeft,
   ExternalLink,
+  Footprints,
+  Loader2,
 } from "lucide-react";
 import { useAppStore } from "@/store/app-store";
 import { createStreetViewEventFromPOI } from "@/lib/maps/poi-utils";
+import { useWalkingRoute } from "@/hooks/useWalkingRoute";
 import type { POI, CampusEvent } from "@/types";
 import campusEventsData from "@/../public/campus-events.json";
 import AACEventsSection from "@/components/ui/AACEventsSection";
@@ -69,6 +72,7 @@ export function POIDetailCard({
   compact?: boolean;
 }) {
   const setSelectedEvent = useAppStore((s) => s.setSelectedEvent);
+  const { walkTo, isLoading: isWalking } = useWalkingRoute();
   const isAAC = poi.category === "Active Ageing Centre";
   const nearbyEvents = useMemo(
     () => (isAAC ? [] : findUpcomingEventsNear(poi)),
@@ -148,6 +152,20 @@ export function POIDetailCard({
           >
             <Navigation size={16} aria-hidden="true" />
             Navigate
+          </button>
+          <button
+            type="button"
+            onClick={() => walkTo(poi)}
+            disabled={isWalking}
+            className="flex-1 bg-primary text-primary-foreground rounded-xl px-4 min-h-[48px] text-[0.9375rem] font-semibold hover:bg-primary/90 active:scale-[0.98] transition-all flex items-center justify-center gap-2 disabled:opacity-60"
+          >
+            {isWalking ? (
+              <Loader2 size={16} className="animate-spin" aria-hidden="true" />
+            ) : (
+              <Footprints size={16} aria-hidden="true" />
+            )}
+            <span className="hidden sm:inline">Walk here</span>
+            <span className="sm:hidden">Walk</span>
           </button>
           {poi.website && (
             <a
@@ -255,6 +273,7 @@ export default function POIPopup() {
   const setStreetViewEvent = useAppStore((s) => s.setStreetViewEvent);
   const setSelectedEvent = useAppStore((s) => s.setSelectedEvent);
   const setActivePanel = useAppStore((s) => s.setActivePanel);
+  const { walkTo, isLoading: isWalking } = useWalkingRoute();
   const [fadingOutPOI, setFadingOutPOI] = useState<POI | null>(null);
 
   const displayPOI = selectedPOI ?? fadingOutPOI;
@@ -414,14 +433,31 @@ export default function POIPopup() {
           </div>
         )}
 
-        <button
-          type="button"
-          onClick={handleNavigate}
-          className="w-full bg-surface-brand text-surface-brand-foreground rounded-xl px-4 min-h-[48px] text-[0.9375rem] font-semibold hover:bg-surface-brand/90 active:scale-[0.98] transition-all flex items-center justify-center gap-2"
-        >
-          <Navigation size={18} aria-hidden="true" />
-          Navigate here
-        </button>
+        <div className="flex gap-2">
+          <button
+            type="button"
+            onClick={handleNavigate}
+            className="flex-1 bg-surface-brand text-surface-brand-foreground rounded-xl px-4 min-h-[48px] text-[0.9375rem] font-semibold hover:bg-surface-brand/90 active:scale-[0.98] transition-all flex items-center justify-center gap-2"
+          >
+            <Navigation size={18} aria-hidden="true" />
+            Navigate here
+          </button>
+          {displayPOI && (
+            <button
+              type="button"
+              onClick={() => walkTo(displayPOI)}
+              disabled={isWalking}
+              className="flex-1 bg-primary text-primary-foreground rounded-xl px-4 min-h-[48px] text-[0.9375rem] font-semibold hover:bg-primary/90 active:scale-[0.98] transition-all flex items-center justify-center gap-2 disabled:opacity-60"
+            >
+              {isWalking ? (
+                <Loader2 size={18} className="animate-spin" aria-hidden="true" />
+              ) : (
+                <Footprints size={18} aria-hidden="true" />
+              )}
+              Walk here
+            </button>
+          )}
+        </div>
       </div>
     </div>
   );

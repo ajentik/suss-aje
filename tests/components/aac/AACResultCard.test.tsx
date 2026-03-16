@@ -55,7 +55,7 @@ describe("AACResultCard", () => {
     const onSelect = vi.fn();
     render(<AACResultCard poi={basePOI} distanceKm={1.0} onSelect={onSelect} />);
 
-    fireEvent.click(screen.getByRole("button"));
+    fireEvent.click(screen.getByText("Test Active Ageing Centre"));
     expect(onSelect).toHaveBeenCalledOnce();
     expect(onSelect).toHaveBeenCalledWith(basePOI);
   });

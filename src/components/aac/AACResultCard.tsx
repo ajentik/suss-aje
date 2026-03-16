@@ -1,7 +1,8 @@
 "use client";
 
 import type { POI } from "@/types";
-import { MapPin } from "lucide-react";
+import { MapPin, Footprints, Loader2 } from "lucide-react";
+import { useWalkingRoute } from "@/hooks/useWalkingRoute";
 
 interface AACResultCardProps {
   poi: POI;
@@ -15,18 +16,21 @@ function formatDistance(km: number): string {
 }
 
 export default function AACResultCard({ poi, distanceKm, onSelect }: AACResultCardProps) {
+  const { walkTo, isLoading: isWalking } = useWalkingRoute();
+
   return (
     <button
       type="button"
+      aria-label={`Select ${poi.name}`}
       onClick={() => onSelect(poi)}
-      className="w-full text-left px-3 py-2.5 rounded-lg border border-border bg-card hover:bg-accent/50 active:bg-accent transition-colors cursor-pointer group"
+      className="w-full text-left px-3 py-2.5 rounded-lg border border-border bg-card hover:bg-accent/50 active:bg-accent transition-colors cursor-pointer group relative"
     >
       <div className="flex items-start gap-2.5">
         <div className="mt-0.5 flex-shrink-0 w-7 h-7 rounded-full bg-poi-aac/15 flex items-center justify-center">
           <MapPin size={14} className="text-poi-aac" />
         </div>
         <div className="min-w-0 flex-1">
-          <p className="text-sm font-medium leading-snug text-foreground group-hover:text-primary transition-colors truncate">
+          <p className="text-sm font-medium leading-snug text-foreground group-hover:text-primary transition-colors truncate pr-8">
             {poi.name}
           </p>
           {poi.address && (
@@ -46,6 +50,22 @@ export default function AACResultCard({ poi, distanceKm, onSelect }: AACResultCa
           </span>
         )}
       </div>
+      <button
+        type="button"
+        aria-label={`Walk to ${poi.name}`}
+        disabled={isWalking}
+        onClick={(e) => {
+          e.stopPropagation();
+          walkTo(poi);
+        }}
+        className="absolute top-2 right-2 flex items-center justify-center w-7 h-7 rounded-full bg-primary/10 hover:bg-primary/20 active:scale-90 transition-all disabled:opacity-60"
+      >
+        {isWalking ? (
+          <Loader2 size={14} className="animate-spin text-primary" aria-hidden="true" />
+        ) : (
+          <Footprints size={14} className="text-primary" aria-hidden="true" />
+        )}
+      </button>
     </button>
   );
 }

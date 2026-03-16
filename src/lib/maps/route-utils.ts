@@ -1,3 +1,5 @@
+import type { RouteStep } from "@/types";
+
 export interface LatLng {
   lat: number;
   lng: number;
@@ -7,6 +9,7 @@ export interface RouteResult {
   polyline: LatLng[];
   distanceMeters: number;
   durationText: string;
+  steps: RouteStep[];
 }
 
 export async function computeWalkingRoute(
@@ -30,10 +33,32 @@ export async function computeWalkingRoute(
     const durationSeconds = parseInt(route.duration.replace("s", ""), 10);
     const minutes = Math.ceil(durationSeconds / 60);
 
+    const rawSteps = route.legs?.[0]?.steps ?? [];
+    const steps: RouteStep[] = rawSteps.map(
+      (step: {
+        navigationInstruction?: { instructions?: string; maneuver?: string };
+        distanceMeters?: number;
+        staticDuration?: string;
+      }) => {
+        const stepDurationSec = step.staticDuration
+          ? parseInt(step.staticDuration.replace("s", ""), 10)
+          : 0;
+        const stepMin = Math.max(1, Math.ceil(stepDurationSec / 60));
+        return {
+          instruction:
+            step.navigationInstruction?.instructions ?? "Continue walking",
+          distanceMeters: step.distanceMeters ?? 0,
+          durationText: `${stepMin} min`,
+          maneuver: step.navigationInstruction?.maneuver,
+        };
+      }
+    );
+
     return {
       polyline,
       distanceMeters: route.distanceMeters,
       durationText: `${minutes} min walk`,
+      steps,
     };
   } catch {
     return null;

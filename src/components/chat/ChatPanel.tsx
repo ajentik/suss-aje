@@ -14,7 +14,6 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useAppStore } from "@/store/app-store";
 import { useSpeechSynthesis } from "@/lib/voice/speech-synthesis";
-import { useGeolocation } from "@/hooks/useGeolocation";
 import { findPOI } from "@/lib/maps/campus-pois";
 import type { DateRangePreset } from "@/types";
 
@@ -124,12 +123,8 @@ export default function ChatPanel() {
   const ttsEnabled = useAppStore((s) => s.ttsEnabled);
   const pendingChatMessage = useAppStore((s) => s.pendingChatMessage);
   const setPendingChatMessage = useAppStore((s) => s.setPendingChatMessage);
+  const userLocation = useAppStore((s) => s.userLocation);
   const { speak } = useSpeechSynthesis();
-  const { lat: geoLat, lng: geoLng, requestLocation } = useGeolocation();
-
-  useEffect(() => {
-    requestLocation();
-  }, [requestLocation]);
 
   const { messages, sendMessage, status, error } = useChat({
     onError: (err) => {
@@ -175,9 +170,7 @@ export default function ChatPanel() {
           );
           setFlyToTarget({ lat: poi.lat, lng: poi.lng });
 
-          const origin = geoLat && geoLng
-              ? { lat: geoLat, lng: geoLng }
-              : { lat: 1.3299, lng: 103.7764 };
+          const origin = userLocation ?? { lat: 1.3299, lng: 103.7764 };
             import("@/lib/maps/route-utils")
               .then(({ computeWalkingRoute }) =>
                 computeWalkingRoute(
@@ -189,6 +182,7 @@ export default function ChatPanel() {
                       polyline: route.polyline,
                       distanceMeters: route.distanceMeters,
                       duration: route.durationText,
+                      steps: route.steps,
                     });
                   }
                 })
@@ -220,8 +214,7 @@ export default function ChatPanel() {
     setActivePanel,
     setEventDateFilter,
     setEventCategoryFilter,
-    geoLat,
-    geoLng,
+    userLocation,
   ]);
 
   useEffect(() => {

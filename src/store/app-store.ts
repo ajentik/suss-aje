@@ -19,6 +19,9 @@ export interface AppState {
   flyToTarget: { lat: number; lng: number; altitude?: number } | null;
   setFlyToTarget: (target: { lat: number; lng: number; altitude?: number } | null) => void;
 
+  userLocation: { lat: number; lng: number } | null;
+  setUserLocation: (loc: { lat: number; lng: number } | null) => void;
+
   activePanel: PanelId;
   setActivePanel: (panel: PanelId) => void;
 
@@ -70,6 +73,8 @@ type MapSlice = Pick<
   | "setRouteInfo"
   | "flyToTarget"
   | "setFlyToTarget"
+  | "userLocation"
+  | "setUserLocation"
 >;
 
 type UiSlice = Pick<
@@ -136,6 +141,8 @@ const createMapSlice: StateCreator<AppState, [], [], MapSlice> = (set) => ({
   setRouteInfo: (route) => set({ routeInfo: route }),
   flyToTarget: null,
   setFlyToTarget: (target) => set({ flyToTarget: target }),
+  userLocation: null,
+  setUserLocation: (loc) => set({ userLocation: loc }),
 });
 
 const createUiSlice: StateCreator<AppState, [], [], UiSlice> = (set) => ({
