@@ -99,18 +99,26 @@ export default function StreetViewPanel({
   useEffect(() => {
     if (!containerRef.current || !window.google?.maps) return;
 
-    new window.google.maps.StreetViewPanorama(containerRef.current, {
-      position: location,
-      pov: { heading: 0, pitch: 0 },
-      zoom: 1,
-      motionTracking: false,
-      motionTrackingControl: false,
-      addressControl: true,
-      fullscreenControl: false,
-      linksControl: true,
-      clickToGo: true,
-      scrollwheel: true,
-    } as google.maps.StreetViewPanoramaOptions);
+    const panorama = new window.google.maps.StreetViewPanorama(
+      containerRef.current,
+      {
+        position: location,
+        pov: { heading: 0, pitch: 0 },
+        zoom: 1,
+        motionTracking: false,
+        motionTrackingControl: false,
+        addressControl: true,
+        fullscreenControl: false,
+        linksControl: true,
+        clickToGo: true,
+        scrollwheel: true,
+      } as google.maps.StreetViewPanoramaOptions,
+    );
+
+    return () => {
+      panorama.setVisible(false);
+      window.google?.maps?.event.clearInstanceListeners(panorama);
+    };
   }, [location]);
 
   return (

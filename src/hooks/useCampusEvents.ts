@@ -1,9 +1,28 @@
 "use client";
 
-import { useState, useEffect, useMemo, useCallback } from "react";
+import { useState, useEffect, useMemo, useCallback, useRef } from "react";
 import { toast } from "sonner";
 import type { CampusEvent, DateRangePreset } from "@/types";
 import { getDateRange } from "@/lib/date-utils";
+
+function loadEvents(
+  signal: AbortSignal,
+  setEvents: (events: CampusEvent[]) => void,
+  setIsLoading: (loading: boolean) => void,
+) {
+  setIsLoading(true);
+  fetch("/campus-events.json", { signal })
+    .then((res) => res.json())
+    .then((data: CampusEvent[]) => {
+      setEvents(data);
+      setIsLoading(false);
+    })
+    .catch((err: unknown) => {
+      if (err instanceof DOMException && err.name === "AbortError") return;
+      toast.error("Failed to load campus events.");
+      setIsLoading(false);
+    });
+}
 
 export function useCampusEvents() {
   const [events, setEvents] = useState<CampusEvent[]>([]);
@@ -11,25 +30,21 @@ export function useCampusEvents() {
   const [categoryFilter, setCategoryFilter] = useState("");
   const [schoolFilter, setSchoolFilter] = useState("");
   const [isLoading, setIsLoading] = useState(true);
-
-  const fetchEvents = useCallback(() => {
-    setIsLoading(true);
-    fetch("/campus-events.json")
-      .then((res) => res.json())
-      .then((data) => {
-        setEvents(data);
-        setIsLoading(false);
-      })
-      .catch(() => {
-        toast.error("Failed to load campus events.");
-        setIsLoading(false);
-      });
-  }, []);
+  const controllerRef = useRef<AbortController | null>(null);
 
   useEffect(() => {
-    const timeoutId = window.setTimeout(fetchEvents, 0);
-    return () => window.clearTimeout(timeoutId);
-  }, [fetchEvents]);
+    const controller = new AbortController();
+    controllerRef.current = controller;
+    loadEvents(controller.signal, setEvents, setIsLoading);
+    return () => controller.abort();
+  }, []);
+
+  const refetch = useCallback(() => {
+    controllerRef.current?.abort();
+    const controller = new AbortController();
+    controllerRef.current = controller;
+    loadEvents(controller.signal, setEvents, setIsLoading);
+  }, []);
 
   const filteredEvents = useMemo(() => {
     let result = events;
@@ -66,7 +81,7 @@ export function useCampusEvents() {
     allEvents: events,
     categories,
     isLoading,
-    refetch: fetchEvents,
+    refetch,
     dateFilter,
     setDateFilter,
     categoryFilter,

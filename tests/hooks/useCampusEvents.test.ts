@@ -171,4 +171,40 @@ describe("useCampusEvents", () => {
     expect(result.current.dateFilter).toBe("all");
     expect(result.current.events).toHaveLength(3);
   });
+
+  it("aborts fetch on unmount", async () => {
+    const abortSpy = vi.spyOn(AbortController.prototype, "abort");
+    mockFetchSuccess(MOCK_EVENTS);
+    const { useCampusEvents } = await import("@/hooks/useCampusEvents");
+    const { result, unmount } = renderHook(() => useCampusEvents());
+
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+
+    unmount();
+    expect(abortSpy).toHaveBeenCalled();
+    abortSpy.mockRestore();
+  });
+
+  it("does not set state after abort", async () => {
+    const abortController = new AbortController();
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockImplementation((_url: string, opts?: { signal?: AbortSignal }) => {
+        if (opts?.signal?.aborted) {
+          return Promise.reject(new DOMException("Aborted", "AbortError"));
+        }
+        abortController.abort();
+        return Promise.reject(new DOMException("Aborted", "AbortError"));
+      }),
+    );
+
+    const { useCampusEvents } = await import("@/hooks/useCampusEvents");
+    const { result, unmount } = renderHook(() => useCampusEvents());
+
+    await waitFor(() => {
+      expect(result.current.events).toEqual([]);
+    });
+
+    unmount();
+  });
 });
