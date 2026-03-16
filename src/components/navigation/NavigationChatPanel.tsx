@@ -1,16 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect, useCallback } from "react";
-import {
-  MessageSquare,
-  Navigation,
-  Mic,
-  ArrowUp,
-  ChevronDown,
-  MapPin,
-  X,
-  Trash2,
-} from "lucide-react";
+import { DooIcon } from "@/lib/icons";
 import { cn } from "@/lib/utils";
 import { useNavigationChat, type NavChatMessage } from "@/hooks/useNavigationChat";
 import { useWalkingRoute } from "@/hooks/useWalkingRoute";
@@ -31,7 +22,7 @@ function PlaceCard({
   return (
     <div className="flex items-center gap-3 rounded-xl border border-border/50 bg-card/60 p-3 mt-2 animate-chat-scale-in">
       <div className="flex items-center justify-center w-9 h-9 rounded-xl bg-primary/10 shrink-0">
-        <MapPin className="w-[18px] h-[18px] text-primary" />
+        <DooIcon name="location-pin" size={18} className="text-primary" />
       </div>
       <div className="flex-1 min-w-0">
         <p className="font-semibold text-sm leading-snug truncate">{name}</p>
@@ -48,7 +39,7 @@ function PlaceCard({
           "hover:bg-surface-brand-hover active:scale-95 transition-all duration-200"
         )}
       >
-        <Navigation className="w-3.5 h-3.5" />
+        <DooIcon name="navigation" size={14} />
         Navigate
       </button>
     </div>
@@ -191,7 +182,7 @@ export default function NavigationChatPanel() {
           <div className="flex items-center justify-between px-4 py-3 border-b border-border/40 shrink-0">
             <div className="flex items-center gap-2">
               <div className="flex items-center justify-center w-7 h-7 rounded-full bg-primary/10">
-                <Navigation className="w-3.5 h-3.5 text-primary" />
+                <DooIcon name="navigation" size={14} className="text-primary" />
               </div>
               <span className="text-sm font-semibold">Navigation</span>
             </div>
@@ -204,7 +195,7 @@ export default function NavigationChatPanel() {
                   title="Clear conversation"
                   aria-label="Clear conversation"
                 >
-                  <Trash2 size={14} className="text-muted-foreground" />
+                  <DooIcon name="minus" size={14} className="text-muted-foreground" />
                 </button>
               )}
               <button
@@ -214,7 +205,7 @@ export default function NavigationChatPanel() {
                 title="Close"
                 aria-label="Close navigation chat"
               >
-                <X size={16} className="text-muted-foreground" />
+                <DooIcon name="cross" size={16} className="text-muted-foreground" />
               </button>
             </div>
           </div>
@@ -226,7 +217,7 @@ export default function NavigationChatPanel() {
             {conversationHistory.length === 0 && (
               <div className="text-center py-8 px-4 animate-chat-fade-in">
                 <div className="flex items-center justify-center w-12 h-12 rounded-2xl bg-primary/10 mx-auto mb-3">
-                  <Navigation className="w-6 h-6 text-primary" />
+                  <DooIcon name="navigation" size={24} className="text-primary" />
                 </div>
                 <p className="font-semibold text-foreground text-sm">
                   Where do you need to go?
@@ -305,7 +296,7 @@ export default function NavigationChatPanel() {
               title={isListening ? "Stop recording" : "Voice input"}
               aria-label={isListening ? "Stop recording" : "Voice input"}
             >
-              <Mic size={16} />
+              <DooIcon name="mic" size={16} />
             </button>
 
             <input
@@ -340,7 +331,7 @@ export default function NavigationChatPanel() {
               )}
               aria-label="Send navigation query"
             >
-              <ArrowUp size={18} strokeWidth={2.5} />
+              <DooIcon name="send" size={18} strokeWidth={2.5} />
             </button>
           </div>
         </aside>
@@ -361,9 +352,9 @@ export default function NavigationChatPanel() {
         aria-expanded={isOpen}
       >
         {isOpen ? (
-          <ChevronDown size={24} />
+          <DooIcon name="chevron-down" size={24} />
         ) : (
-          <MessageSquare size={24} />
+          <DooIcon name="message" size={24} />
         )}
       </button>
     </div>

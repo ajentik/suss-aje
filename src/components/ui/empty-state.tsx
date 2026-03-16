@@ -1,4 +1,4 @@
-import { Inbox } from "lucide-react";
+import { DooIcon } from "@/lib/icons";
 
 interface EmptyStateProps {
   icon?: React.ReactNode;
@@ -17,7 +17,7 @@ export function EmptyState({
     <div className="flex flex-col items-center justify-center gap-3 py-12 px-6 text-center">
       <div className="flex items-center justify-center w-14 h-14 rounded-2xl bg-muted">
         {icon ?? (
-          <Inbox className="h-7 w-7 text-muted-foreground" aria-hidden="true" />
+          <DooIcon name="mail" size={28} className="text-muted-foreground" aria-hidden="true" />
         )}
       </div>
       <div className="space-y-1">

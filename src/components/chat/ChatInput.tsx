@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect, useCallback } from "react";
-import { ArrowUp } from "lucide-react";
+import { DooIcon } from "@/lib/icons";
 import { cn } from "@/lib/utils";
 import VoiceButton from "./VoiceButton";
 
@@ -126,9 +126,9 @@ export default function ChatInput({ onSend, isLoading }: ChatInputProps) {
             : "bg-muted/60 text-muted-foreground/40"
         )}
       >
-        <ArrowUp
+        <DooIcon
+          name="send"
           size={20}
-          strokeWidth={2.5}
           className={cn(
             "transition-all duration-250",
             canSend ? "opacity-100 translate-y-0" : "opacity-50 translate-y-0.5"

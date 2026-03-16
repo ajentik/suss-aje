@@ -48,7 +48,7 @@ The landing page MUST load within 3 seconds on standard broadband. Transitions b
 - **Maps**: `@vis.gl/react-google-maps` for all Google Maps integration. `APIProvider` MUST wrap the map tree. Raw `gmp-*` web components are acceptable ONLY for elements without React bindings (e.g., `gmp-polyline-3d`).
 - **AI**: Vercel AI SDK with Google Gemini. Tool definitions in `src/lib/ai/tools.ts`.
 - **Voice**: Web Speech API wrappers in `src/lib/voice/`.
-- **Icons**: Inline SVG or Lucide React. No icon font libraries.
+- **Icons**: doo-iconik bridge (`src/lib/icons/`) using `<DooIcon name="..." />`. Icon data sourced from [ajentik/doo-iconik](https://github.com/ajentik/doo-iconik) (MIT). No icon font libraries.
 - **Deploy**: Railway auto-deploy from `main` branch. GitHub Actions CI runs lint + build on all PRs.
 
 ## Development Workflow

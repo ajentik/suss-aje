@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { EmptyState } from "@/components/ui/empty-state";
-import { CalendarX, ChevronUp } from "lucide-react";
+import { DooIcon } from "@/lib/icons";
 import { useCampusEvents } from "@/hooks/useCampusEvents";
 import { useAppStore } from "@/store/app-store";
 import type { DateRangePreset } from "@/types";
@@ -43,7 +43,6 @@ export default function EventsPanel() {
     setMapEventMarkers(events);
   }, [events, setMapEventMarkers]);
 
-  // Track scroll to show/hide scroll-to-top button
   useEffect(() => {
     const viewport = scrollRef.current?.querySelector("[data-radix-scroll-area-viewport]");
     if (!viewport) return;
@@ -52,7 +51,7 @@ export default function EventsPanel() {
     };
     viewport.addEventListener("scroll", handleScroll, { passive: true });
     return () => viewport.removeEventListener("scroll", handleScroll);
-  }, [isLoading]);
+  }, []);
 
   const scrollToTop = useCallback(() => {
     const viewport = scrollRef.current?.querySelector("[data-radix-scroll-area-viewport]");
@@ -88,7 +87,7 @@ export default function EventsPanel() {
             icon={
               <div className="flex flex-col items-center gap-3 mb-1">
                 <div className="w-16 h-16 rounded-2xl bg-muted/60 flex items-center justify-center">
-                  <CalendarX className="h-8 w-8 text-muted-foreground/50" />
+                  <DooIcon name="calendar" size={32} className="text-muted-foreground/50" />
                 </div>
               </div>
             }
@@ -119,7 +118,6 @@ export default function EventsPanel() {
         )}
       </ScrollArea>
 
-      {/* Scroll to top FAB */}
       {showScrollTop && (
         <button
           type="button"
@@ -127,7 +125,7 @@ export default function EventsPanel() {
           aria-label="Scroll to top"
           className="absolute bottom-4 right-4 z-10 w-11 h-11 rounded-full bg-primary text-primary-foreground shadow-lg shadow-primary/20 flex items-center justify-center hover:opacity-90 active:scale-90 transition-all animate-hero-fade-in-up min-w-[44px] min-h-[44px]"
         >
-          <ChevronUp className="w-5 h-5" />
+          <DooIcon name="chevron-up" size={20} />
         </button>
       )}
     </div>

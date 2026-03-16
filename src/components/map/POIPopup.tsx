@@ -1,18 +1,7 @@
 "use client";
 
 import { useCallback, useState, useMemo, useRef } from "react";
-import {
-  X,
-  MapPin,
-  Clock,
-  Star,
-  Navigation,
-  Calendar,
-  ArrowLeft,
-  ExternalLink,
-  Footprints,
-  Loader2,
-} from "lucide-react";
+import { DooIcon } from "@/lib/icons";
 import { useAppStore } from "@/store/app-store";
 import { createStreetViewEventFromPOI } from "@/lib/maps/poi-utils";
 import { useWalkingRoute } from "@/hooks/useWalkingRoute";
@@ -59,7 +48,6 @@ const POI_CATEGORY_DOT: Record<string, string> = {
   "Active Ageing Centre": "bg-poi-aac",
 };
 
-/** Standalone detail card — rendered inside the bottom sheet on mobile */
 export function POIDetailCard({
   poi,
   onClose,
@@ -74,10 +62,7 @@ export function POIDetailCard({
   const setSelectedEvent = useAppStore((s) => s.setSelectedEvent);
   const { walkTo, isLoading: isWalking } = useWalkingRoute();
   const isAAC = poi.category === "Active Ageing Centre";
-  const nearbyEvents = useMemo(
-    () => (isAAC ? [] : findUpcomingEventsNear(poi)),
-    [poi, isAAC],
-  );
+  const nearbyEvents = useMemo(() => (isAAC ? [] : findUpcomingEventsNear(poi)), [poi, isAAC]);
   const dotClass = POI_CATEGORY_DOT[poi.category] ?? "bg-muted-foreground";
 
   const handleEventClick = useCallback(
@@ -89,68 +74,55 @@ export function POIDetailCard({
 
   return (
     <div className="flex flex-col h-full">
-      {/* Back button */}
       <div className="flex items-center gap-2 px-4 pt-3 pb-2 shrink-0">
         <button
           type="button"
           onClick={onClose}
           className="inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:text-primary/80 active:scale-[0.97] transition-all min-h-[44px] px-2"
         >
-          <ArrowLeft size={16} aria-hidden="true" />
+          <DooIcon name="arrow-left" size={16} aria-hidden="true" />
           Back to chat
         </button>
       </div>
 
-      {/* Scrollable content */}
       <div className="flex-1 overflow-y-auto overscroll-contain px-5 pb-5">
         <div className="mb-2">
           <span className="inline-flex items-center gap-1.5 bg-secondary text-secondary-foreground text-sm font-semibold px-3 py-1 rounded-full">
-            <span
-              className={`w-2 h-2 rounded-full ${dotClass}`}
-              aria-hidden="true"
-            />
+            <span className={`w-2 h-2 rounded-full ${dotClass}`} aria-hidden="true" />
             {poi.category}
           </span>
         </div>
 
-        <h3 className="text-lg font-bold text-card-foreground mb-1.5 leading-snug">
-          {poi.name}
-        </h3>
+        <h3 className="text-lg font-bold text-card-foreground mb-1.5 leading-snug">{poi.name}</h3>
 
-        {/* Peek: key metadata inline */}
         <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-muted-foreground mb-3">
           {poi.hours && (
             <span className="inline-flex items-center gap-1">
-              <Clock size={14} aria-hidden="true" />
+              <DooIcon name="clock" size={14} aria-hidden="true" />
               <span className="truncate max-w-[140px]">{poi.hours}</span>
             </span>
           )}
           {poi.rating && (
             <span className="inline-flex items-center gap-1">
-              <Star
-                size={14}
-                className="text-yellow-500 fill-yellow-500"
-                aria-hidden="true"
-              />
+              <DooIcon name="star" size={14} className="text-yellow-500" aria-hidden="true" />
               {poi.rating}
             </span>
           )}
           {poi.address && (
             <span className="inline-flex items-center gap-1">
-              <MapPin size={14} aria-hidden="true" />
+              <DooIcon name="location-pin" size={14} aria-hidden="true" />
               <span className="truncate max-w-[160px]">{poi.address}</span>
             </span>
           )}
         </div>
 
-        {/* Action buttons — always visible in peek */}
         <div className="flex gap-2 mb-4">
           <button
             type="button"
             onClick={onNavigate}
             className="flex-1 bg-surface-brand text-surface-brand-foreground rounded-xl px-4 min-h-[48px] text-[0.9375rem] font-semibold hover:bg-surface-brand/90 active:scale-[0.98] transition-all flex items-center justify-center gap-2"
           >
-            <Navigation size={16} aria-hidden="true" />
+            <DooIcon name="navigation" size={16} aria-hidden="true" />
             Navigate
           </button>
           <button
@@ -160,9 +132,9 @@ export function POIDetailCard({
             className="flex-1 bg-primary text-primary-foreground rounded-xl px-4 min-h-[48px] text-[0.9375rem] font-semibold hover:bg-primary/90 active:scale-[0.98] transition-all flex items-center justify-center gap-2 disabled:opacity-60"
           >
             {isWalking ? (
-              <Loader2 size={16} className="animate-spin" aria-hidden="true" />
+              <DooIcon name="loader" size={16} className="animate-spin" aria-hidden="true" />
             ) : (
-              <Footprints size={16} aria-hidden="true" />
+              <DooIcon name="navigation2" size={16} aria-hidden="true" />
             )}
             <span className="hidden sm:inline">Walk here</span>
             <span className="sm:hidden">Walk</span>
@@ -174,48 +146,33 @@ export function POIDetailCard({
               rel="noopener noreferrer"
               className="bg-secondary text-secondary-foreground rounded-xl px-4 min-h-[48px] text-[0.9375rem] font-semibold hover:bg-secondary/80 active:scale-[0.98] transition-all flex items-center justify-center gap-2"
             >
-              <ExternalLink size={14} aria-hidden="true" />
+              <DooIcon name="external-link" size={14} aria-hidden="true" />
               Website
             </a>
           )}
         </div>
 
-        {/* Expanded content — visible when sheet is swiped up */}
         {!compact && (
           <>
-            <p className="text-[0.9375rem] text-muted-foreground mb-4 leading-relaxed">
-              {poi.description}
-            </p>
+            <p className="text-[0.9375rem] text-muted-foreground mb-4 leading-relaxed">{poi.description}</p>
 
             {poi.address && (
               <div className="flex items-start gap-2 mb-2 text-sm text-muted-foreground">
-                <MapPin
-                  size={15}
-                  className="mt-0.5 shrink-0"
-                  aria-hidden="true"
-                />
+                <DooIcon name="location-pin" size={15} className="mt-0.5 shrink-0" aria-hidden="true" />
                 <span>{poi.address}</span>
               </div>
             )}
 
             {poi.hours && (
               <div className="flex items-start gap-2 mb-2 text-sm text-muted-foreground">
-                <Clock
-                  size={15}
-                  className="mt-0.5 shrink-0"
-                  aria-hidden="true"
-                />
+                <DooIcon name="clock" size={15} className="mt-0.5 shrink-0" aria-hidden="true" />
                 <span>{poi.hours}</span>
               </div>
             )}
 
             {poi.rating && (
               <div className="flex items-center gap-2 mb-2 text-sm text-muted-foreground">
-                <Star
-                  size={15}
-                  className="text-yellow-500 fill-yellow-500 shrink-0"
-                  aria-hidden="true"
-                />
+                <DooIcon name="star" size={15} className="text-yellow-500 shrink-0" aria-hidden="true" />
                 <span>{poi.rating} / 5.0</span>
               </div>
             )}
@@ -243,7 +200,7 @@ export function POIDetailCard({
             {!isAAC && nearbyEvents.length > 0 && (
               <div className="mt-4 border-t border-border pt-3">
                 <p className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-2 flex items-center gap-1.5">
-                  <Calendar size={14} aria-hidden="true" />
+                  <DooIcon name="calendar" size={14} aria-hidden="true" />
                   Upcoming Events Nearby
                 </p>
                 <div className="space-y-1.5">
@@ -265,7 +222,6 @@ export function POIDetailCard({
   );
 }
 
-/** Desktop floating popup — hidden on mobile */
 export default function POIPopup() {
   const selectedPOI = useAppStore((s) => s.selectedPOI);
   const setSelectedPOI = useAppStore((s) => s.setSelectedPOI);
@@ -285,7 +241,6 @@ export default function POIPopup() {
     [displayPOI, isAAC],
   );
 
-  // Swipe-to-dismiss with interactive drag
   const touchStartY = useRef(0);
   const touchCurrentY = useRef(0);
   const popupRef = useRef<HTMLDivElement>(null);
@@ -369,7 +324,7 @@ export default function POIPopup() {
           className="absolute top-3 right-3 flex items-center justify-center w-11 h-11 rounded-full bg-muted hover:bg-muted/80 text-muted-foreground hover:text-foreground transition-colors"
           aria-label="Close popup"
         >
-          <X size={18} aria-hidden="true" />
+          <DooIcon name="cross" size={18} aria-hidden="true" />
         </button>
 
         <div className="mb-2">
@@ -379,9 +334,7 @@ export default function POIPopup() {
           </span>
         </div>
 
-        <h3 className="text-xl font-bold text-card-foreground mb-1.5 pr-12">
-          {displayPOI.name}
-        </h3>
+        <h3 className="text-xl font-bold text-card-foreground mb-1.5 pr-12">{displayPOI.name}</h3>
 
         <p className="text-[0.9375rem] text-muted-foreground mb-3 line-clamp-2 leading-relaxed">
           {displayPOI.description}
@@ -390,19 +343,19 @@ export default function POIPopup() {
         <div className="space-y-2 mb-4 text-[0.9375rem] text-muted-foreground">
           {displayPOI.address && (
             <div className="flex items-start gap-2">
-              <MapPin size={16} className="mt-0.5 shrink-0" aria-hidden="true" />
+              <DooIcon name="location-pin" size={16} className="mt-0.5 shrink-0" aria-hidden="true" />
               <span className="line-clamp-1">{displayPOI.address}</span>
             </div>
           )}
           {displayPOI.hours && (
             <div className="flex items-start gap-2">
-              <Clock size={16} className="mt-0.5 shrink-0" aria-hidden="true" />
+              <DooIcon name="clock" size={16} className="mt-0.5 shrink-0" aria-hidden="true" />
               <span className="line-clamp-1">{displayPOI.hours}</span>
             </div>
           )}
           {displayPOI.rating && (
             <div className="flex items-center gap-2">
-              <Star size={16} className="text-yellow-500 fill-yellow-500 shrink-0" aria-hidden="true" />
+              <DooIcon name="star" size={16} className="text-yellow-500 shrink-0" aria-hidden="true" />
               <span>{displayPOI.rating} / 5.0</span>
             </div>
           )}
@@ -417,7 +370,7 @@ export default function POIPopup() {
         {!isAAC && nearbyEvents.length > 0 && (
           <div className="mb-3 border-t border-border pt-3">
             <p className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-2 flex items-center gap-1.5">
-              <Calendar size={14} aria-hidden="true" />
+              <DooIcon name="calendar" size={14} aria-hidden="true" />
               Upcoming Events Nearby
             </p>
             <div className="space-y-1.5">
@@ -439,7 +392,7 @@ export default function POIPopup() {
             onClick={handleNavigate}
             className="flex-1 bg-surface-brand text-surface-brand-foreground rounded-xl px-4 min-h-[48px] text-[0.9375rem] font-semibold hover:bg-surface-brand/90 active:scale-[0.98] transition-all flex items-center justify-center gap-2"
           >
-            <Navigation size={18} aria-hidden="true" />
+            <DooIcon name="navigation" size={18} aria-hidden="true" />
             Navigate here
           </button>
           {displayPOI && (
@@ -450,9 +403,9 @@ export default function POIPopup() {
               className="flex-1 bg-primary text-primary-foreground rounded-xl px-4 min-h-[48px] text-[0.9375rem] font-semibold hover:bg-primary/90 active:scale-[0.98] transition-all flex items-center justify-center gap-2 disabled:opacity-60"
             >
               {isWalking ? (
-                <Loader2 size={18} className="animate-spin" aria-hidden="true" />
+                <DooIcon name="loader" size={18} className="animate-spin" aria-hidden="true" />
               ) : (
-                <Footprints size={18} aria-hidden="true" />
+                <DooIcon name="navigation2" size={18} aria-hidden="true" />
               )}
               Walk here
             </button>

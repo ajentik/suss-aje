@@ -1,18 +1,7 @@
 "use client";
 
 import { useCallback, useState, useMemo } from "react";
-import {
-  MapPin,
-  Clock,
-  Star,
-  Navigation,
-  ExternalLink,
-  Phone,
-  Tag,
-  Calendar,
-  ChevronDown,
-  ChevronUp,
-} from "lucide-react";
+import { DooIcon } from "@/lib/icons";
 import { useAppStore } from "@/store/app-store";
 import type { POI } from "@/types";
 import { Badge } from "@/components/ui/badge";
@@ -57,7 +46,6 @@ export default function POICard({ poi }: POICardProps) {
 
   return (
     <div className="relative bg-card rounded-2xl shadow-lg border border-border w-full text-left transition-all hover:shadow-xl hover:border-border/80 overflow-hidden">
-      {/* Collapsed header — always visible, tappable to expand */}
       <button
         type="button"
         onClick={toggleExpand}
@@ -69,12 +57,10 @@ export default function POICard({ poi }: POICardProps) {
           <span className="inline-block bg-secondary text-secondary-foreground text-xs font-semibold px-2.5 py-0.5 rounded-full shrink-0">
             {poi.category}
           </span>
-          <h3 className="text-sm font-bold text-card-foreground truncate">
-            {poi.name}
-          </h3>
+          <h3 className="text-sm font-bold text-card-foreground truncate">{poi.name}</h3>
           {eventCount > 0 && (
             <Badge variant="outline" className="text-[0.6875rem] text-primary shrink-0 gap-0.5">
-              <Calendar size={10} aria-hidden="true" />
+              <DooIcon name="calendar" size={10} aria-hidden="true" />
               {eventCount}
             </Badge>
           )}
@@ -90,11 +76,10 @@ export default function POICard({ poi }: POICardProps) {
           )}
         </div>
         <div className="flex items-center justify-center w-7 h-7 rounded-full text-muted-foreground shrink-0">
-          {isExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+          {isExpanded ? <DooIcon name="chevron-up" size={16} /> : <DooIcon name="chevron-down" size={16} />}
         </div>
       </button>
 
-      {/* Expandable details */}
       <div
         className={`grid transition-[grid-template-rows] duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] ${
           isExpanded ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
@@ -102,39 +87,33 @@ export default function POICard({ poi }: POICardProps) {
       >
         <div className="overflow-hidden">
           <div className="px-5 pb-5">
-            <p className="text-[0.9375rem] text-muted-foreground mb-3 line-clamp-3 leading-relaxed">
-              {poi.description}
-            </p>
+            <p className="text-[0.9375rem] text-muted-foreground mb-3 line-clamp-3 leading-relaxed">{poi.description}</p>
 
             <div className="space-y-2 mb-4 text-[0.9375rem] text-muted-foreground">
               {poi.address && (
                 <div className="flex items-start gap-2">
-                  <MapPin size={16} className="mt-0.5 shrink-0" aria-hidden="true" />
+                  <DooIcon name="location-pin" size={16} className="mt-0.5 shrink-0" aria-hidden="true" />
                   <span className="line-clamp-1">{poi.address}</span>
                 </div>
               )}
 
               {poi.hours && (
                 <div className="flex items-start gap-2">
-                  <Clock size={16} className="mt-0.5 shrink-0" aria-hidden="true" />
+                  <DooIcon name="clock" size={16} className="mt-0.5 shrink-0" aria-hidden="true" />
                   <span className="line-clamp-1">{poi.hours}</span>
                 </div>
               )}
 
               {poi.rating && (
                 <div className="flex items-center gap-2">
-                  <Star
-                    size={16}
-                    className="text-yellow-500 fill-yellow-500 shrink-0"
-                    aria-hidden="true"
-                  />
+                  <DooIcon name="star" size={16} className="text-yellow-500 shrink-0" aria-hidden="true" />
                   <span>{poi.rating} / 5.0</span>
                 </div>
               )}
 
               {poi.contact && (
                 <div className="flex items-center gap-2">
-                  <Phone size={16} className="shrink-0" aria-hidden="true" />
+                  <DooIcon name="phone" size={16} className="shrink-0" aria-hidden="true" />
                   <span>{poi.contact}</span>
                 </div>
               )}
@@ -142,16 +121,9 @@ export default function POICard({ poi }: POICardProps) {
 
             {poi.tags && poi.tags.length > 0 && (
               <div className="flex items-center gap-1.5 mb-4 flex-wrap">
-                <Tag
-                  size={14}
-                  className="text-muted-foreground shrink-0"
-                  aria-hidden="true"
-                />
+                <DooIcon name="tag" size={14} className="text-muted-foreground shrink-0" aria-hidden="true" />
                 {poi.tags.map((tag) => (
-                  <span
-                    key={tag}
-                    className="inline-block bg-muted text-muted-foreground text-xs px-2 py-0.5 rounded-full"
-                  >
+                  <span key={tag} className="inline-block bg-muted text-muted-foreground text-xs px-2 py-0.5 rounded-full">
                     {tag}
                   </span>
                 ))}
@@ -172,7 +144,7 @@ export default function POICard({ poi }: POICardProps) {
                   onClick={(e) => e.stopPropagation()}
                   className="flex items-center justify-center gap-2.5 w-full h-14 rounded-xl bg-green-600 hover:bg-green-700 active:bg-green-800 text-white font-semibold text-base transition-colors active:scale-[0.98]"
                 >
-                  <Phone size={22} aria-hidden="true" />
+                  <DooIcon name="phone" size={22} aria-hidden="true" />
                   📞 Call This Centre
                 </a>
               )}
@@ -182,7 +154,7 @@ export default function POICard({ poi }: POICardProps) {
                   onClick={handleShowOnMap}
                   className="flex-1 bg-surface-brand text-surface-brand-foreground rounded-xl px-4 py-3 min-h-[44px] text-[0.9375rem] font-semibold hover:bg-surface-brand/90 active:scale-[0.98] transition-all flex items-center justify-center gap-2"
                 >
-                  <Navigation size={16} aria-hidden="true" />
+                  <DooIcon name="navigation" size={16} aria-hidden="true" />
                   Show on map
                 </button>
                 {poi.website && (
@@ -193,7 +165,7 @@ export default function POICard({ poi }: POICardProps) {
                     onClick={(e) => e.stopPropagation()}
                     className="inline-flex items-center gap-1.5 rounded-xl border border-border px-4 py-3 min-h-[44px] text-[0.9375rem] font-semibold text-card-foreground hover:bg-muted active:scale-[0.98] transition-all"
                   >
-                    <ExternalLink size={16} aria-hidden="true" />
+                    <DooIcon name="external-link" size={16} aria-hidden="true" />
                     Website
                   </a>
                 )}

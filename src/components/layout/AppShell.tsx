@@ -3,19 +3,7 @@
 import { useState, useCallback, useRef, useEffect } from "react";
 import Image from "next/image";
 import dynamic from "next/dynamic";
-import {
-  Volume2,
-  VolumeX,
-  Minus,
-  Maximize2,
-  GripVertical,
-  MessageSquare,
-  Calendar,
-  Building2,
-  // SquarePen — hidden for senior UX
-  // Sun, Moon — theme toggle hidden for senior UX
-} from "lucide-react";
-// import { useTheme } from "next-themes"; — theme toggle hidden for senior UX
+import { DooIcon } from "@/lib/icons";
 import { APIProvider } from "@vis.gl/react-google-maps";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAppStore, type PanelId } from "@/store/app-store";
@@ -67,37 +55,9 @@ function BrandHeader({
           priority
         />
         <div className="h-5 w-px bg-white/25" />
-        <span className="text-sm font-bold tracking-wide opacity-90">
-          AskSUSSi
-        </span>
+        <span className="text-sm font-bold tracking-wide opacity-90">AskSUSSi</span>
       </div>
       <div className="flex items-center gap-1">
-        {/* Feedback / New-chat button hidden for senior UX
-        {onNewChat && (
-          <button
-            type="button"
-            onClick={onNewChat}
-            className="flex items-center justify-center w-11 h-11 rounded-full bg-white/10 hover:bg-white/20 active:bg-white/25 transition-colors text-white/80 hover:text-white"
-            title="New chat"
-            aria-label="New chat"
-          >
-            <SquarePen size={18} />
-          </button>
-        )}
-        */}
-        {/* Theme toggle removed — forcing light mode (handled externally)
-        {mounted && (
-          <button
-            type="button"
-            onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
-            className="flex items-center justify-center w-11 h-11 rounded-full bg-white/10 hover:bg-white/20 active:bg-white/25 transition-colors text-white/80 hover:text-white"
-            title={resolvedTheme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
-            aria-label={resolvedTheme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
-          >
-            {resolvedTheme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
-          </button>
-        )}
-        */}
         <button
           type="button"
           onClick={onToggleTts}
@@ -105,7 +65,7 @@ function BrandHeader({
           title={ttsEnabled ? "Disable voice" : "Enable voice"}
           aria-label={ttsEnabled ? "Disable voice" : "Enable voice"}
         >
-          {ttsEnabled ? <Volume2 size={18} /> : <VolumeX size={18} />}
+          {ttsEnabled ? <DooIcon name="volume-up" size={18} /> : <DooIcon name="mute" size={18} />}
         </button>
         {extraButtons}
       </div>
@@ -140,8 +100,7 @@ export default function AppShell() {
     (e: React.MouseEvent | React.TouchEvent) => {
       e.preventDefault();
       isResizing.current = true;
-      startX.current =
-        "touches" in e ? e.touches[0].clientX : e.clientX;
+      startX.current = "touches" in e ? e.touches[0].clientX : e.clientX;
       startWidth.current = panelWidth;
       document.body.style.cursor = "col-resize";
       document.body.style.userSelect = "none";
@@ -155,15 +114,18 @@ export default function AppShell() {
     }
   }, []);
 
-  const handleSnapChange = useCallback((snap: SnapName) => {
-    const mapping: Record<SnapName, MobileSheetState> = {
-      mini: "collapsed",
-      peek: "peek",
-      half: "expanded",
-      full: "expanded",
-    };
-    setMobileSheet(mapping[snap]);
-  }, [setMobileSheet]);
+  const handleSnapChange = useCallback(
+    (snap: SnapName) => {
+      const mapping: Record<SnapName, MobileSheetState> = {
+        mini: "collapsed",
+        peek: "peek",
+        half: "expanded",
+        full: "expanded",
+      };
+      setMobileSheet(mapping[snap]);
+    },
+    [setMobileSheet],
+  );
 
   const mobileSnapToRef = useRef<((snap: SnapName) => void) | null>(null);
 
@@ -176,12 +138,8 @@ export default function AppShell() {
     mobileSnapToRef.current?.(mapping[mobileSheet]);
   }, [mobileSheet]);
 
-  const toggleTts = useCallback(
-    () => setTtsEnabled(!ttsEnabled),
-    [ttsEnabled, setTtsEnabled],
-  );
+  const toggleTts = useCallback(() => setTtsEnabled(!ttsEnabled), [ttsEnabled, setTtsEnabled]);
 
-  // Close detail and return to default sheet content
   const handleCloseDetail = useCallback(() => {
     setSheetContentMode("default");
     setSelectedPOI(null);
@@ -189,7 +147,6 @@ export default function AppShell() {
     setMobileSheet("expanded");
   }, [setSheetContentMode, setSelectedPOI, setSelectedEvent, setMobileSheet]);
 
-  // Handle navigate from detail cards
   const handleNavigatePOI = useCallback(() => {
     if (selectedPOI) {
       setSelectedDestination(selectedPOI);
@@ -210,13 +167,9 @@ export default function AppShell() {
   useEffect(() => {
     const handleMove = (e: MouseEvent | TouchEvent) => {
       if (!isResizing.current) return;
-      const clientX =
-        "touches" in e ? e.touches[0].clientX : e.clientX;
+      const clientX = "touches" in e ? e.touches[0].clientX : e.clientX;
       const delta = clientX - startX.current;
-      const newWidth = Math.min(
-        MAX_WIDTH,
-        Math.max(MIN_WIDTH, startWidth.current + delta),
-      );
+      const newWidth = Math.min(MAX_WIDTH, Math.max(MIN_WIDTH, startWidth.current + delta));
       setPanelWidth(newWidth);
     };
 
@@ -245,15 +198,11 @@ export default function AppShell() {
       peek: sheetContentMode !== "default" ? "280px" : "140px",
       expanded: "75dvh",
     };
-    document.documentElement.style.setProperty(
-      "--sheet-height",
-      heightMap[mobileSheet] ?? "64px"
-    );
+    document.documentElement.style.setProperty("--sheet-height", heightMap[mobileSheet] ?? "64px");
   }, [mobileSheet, sheetContentMode]);
 
   return (
     <div className="h-dvh w-full flex flex-col md:flex-row overflow-hidden">
-      {/* Desktop sidebar */}
       <aside
         aria-label="Chat and Events"
         style={{ width: minimized ? 0 : panelWidth }}
@@ -275,12 +224,11 @@ export default function AppShell() {
               title="Minimize panel"
               aria-label="Minimize panel"
             >
-              <Minus size={14} />
+              <DooIcon name="minus" size={14} />
             </button>
           }
         />
 
-        {/* Tabs */}
         <Tabs
           value={activePanel}
           onValueChange={(v) => setActivePanel(v as PanelId)}
@@ -300,22 +248,15 @@ export default function AppShell() {
           <TabsContent value="chat" className="flex-1 min-h-0 mt-0">
             <ChatPanel />
           </TabsContent>
-          <TabsContent
-            value="events"
-            className="flex-1 min-h-0 mt-0 overflow-y-auto"
-          >
+          <TabsContent value="events" className="flex-1 min-h-0 mt-0 overflow-y-auto">
             <EventsPanel />
           </TabsContent>
-          <TabsContent
-            value="aac-search"
-            className="flex-1 min-h-0 mt-0 overflow-y-auto"
-          >
+          <TabsContent value="aac-search" className="flex-1 min-h-0 mt-0 overflow-y-auto">
             <AACSearchPanel />
           </TabsContent>
         </Tabs>
       </aside>
 
-      {/* Desktop resize handle */}
       {!minimized && (
         <button
           type="button"
@@ -324,14 +265,14 @@ export default function AppShell() {
           onMouseDown={handleResizeStart}
           onTouchStart={handleResizeStart}
         >
-          <GripVertical
+          <DooIcon
+            name="grid"
             size={14}
             className="text-muted-foreground/40 group-hover:text-muted-foreground/70 transition-colors"
           />
         </button>
       )}
 
-      {/* Desktop minimize restore button */}
       {minimized && (
         <button
           type="button"
@@ -339,7 +280,7 @@ export default function AppShell() {
           className="hidden md:flex absolute top-3 left-3 z-30 items-center gap-1.5 px-3 py-2 bg-surface-brand/90 backdrop-blur text-surface-brand-foreground rounded-lg shadow-lg text-xs font-medium hover:bg-surface-brand transition-colors"
           aria-label="Restore panel"
         >
-          <Maximize2 size={14} />
+          <DooIcon name="maximize" size={14} />
           AskSUSSi
         </button>
       )}
@@ -351,7 +292,7 @@ export default function AppShell() {
           <div className="flex items-center justify-between px-4 pb-2 shrink-0">
             <div className="flex items-center gap-2.5 text-sm text-muted-foreground">
               <div className="flex items-center justify-center w-7 h-7 rounded-full bg-primary/10">
-                <MessageSquare size={14} className="text-primary" aria-hidden="true" />
+                <DooIcon name="message" size={14} className="text-primary" />
               </div>
               <div className="flex flex-col">
                 <span className="font-semibold text-card-foreground text-[13px] leading-tight">AskSUSSi</span>
@@ -385,41 +326,26 @@ export default function AppShell() {
               className="flex-1 flex flex-col min-h-0"
             >
               <TabsList className="mx-3 mt-2 shrink-0 h-12">
-                <TabsTrigger
-                  value="chat"
-                  className="flex-1 min-h-[44px] text-sm gap-1.5 font-medium"
-                >
-                  <MessageSquare size={15} aria-hidden="true" />
+                <TabsTrigger value="chat" className="flex-1 min-h-[44px] text-sm gap-1.5 font-medium">
+                  <DooIcon name="message" size={15} />
                   Chat
                 </TabsTrigger>
-                <TabsTrigger
-                  value="events"
-                  className="flex-1 min-h-[44px] text-sm gap-1.5 font-medium"
-                >
-                  <Calendar size={15} aria-hidden="true" />
+                <TabsTrigger value="events" className="flex-1 min-h-[44px] text-sm gap-1.5 font-medium">
+                  <DooIcon name="calendar" size={15} />
                   Events
                 </TabsTrigger>
-                <TabsTrigger
-                  value="aac-search"
-                  className="flex-1 min-h-[44px] text-sm gap-1.5 font-medium"
-                >
-                  <Building2 size={15} aria-hidden="true" />
+                <TabsTrigger value="aac-search" className="flex-1 min-h-[44px] text-sm gap-1.5 font-medium">
+                  <DooIcon name="shop" size={15} />
                   AAC
                 </TabsTrigger>
               </TabsList>
               <TabsContent value="chat" className="flex-1 min-h-0 mt-0">
                 <ChatPanel />
               </TabsContent>
-              <TabsContent
-                value="events"
-                className="flex-1 min-h-0 mt-0 overflow-y-auto"
-              >
+              <TabsContent value="events" className="flex-1 min-h-0 mt-0 overflow-y-auto">
                 <EventsPanel />
               </TabsContent>
-              <TabsContent
-                value="aac-search"
-                className="flex-1 min-h-0 mt-0 overflow-y-auto"
-              >
+              <TabsContent value="aac-search" className="flex-1 min-h-0 mt-0 overflow-y-auto">
                 <AACSearchPanel />
               </TabsContent>
             </Tabs>
@@ -427,10 +353,7 @@ export default function AppShell() {
         )}
       </MobileSheet>
 
-      <APIProvider
-        apiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || ""}
-        version="beta"
-      >
+      <APIProvider apiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || ""} version="beta">
         <main id="main-content" className="flex-1 h-full relative">
           <MapView />
           <RouteOverlay />

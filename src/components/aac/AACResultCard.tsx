@@ -1,7 +1,7 @@
 "use client";
 
 import type { POI } from "@/types";
-import { MapPin, Footprints, Loader2, Phone } from "lucide-react";
+import { DooIcon } from "@/lib/icons";
 import { useWalkingRoute } from "@/hooks/useWalkingRoute";
 
 interface AACResultCardProps {
@@ -28,7 +28,7 @@ export default function AACResultCard({ poi, distanceKm, onSelect }: AACResultCa
       >
         <div className="flex items-start gap-2.5">
           <div className="mt-0.5 flex-shrink-0 w-7 h-7 rounded-full bg-poi-aac/15 flex items-center justify-center">
-            <MapPin size={14} className="text-poi-aac" />
+            <DooIcon name="location-pin" size={14} className="text-poi-aac" />
           </div>
           <div className="min-w-0 flex-1">
             <p className="text-sm font-medium leading-snug text-foreground group-hover:text-primary transition-colors truncate pr-8">
@@ -62,9 +62,9 @@ export default function AACResultCard({ poi, distanceKm, onSelect }: AACResultCa
           className="absolute top-2 right-2 flex items-center justify-center w-7 h-7 rounded-full bg-primary/10 hover:bg-primary/20 active:scale-90 transition-all disabled:opacity-60"
         >
           {isWalking ? (
-            <Loader2 size={14} className="animate-spin text-primary" aria-hidden="true" />
+            <DooIcon name="loader" size={14} className="animate-spin text-primary" />
           ) : (
-            <Footprints size={14} className="text-primary" aria-hidden="true" />
+            <DooIcon name="navigation2" size={14} className="text-primary" />
           )}
         </button>
       </button>
@@ -74,7 +74,7 @@ export default function AACResultCard({ poi, distanceKm, onSelect }: AACResultCa
           aria-label={`Call ${poi.name}`}
           className="flex items-center justify-center gap-2.5 w-full h-14 bg-green-600 hover:bg-green-700 active:bg-green-800 text-white font-semibold text-base transition-colors"
         >
-          <Phone size={22} aria-hidden="true" />
+          <DooIcon name="phone" size={22} />
           📞 Call This Centre
         </a>
       )}

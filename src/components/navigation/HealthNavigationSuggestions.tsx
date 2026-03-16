@@ -1,15 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import {
-  Accessibility,
-  Pill,
-  Brain,
-  Stethoscope,
-  HeartHandshake,
-  Navigation,
-} from "lucide-react";
-import type { ComponentType } from "react";
+import { DooIcon, type IconName } from "@/lib/icons";
 
 import { cn } from "@/lib/utils";
 
@@ -21,34 +13,34 @@ export type HealthConcern =
   | "caregiver stress";
 
 interface SuggestionConfig {
-  icon: ComponentType<{ size?: number; className?: string }>;
+  icon: IconName;
   label: string;
   destination: string;
 }
 
 export const HEALTH_SUGGESTIONS: Record<HealthConcern, SuggestionConfig> = {
   "mobility issues": {
-    icon: Accessibility,
+    icon: "navigation2",
     label: "Find physiotherapy clinic nearby",
     destination: "physiotherapy",
   },
   "medication concerns": {
-    icon: Pill,
+    icon: "plus",
     label: "Walk to nearest pharmacy",
     destination: "pharmacy",
   },
   "cognitive decline": {
-    icon: Brain,
+    icon: "bot",
     label: "Find memory clinic nearby",
     destination: "memory-clinic",
   },
   "general checkup": {
-    icon: Stethoscope,
+    icon: "heart",
     label: "Navigate to nearest polyclinic",
     destination: "polyclinic",
   },
   "caregiver stress": {
-    icon: HeartHandshake,
+    icon: "heart",
     label: "Find caregiver support centre nearby",
     destination: "caregiver-support",
   },
@@ -79,7 +71,7 @@ export default function HealthNavigationSuggestions({
       </h3>
       <ul className="flex flex-col gap-1.5">
         {matched.map((concern) => {
-          const { icon: Icon, label, destination } =
+          const { icon, label, destination } =
             HEALTH_SUGGESTIONS[concern];
           return (
             <li key={concern}>
@@ -97,7 +89,7 @@ export default function HealthNavigationSuggestions({
                   className="flex-shrink-0 flex items-center justify-center w-8 h-8 rounded-full bg-primary/10"
                   aria-hidden="true"
                 >
-                  <Icon size={16} className="text-primary" />
+                  <DooIcon name={icon} size={16} className="text-primary" />
                 </span>
                 <span className="flex-1 text-sm font-medium text-foreground group-hover:text-primary transition-colors">
                   {label}
@@ -106,7 +98,7 @@ export default function HealthNavigationSuggestions({
                   className="flex-shrink-0 inline-flex items-center gap-1 rounded-full bg-primary px-3 py-1 text-xs font-medium text-primary-foreground"
                   aria-hidden="true"
                 >
-                  <Navigation size={12} aria-hidden="true" />
+                  <DooIcon name="navigation" size={12} />
                   Navigate
                 </span>
               </Link>

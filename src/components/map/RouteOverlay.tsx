@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useRef, useCallback } from "react";
 import { toast } from "sonner";
-import { Footprints, X, ChevronUp, ChevronDown } from "lucide-react";
+import { DooIcon } from "@/lib/icons";
 import { useAppStore } from "@/store/app-store";
 import { getBuildingInsights, type SolarInsight } from "@/lib/maps/solar-utils";
 import { estimateElderlyWalkTime, assessRouteAccessibility } from "@/utils/elderNavigation";
@@ -156,7 +156,7 @@ export default function RouteOverlay() {
         <div className="flex items-center justify-between gap-2">
           <div className="flex items-center gap-2.5 min-w-0">
             <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary/10 shrink-0">
-              <Footprints size={16} className="text-primary" aria-hidden="true" />
+              <DooIcon name="navigation2" size={16} className="text-primary" />
             </div>
             <div className="flex items-center gap-2 text-sm min-w-0">
               <span className="font-semibold text-card-foreground truncate">
@@ -176,9 +176,9 @@ export default function RouteOverlay() {
                 className="flex items-center justify-center w-8 h-8 rounded-full hover:bg-muted/60 active:scale-90 transition-all duration-200"
               >
                 {expanded ? (
-                  <ChevronDown size={16} className="text-muted-foreground" />
+                  <DooIcon name="chevron-down" size={16} className="text-muted-foreground" />
                 ) : (
-                  <ChevronUp size={16} className="text-muted-foreground" />
+                  <DooIcon name="chevron-up" size={16} className="text-muted-foreground" />
                 )}
               </button>
             )}
@@ -188,7 +188,7 @@ export default function RouteOverlay() {
               onClick={handleDismiss}
               className="flex items-center justify-center w-8 h-8 rounded-full hover:bg-muted/60 active:scale-90 transition-all duration-200"
             >
-              <X size={16} className="text-muted-foreground" />
+              <DooIcon name="cross" size={16} className="text-muted-foreground" />
             </button>
           </div>
         </div>

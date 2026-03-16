@@ -5,19 +5,6 @@ import {
   DEFAULT_EVENT_ICON,
   DEFAULT_ICON_BG,
 } from "@/lib/event-icons";
-import {
-  Info,
-  DoorOpen,
-  Presentation,
-  Users,
-  Briefcase,
-  BookOpen,
-  MessageSquare,
-  Landmark,
-  PartyPopper,
-  Trophy,
-  Calendar,
-} from "lucide-react";
 
 const ALL_CATEGORIES = [
   "Information Session",
@@ -41,34 +28,35 @@ describe("CATEGORY_ICON", () => {
     }
   });
 
-  it("maps each category to a defined icon component", () => {
+  it("maps each category to a defined icon name string", () => {
     for (const cat of ALL_CATEGORIES) {
       expect(CATEGORY_ICON[cat]).toBeDefined();
+      expect(typeof CATEGORY_ICON[cat]).toBe("string");
     }
   });
 
-  it("maps known categories to their correct icons", () => {
-    expect(CATEGORY_ICON["Information Session"]).toBe(Info);
-    expect(CATEGORY_ICON["Open House"]).toBe(DoorOpen);
-    expect(CATEGORY_ICON["Public Lecture / Enrichment Talk"]).toBe(Presentation);
-    expect(CATEGORY_ICON["Symposium"]).toBe(Users);
-    expect(CATEGORY_ICON["Competition / Hackathon"]).toBe(Trophy);
-    expect(CATEGORY_ICON["Lecture"]).toBe(BookOpen);
-    expect(CATEGORY_ICON["Forum / Conference"]).toBe(MessageSquare);
-    expect(CATEGORY_ICON["Conference"]).toBe(Landmark);
-    expect(CATEGORY_ICON["Social"]).toBe(PartyPopper);
+  it("maps known categories to their correct icon names", () => {
+    expect(CATEGORY_ICON["Information Session"]).toBe("info");
+    expect(CATEGORY_ICON["Open House"]).toBe("shop");
+    expect(CATEGORY_ICON["Public Lecture / Enrichment Talk"]).toBe("message2");
+    expect(CATEGORY_ICON["Symposium"]).toBe("user");
+    expect(CATEGORY_ICON["Competition / Hackathon"]).toBe("star");
+    expect(CATEGORY_ICON["Lecture"]).toBe("doc");
+    expect(CATEGORY_ICON["Forum / Conference"]).toBe("message");
+    expect(CATEGORY_ICON["Conference"]).toBe("globe");
+    expect(CATEGORY_ICON["Social"]).toBe("sparkle");
   });
 
-  it("maps Career and Career Fair to the same icon (Briefcase)", () => {
-    expect(CATEGORY_ICON["Career"]).toBe(Briefcase);
-    expect(CATEGORY_ICON["Career Fair"]).toBe(Briefcase);
+  it("maps Career and Career Fair to the same icon", () => {
+    expect(CATEGORY_ICON["Career"]).toBe("wallet");
+    expect(CATEGORY_ICON["Career Fair"]).toBe("wallet");
   });
 });
 
 describe("DEFAULT_EVENT_ICON", () => {
-  it("is defined and matches the Calendar icon", () => {
+  it("is defined and matches the calendar icon name", () => {
     expect(DEFAULT_EVENT_ICON).toBeDefined();
-    expect(DEFAULT_EVENT_ICON).toBe(Calendar);
+    expect(DEFAULT_EVENT_ICON).toBe("calendar");
   });
 });
 
