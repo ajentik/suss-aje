@@ -3,7 +3,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import type { StateCreator } from "zustand";
-import type { POI, RouteInfo, CampusEvent, ChatMessage, DateRangePreset } from "@/types";
+import type { POI, RouteInfo, CampusEvent, ChatMessage, DateRangePreset, SttLanguage } from "@/types";
 
 type SheetContentMode = "default" | "poi-detail" | "event-detail";
 type MobileSheetState = "collapsed" | "peek" | "expanded";
@@ -47,6 +47,8 @@ export interface AppState {
   setIsSpeaking: (speaking: boolean) => void;
   ttsEnabled: boolean;
   setTtsEnabled: (enabled: boolean) => void;
+  sttLanguage: SttLanguage;
+  setSttLanguage: (lang: SttLanguage) => void;
 
   onboardingDismissed: boolean;
   setOnboardingDismissed: (dismissed: boolean) => void;
@@ -119,6 +121,8 @@ type ChatSlice = Pick<
   | "setIsSpeaking"
   | "ttsEnabled"
   | "setTtsEnabled"
+  | "sttLanguage"
+  | "setSttLanguage"
 >;
 
 function generateId(): string {
@@ -185,6 +189,8 @@ const createChatSlice: StateCreator<AppState, [], [], ChatSlice> = (set) => ({
   setIsSpeaking: (speaking) => set({ isSpeaking: speaking }),
   ttsEnabled: false,
   setTtsEnabled: (enabled) => set({ ttsEnabled: enabled }),
+  sttLanguage: "english",
+  setSttLanguage: (lang) => set({ sttLanguage: lang }),
   chatMessages: [],
   setChatMessages: (messages) => set({ chatMessages: messages }),
   conversationId: generateId(),
@@ -217,6 +223,7 @@ export const useAppStore = create<AppState>()(
       name: "asksussi-prefs",
       partialize: (state) => ({
         ttsEnabled: state.ttsEnabled,
+        sttLanguage: state.sttLanguage,
         activePanel: state.activePanel,
         onboardingDismissed: state.onboardingDismissed,
         introDismissed: state.introDismissed,

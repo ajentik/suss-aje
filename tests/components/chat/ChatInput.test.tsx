@@ -5,6 +5,26 @@ vi.mock("@/components/chat/VoiceButton", () => ({
   default: () => <button type="button" aria-label="Mock voice" />,
 }));
 
+vi.mock("@/components/chat/LanguageSelector", () => ({
+  default: () => <div data-testid="lang-selector" />,
+}));
+
+vi.mock("@/store/app-store", () => ({
+  useAppStore: (selector: (s: Record<string, unknown>) => unknown) =>
+    selector({ sttLanguage: "english" }),
+}));
+
+vi.mock("@/lib/voice/speech-recognition", () => ({
+  getSttLang: (mode: string) => {
+    const map: Record<string, string> = {
+      english: "en-US",
+      singlish: "en-SG",
+      "mandarin-mix": "zh",
+    };
+    return map[mode];
+  },
+}));
+
 import ChatInput from "@/components/chat/ChatInput";
 
 describe("ChatInput", () => {

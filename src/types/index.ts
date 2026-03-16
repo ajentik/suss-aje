@@ -62,3 +62,5 @@ export interface ChatMessage {
 }
 
 export type DateRangePreset = "all" | "1d" | "3d" | "7d";
+
+export type SttLanguage = "english" | "singlish" | "mandarin-mix";

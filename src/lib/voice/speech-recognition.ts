@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useCallback, useRef } from "react";
+import type { SttLanguage } from "@/types";
 
 interface SpeechRecognitionEvent {
   results: SpeechRecognitionResultList;
@@ -24,18 +25,33 @@ declare global {
   }
 }
 
+/** BCP-47 language tag for each STT mode. */
+const STT_LANG_MAP: Record<SttLanguage, string> = {
+  english: "en-US",
+  singlish: "en-SG",
+  "mandarin-mix": "zh",
+};
+
+export function getSttLang(mode: SttLanguage): string {
+  return STT_LANG_MAP[mode];
+}
+
 export function useSpeechRecognition() {
   const [isListening, setIsListening] = useState(false);
   const [transcript, setTranscript] = useState("");
   const recognitionRef = useRef<ReturnType<typeof createRecognition> | null>(null);
 
   const startListening = useCallback(
-    (onResult: (text: string) => void, onError?: (message: string) => void) => {
+    (
+      onResult: (text: string) => void,
+      onError?: (message: string) => void,
+      lang: string = "en-SG",
+    ) => {
       const recognition = createRecognition();
       if (!recognition) return;
 
       recognitionRef.current = recognition;
-      recognition.lang = "en-SG";
+      recognition.lang = lang;
       recognition.interimResults = false;
       recognition.continuous = false;
 

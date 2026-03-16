@@ -7,9 +7,10 @@ import { cn } from "@/lib/utils";
 
 interface VoiceButtonProps {
   onTranscript: (text: string) => void;
+  lang?: string;
 }
 
-export default function VoiceButton({ onTranscript }: VoiceButtonProps) {
+export default function VoiceButton({ onTranscript, lang }: VoiceButtonProps) {
   const { isListening, startListening, stopListening } = useSpeechRecognition();
 
   const handleClick = () => {
@@ -17,7 +18,7 @@ export default function VoiceButton({ onTranscript }: VoiceButtonProps) {
     if (isListening) {
       stopListening();
     } else {
-      startListening(onTranscript, (msg) => toast.error(msg));
+      startListening(onTranscript, (msg) => toast.error(msg), lang);
     }
   };
 

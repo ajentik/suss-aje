@@ -99,6 +99,20 @@ describe("VoiceButton", () => {
     expect(mockStartListening).toHaveBeenCalledWith(
       onTranscript,
       expect.any(Function),
+      undefined,
+    );
+  });
+
+  it("passes lang to startListening when provided", () => {
+    const onTranscript = vi.fn();
+    render(<VoiceButton onTranscript={onTranscript} lang="en-SG" />);
+
+    fireEvent.click(screen.getByRole("button"));
+
+    expect(mockStartListening).toHaveBeenCalledWith(
+      onTranscript,
+      expect.any(Function),
+      "en-SG",
     );
   });
 

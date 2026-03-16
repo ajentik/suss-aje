@@ -3,7 +3,10 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { ArrowUp } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useAppStore } from "@/store/app-store";
+import { getSttLang } from "@/lib/voice/speech-recognition";
 import VoiceButton from "./VoiceButton";
+import LanguageSelector from "./LanguageSelector";
 
 interface ChatInputProps {
   onSend: (message: string) => void;
@@ -75,6 +78,8 @@ export default function ChatInput({ onSend, isLoading }: ChatInputProps) {
   };
 
   const canSend = value.trim().length > 0 && !isLoading;
+  const sttLanguage = useAppStore((s) => s.sttLanguage);
+  const sttLang = getSttLang(sttLanguage);
 
   return (
     <form
@@ -85,7 +90,10 @@ export default function ChatInput({ onSend, isLoading }: ChatInputProps) {
         "transition-colors duration-200"
       )}
     >
-      <VoiceButton onTranscript={handleVoiceTranscript} />
+      <div className="flex items-end gap-1.5">
+        <VoiceButton onTranscript={handleVoiceTranscript} lang={sttLang} />
+        <LanguageSelector />
+      </div>
 
       <div className="relative flex-1 min-w-0">
         <textarea

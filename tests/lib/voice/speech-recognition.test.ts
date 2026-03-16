@@ -1,6 +1,6 @@
 import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
 import { renderHook, act } from "@testing-library/react";
-import { useSpeechRecognition } from "@/lib/voice/speech-recognition";
+import { useSpeechRecognition, getSttLang } from "@/lib/voice/speech-recognition";
 
 interface MockRecognitionInstance {
   lang: string;
@@ -61,6 +61,18 @@ describe("useSpeechRecognition", () => {
     expect(inst.lang).toBe("en-SG");
     expect(inst.interimResults).toBe(false);
     expect(inst.continuous).toBe(false);
+  });
+
+  it("uses the provided lang parameter", () => {
+    const { result } = renderHook(() => useSpeechRecognition());
+    const onResult = vi.fn();
+
+    act(() => {
+      result.current.startListening(onResult, undefined, "zh");
+    });
+
+    const inst = getInstance(MockSpeechRecognition);
+    expect(inst.lang).toBe("zh");
   });
 
   it("calls recognition.start() and sets isListening to true", () => {
@@ -196,5 +208,19 @@ describe("useSpeechRecognition", () => {
     });
 
     expect(result.current.isListening).toBe(false);
+  });
+});
+
+describe("getSttLang", () => {
+  it("returns en-US for english", () => {
+    expect(getSttLang("english")).toBe("en-US");
+  });
+
+  it("returns en-SG for singlish", () => {
+    expect(getSttLang("singlish")).toBe("en-SG");
+  });
+
+  it("returns zh for mandarin-mix", () => {
+    expect(getSttLang("mandarin-mix")).toBe("zh");
   });
 });

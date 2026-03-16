@@ -43,6 +43,7 @@ function resetStore() {
     streetViewEvent: null,
     isSpeaking: false,
     ttsEnabled: false,
+    sttLanguage: "english",
     onboardingDismissed: false,
     chatMessages: [],
     pendingChatMessage: null,
@@ -70,6 +71,7 @@ describe("app-store", () => {
     expect(state.selectedEvent).toBeNull();
     expect(state.isSpeaking).toBe(false);
     expect(state.ttsEnabled).toBe(false);
+    expect(state.sttLanguage).toBe("english");
     expect(state.onboardingDismissed).toBe(false);
     expect(state.chatMessages).toEqual([]);
     expect(state.pendingChatMessage).toBeNull();
@@ -153,6 +155,15 @@ describe("app-store", () => {
     expect(useAppStore.getState().ttsEnabled).toBe(true);
     useAppStore.getState().setTtsEnabled(false);
     expect(useAppStore.getState().ttsEnabled).toBe(false);
+  });
+
+  it("setSttLanguage updates STT language", () => {
+    useAppStore.getState().setSttLanguage("singlish");
+    expect(useAppStore.getState().sttLanguage).toBe("singlish");
+    useAppStore.getState().setSttLanguage("mandarin-mix");
+    expect(useAppStore.getState().sttLanguage).toBe("mandarin-mix");
+    useAppStore.getState().setSttLanguage("english");
+    expect(useAppStore.getState().sttLanguage).toBe("english");
   });
 
   it("setOnboardingDismissed works", () => {
