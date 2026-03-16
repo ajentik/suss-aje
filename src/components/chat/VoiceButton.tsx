@@ -13,6 +13,7 @@ export default function VoiceButton({ onTranscript }: VoiceButtonProps) {
   const { isListening, startListening, stopListening } = useSpeechRecognition();
 
   const handleClick = () => {
+    navigator.vibrate?.(10);
     if (isListening) {
       stopListening();
     } else {

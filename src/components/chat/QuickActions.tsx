@@ -15,7 +15,7 @@ const QUICK_ACTIONS: QuickAction[] = [
   { emoji: "\u{1F354}", label: "Where to Eat", message: "Where can I eat near campus?" },
   { emoji: "\u{1F4DA}", label: "Library Hours", message: "What are the library hours?" },
   { emoji: "\u{1F68C}", label: "Shuttle Schedule", message: "What is the shuttle bus schedule?" },
-  { emoji: "\u{1F3E5}", label: "Nearest AAC", message: "Where is the nearest AAC (Academic Advisory Centre)?" },
+  { emoji: "\u{1F3E5}", label: "Nearest AAC", message: "Where is the nearest AAC (Active Ageing Centre)?" },
 ];
 
 interface QuickActionsProps {

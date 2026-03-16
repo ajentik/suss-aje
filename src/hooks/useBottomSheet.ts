@@ -192,7 +192,7 @@ export function useBottomSheet(
   const snapStateRef = useRef<SnapName>("peek");
 
   // ── Spring animation loop ──
-  const animateSpring = useCallback(() => {
+  const animateSpring = useCallback(function animateSpringFrame() {
     const target = targetHeightRef.current;
     const current = currentHeightRef.current;
     let vel = velocityRef.current;
@@ -210,6 +210,8 @@ export function useBottomSheet(
       velocityRef.current = 0;
       animFrameRef.current = 0;
 
+      navigator.vibrate?.(10);
+
       // Final state update for React consumers
       setCurrentHeight(target);
       const snap = findNearestSnap(target, orderedSnapsRef.current);
@@ -219,7 +221,7 @@ export function useBottomSheet(
     }
 
     applyTransform(nextHeight);
-    animFrameRef.current = requestAnimationFrame(animateSpring);
+    animFrameRef.current = requestAnimationFrame(animateSpringFrame);
   }, [applyTransform]);
 
   // ── Snap to a target height with spring ──
@@ -395,8 +397,7 @@ export function useBottomSheet(
         cancelAnimationFrame(animFrameRef.current);
       }
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [applyTransform, resolveSnaps]);
 
   return {
     sheetRef,

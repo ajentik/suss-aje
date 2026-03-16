@@ -25,12 +25,6 @@ export function useWalkingRoute() {
         altitude: 400,
       });
 
-      const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || "";
-      if (!apiKey) {
-        setIsLoading(false);
-        return;
-      }
-
       const getLocation = (): Promise<{ lat: number; lng: number }> => {
         if (userLocation) return Promise.resolve(userLocation);
         return new Promise((resolve, reject) => {
@@ -53,7 +47,7 @@ export function useWalkingRoute() {
         const { computeWalkingRoute } = await import(
           "@/lib/maps/route-utils"
         );
-        const route = await computeWalkingRoute(origin, destination, apiKey);
+        const route = await computeWalkingRoute(origin, destination);
         if (route) {
           setRouteInfo({
             polyline: route.polyline,
@@ -71,8 +65,7 @@ export function useWalkingRoute() {
         );
         const route = await computeWalkingRoute(
           SUSS_CAMPUS,
-          destination,
-          apiKey
+          destination
         );
         if (route) {
           setRouteInfo({

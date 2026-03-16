@@ -48,6 +48,7 @@ export default function ChatInput({ onSend, isLoading }: ChatInputProps) {
   const doSend = () => {
     const trimmed = value.trim();
     if (!trimmed || isLoading) return;
+    navigator.vibrate?.(10);
     onSend(trimmed);
     setValue("");
     requestAnimationFrame(() => {

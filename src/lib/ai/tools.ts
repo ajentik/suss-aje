@@ -41,7 +41,7 @@ export const showEvents = tool({
     date: z
       .string()
       .optional()
-      .describe("Filter events by date in YYYY-MM-DD format. Use 2026-03-13 for today."),
+      .describe("Filter events by date in YYYY-MM-DD format. Use dynamic date detection for 'today'."),
     category: z
       .string()
       .optional()

@@ -2,13 +2,14 @@
 
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
+import type { StateCreator } from "zustand";
 import type { POI, RouteInfo, CampusEvent, ChatMessage, DateRangePreset } from "@/types";
 
 type SheetContentMode = "default" | "poi-detail" | "event-detail";
 type MobileSheetState = "collapsed" | "peek" | "expanded";
 export type PanelId = "chat" | "events" | "aac-search";
 
-interface AppState {
+export interface AppState {
   selectedPOI: POI | null;
   setSelectedPOI: (poi: POI | null) => void;
   selectedDestination: POI | null;
@@ -50,6 +51,9 @@ interface AppState {
   onboardingDismissed: boolean;
   setOnboardingDismissed: (dismissed: boolean) => void;
 
+  introDismissed: boolean;
+  setIntroDismissed: (dismissed: boolean) => void;
+
   chatMessages: ChatMessage[];
   setChatMessages: (messages: ChatMessage[]) => void;
   conversationId: string;
@@ -59,82 +63,155 @@ interface AppState {
   setPendingChatMessage: (message: string | null) => void;
 }
 
+type MapSlice = Pick<
+  AppState,
+  | "selectedPOI"
+  | "setSelectedPOI"
+  | "selectedDestination"
+  | "setSelectedDestination"
+  | "routeInfo"
+  | "setRouteInfo"
+  | "flyToTarget"
+  | "setFlyToTarget"
+  | "userLocation"
+  | "setUserLocation"
+>;
+
+type UiSlice = Pick<
+  AppState,
+  | "activePanel"
+  | "setActivePanel"
+  | "sheetContentMode"
+  | "setSheetContentMode"
+  | "mobileSheetState"
+  | "setMobileSheetState"
+  | "onboardingDismissed"
+  | "setOnboardingDismissed"
+  | "introDismissed"
+  | "setIntroDismissed"
+>;
+
+type EventsSlice = Pick<
+  AppState,
+  | "eventDateFilter"
+  | "setEventDateFilter"
+  | "eventCategoryFilter"
+  | "setEventCategoryFilter"
+  | "mapEventMarkers"
+  | "setMapEventMarkers"
+  | "highlightedEventIds"
+  | "setHighlightedEventIds"
+  | "selectedEvent"
+  | "setSelectedEvent"
+  | "streetViewEvent"
+  | "setStreetViewEvent"
+>;
+
+type ChatSlice = Pick<
+  AppState,
+  | "chatMessages"
+  | "setChatMessages"
+  | "conversationId"
+  | "newChat"
+  | "pendingChatMessage"
+  | "setPendingChatMessage"
+  | "isSpeaking"
+  | "setIsSpeaking"
+  | "ttsEnabled"
+  | "setTtsEnabled"
+>;
+
 function generateId(): string {
   return Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
 }
 
+const createMapSlice: StateCreator<AppState, [], [], MapSlice> = (set) => ({
+  selectedPOI: null,
+  setSelectedPOI: (poi) =>
+    set({
+      selectedPOI: poi,
+      selectedEvent: null,
+      ...(poi
+        ? { sheetContentMode: "poi-detail" as const, mobileSheetState: "peek" as const }
+        : { sheetContentMode: "default" as const }),
+    }),
+  selectedDestination: null,
+  setSelectedDestination: (poi) => set({ selectedDestination: poi }),
+  routeInfo: null,
+  setRouteInfo: (route) => set({ routeInfo: route }),
+  flyToTarget: null,
+  setFlyToTarget: (target) => set({ flyToTarget: target }),
+  userLocation: null,
+  setUserLocation: (loc) => set({ userLocation: loc }),
+});
+
+const createUiSlice: StateCreator<AppState, [], [], UiSlice> = (set) => ({
+  activePanel: "chat",
+  setActivePanel: (panel) => set({ activePanel: panel }),
+  sheetContentMode: "default",
+  setSheetContentMode: (mode) => set({ sheetContentMode: mode }),
+  mobileSheetState: "expanded",
+  setMobileSheetState: (state) => set({ mobileSheetState: state }),
+  onboardingDismissed: false,
+  setOnboardingDismissed: (dismissed) => set({ onboardingDismissed: dismissed }),
+  introDismissed: false,
+  setIntroDismissed: (dismissed) => set({ introDismissed: dismissed }),
+});
+
+const createEventsSlice: StateCreator<AppState, [], [], EventsSlice> = (set) => ({
+  eventDateFilter: "all",
+  setEventDateFilter: (preset) => set({ eventDateFilter: preset }),
+  eventCategoryFilter: "",
+  setEventCategoryFilter: (category) => set({ eventCategoryFilter: category }),
+  mapEventMarkers: [],
+  setMapEventMarkers: (events) => set({ mapEventMarkers: events }),
+  highlightedEventIds: [],
+  setHighlightedEventIds: (ids) => set({ highlightedEventIds: ids }),
+  selectedEvent: null,
+  setSelectedEvent: (event) =>
+    set({
+      selectedEvent: event,
+      selectedPOI: null,
+      ...(event
+        ? { sheetContentMode: "event-detail" as const, mobileSheetState: "peek" as const }
+        : { sheetContentMode: "default" as const }),
+    }),
+  streetViewEvent: null,
+  setStreetViewEvent: (event) => set({ streetViewEvent: event }),
+});
+
+const createChatSlice: StateCreator<AppState, [], [], ChatSlice> = (set) => ({
+  isSpeaking: false,
+  setIsSpeaking: (speaking) => set({ isSpeaking: speaking }),
+  ttsEnabled: false,
+  setTtsEnabled: (enabled) => set({ ttsEnabled: enabled }),
+  chatMessages: [],
+  setChatMessages: (messages) => set({ chatMessages: messages }),
+  conversationId: generateId(),
+  newChat: () =>
+    set({
+      chatMessages: [],
+      conversationId: generateId(),
+      routeInfo: null,
+      selectedDestination: null,
+      selectedPOI: null,
+      selectedEvent: null,
+      streetViewEvent: null,
+      sheetContentMode: "default",
+      mobileSheetState: "expanded",
+      pendingChatMessage: null,
+    }),
+  pendingChatMessage: null,
+  setPendingChatMessage: (message) => set({ pendingChatMessage: message }),
+});
+
 export const useAppStore = create<AppState>()(
   persist(
-    (set) => ({
-      selectedPOI: null,
-      setSelectedPOI: (poi) =>
-        set({
-          selectedPOI: poi,
-          selectedEvent: null,
-          ...(poi
-            ? { sheetContentMode: "poi-detail" as const, mobileSheetState: "peek" as const }
-            : { sheetContentMode: "default" as const }),
-        }),
-      selectedDestination: null,
-      setSelectedDestination: (poi) => set({ selectedDestination: poi }),
-      routeInfo: null,
-      setRouteInfo: (route) => set({ routeInfo: route }),
-      flyToTarget: null,
-      setFlyToTarget: (target) => set({ flyToTarget: target }),
-
-      userLocation: null,
-      setUserLocation: (loc) => set({ userLocation: loc }),
-
-      activePanel: "chat",
-      setActivePanel: (panel) => set({ activePanel: panel }),
-
-      sheetContentMode: "default",
-      setSheetContentMode: (mode) => set({ sheetContentMode: mode }),
-      mobileSheetState: "expanded",
-      setMobileSheetState: (state) => set({ mobileSheetState: state }),
-
-      eventDateFilter: "all",
-      setEventDateFilter: (preset) => set({ eventDateFilter: preset }),
-      eventCategoryFilter: "",
-      setEventCategoryFilter: (category) => set({ eventCategoryFilter: category }),
-      mapEventMarkers: [],
-      setMapEventMarkers: (events) => set({ mapEventMarkers: events }),
-      highlightedEventIds: [],
-      setHighlightedEventIds: (ids) => set({ highlightedEventIds: ids }),
-      selectedEvent: null,
-      setSelectedEvent: (event) =>
-        set({
-          selectedEvent: event,
-          selectedPOI: null,
-          ...(event
-            ? { sheetContentMode: "event-detail" as const, mobileSheetState: "peek" as const }
-            : { sheetContentMode: "default" as const }),
-        }),
-      streetViewEvent: null,
-      setStreetViewEvent: (event) => set({ streetViewEvent: event }),
-
-      isSpeaking: false,
-      setIsSpeaking: (speaking) => set({ isSpeaking: speaking }),
-      ttsEnabled: false,
-      setTtsEnabled: (enabled) => set({ ttsEnabled: enabled }),
-
-      onboardingDismissed: false,
-      setOnboardingDismissed: (dismissed) => set({ onboardingDismissed: dismissed }),
-
-      chatMessages: [],
-      setChatMessages: (messages) => set({ chatMessages: messages }),
-      conversationId: generateId(),
-      newChat: () =>
-        set({
-          chatMessages: [],
-          conversationId: generateId(),
-          routeInfo: null,
-          selectedDestination: null,
-          selectedPOI: null,
-        }),
-
-      pendingChatMessage: null,
-      setPendingChatMessage: (message) => set({ pendingChatMessage: message }),
+    (set, get, api) => ({
+      ...createMapSlice(set, get, api),
+      ...createUiSlice(set, get, api),
+      ...createEventsSlice(set, get, api),
+      ...createChatSlice(set, get, api),
     }),
     {
       name: "asksussi-prefs",
@@ -142,6 +219,7 @@ export const useAppStore = create<AppState>()(
         ttsEnabled: state.ttsEnabled,
         activePanel: state.activePanel,
         onboardingDismissed: state.onboardingDismissed,
+        introDismissed: state.introDismissed,
         chatMessages: state.chatMessages,
         conversationId: state.conversationId,
       }),
