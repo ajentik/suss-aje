@@ -22,6 +22,7 @@ interface MobileSheetProps {
   initialSnap?: SnapName;
   /** Additional class names on the outer container */
   className?: string;
+  snapToRef?: { current: ((snap: SnapName) => void) | null };
 }
 
 // ── Default mini content ──
@@ -53,6 +54,7 @@ export function MobileSheet({
   onSnapChange,
   initialSnap = "peek",
   className = "",
+  snapToRef,
 }: MobileSheetProps) {
   const {
     sheetRef,
@@ -71,6 +73,14 @@ export function MobileSheet({
       onSnapChange?.(snapState);
     }
   }, [snapState, onSnapChange]);
+
+  useEffect(() => {
+    if (!snapToRef) return;
+    snapToRef.current = snapTo;
+    return () => {
+      snapToRef.current = null;
+    };
+  }, [snapTo, snapToRef]);
 
   // Snap to initial on mount
   const didInitRef = useRef(false);
@@ -121,9 +131,8 @@ export function MobileSheet({
   const isMini = snapState === "mini";
 
   return (
-    <div
+    <aside
       ref={sheetRef}
-      role="region"
       aria-label="Bottom sheet"
       className={`
         md:hidden fixed bottom-0 left-0 right-0 z-30
@@ -146,28 +155,31 @@ export function MobileSheet({
       {/* ── Drag handle area ── */}
       <div
         ref={handleRef}
-        role="button"
-        tabIndex={0}
-        aria-label={
-          isMini ? "Expand panel" : "Drag to resize or tap to cycle"
-        }
-        aria-roledescription="drag handle"
-        className="flex flex-col items-center pt-2.5 pb-1.5 shrink-0 cursor-grab active:cursor-grabbing select-none"
+        className="flex flex-col items-center pt-2.5 pb-1.5 shrink-0 cursor-grab active:cursor-grabbing select-none w-full"
         style={{ touchAction: "none" }}
-        onClick={handleTap}
-        onKeyDown={handleKeyDown}
         onTouchStart={touchHandlers.onTouchStart}
         onTouchMove={touchHandlers.onTouchMove}
         onTouchEnd={touchHandlers.onTouchEnd}
       >
-        {/* Visual pill indicator */}
-        <div
-          className={`
-            w-10 h-1 rounded-full bg-muted-foreground/30
-            transition-all duration-200
-            ${isDragging ? "w-12 bg-muted-foreground/50" : ""}
-          `}
-        />
+        <button
+          type="button"
+          aria-label={
+            isMini ? "Expand panel" : "Drag to resize or tap to cycle"
+          }
+          aria-roledescription="drag handle"
+          className="border-0 bg-transparent p-0"
+          onClick={handleTap}
+          onKeyDown={handleKeyDown}
+        >
+          {/* Visual pill indicator */}
+          <div
+            className={`
+              w-10 h-1 rounded-full bg-muted-foreground/30
+              transition-all duration-200
+              ${isDragging ? "w-12 bg-muted-foreground/50" : ""}
+            `}
+          />
+        </button>
       </div>
 
       {/* ── Mini state content ── */}
@@ -191,7 +203,7 @@ export function MobileSheet({
       >
         {children}
       </div>
-    </div>
+    </aside>
   );
 }
 

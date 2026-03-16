@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useRef, useEffect } from "react";
+import { useState, useCallback, useRef, useEffect, useSyncExternalStore } from "react";
 import Image from "next/image";
 import dynamic from "next/dynamic";
 import {
@@ -12,8 +12,11 @@ import {
   MessageSquare,
   Calendar,
   Building2,
-  ChevronUp,
+  SquarePen,
+  Sun,
+  Moon,
 } from "lucide-react";
+import { useTheme } from "next-themes";
 import { APIProvider } from "@vis.gl/react-google-maps";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAppStore, type PanelId } from "@/store/app-store";
@@ -25,7 +28,8 @@ import AerialViewButton from "@/components/map/AerialViewButton";
 import POIPopup, { POIDetailCard } from "@/components/map/POIPopup";
 import EventPopup, { EventDetailCard } from "@/components/map/EventPopup";
 import Onboarding from "@/components/layout/Onboarding";
-import type { CampusEvent } from "@/types";
+import { MobileSheet, type SnapName } from "@/components/layout/MobileSheet";
+import { createStreetViewEventFromPOI } from "@/lib/maps/poi-utils";
 
 const MapView = dynamic(() => import("@/components/map/MapView"), {
   ssr: false,
@@ -39,16 +43,26 @@ const MapView = dynamic(() => import("@/components/map/MapView"), {
 const MIN_WIDTH = 320;
 const MAX_WIDTH = 600;
 const DEFAULT_WIDTH = 400;
+type MobileSheetState = "collapsed" | "peek" | "expanded";
 
 function BrandHeader({
   ttsEnabled,
   onToggleTts,
+  onNewChat,
   extraButtons,
 }: {
   ttsEnabled: boolean;
   onToggleTts: () => void;
+  onNewChat?: () => void;
   extraButtons?: React.ReactNode;
 }) {
+  const { resolvedTheme, setTheme } = useTheme();
+  const mounted = useSyncExternalStore(
+    () => () => undefined,
+    () => true,
+    () => false,
+  );
+
   return (
     <div className="flex items-center justify-between px-4 py-2.5 border-b bg-surface-brand/90 backdrop-blur text-surface-brand-foreground shrink-0">
       <div className="flex items-center gap-2.5">
@@ -66,6 +80,28 @@ function BrandHeader({
         </span>
       </div>
       <div className="flex items-center gap-1">
+        {onNewChat && (
+          <button
+            type="button"
+            onClick={onNewChat}
+            className="flex items-center justify-center w-11 h-11 rounded-full bg-white/10 hover:bg-white/20 active:bg-white/25 transition-colors text-white/80 hover:text-white"
+            title="New chat"
+            aria-label="New chat"
+          >
+            <SquarePen size={18} />
+          </button>
+        )}
+        {mounted && (
+          <button
+            type="button"
+            onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
+            className="flex items-center justify-center w-11 h-11 rounded-full bg-white/10 hover:bg-white/20 active:bg-white/25 transition-colors text-white/80 hover:text-white"
+            title={resolvedTheme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+            aria-label={resolvedTheme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+          >
+            {resolvedTheme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
+          </button>
+        )}
         <button
           type="button"
           onClick={onToggleTts}
@@ -86,6 +122,7 @@ export default function AppShell() {
   const setActivePanel = useAppStore((s) => s.setActivePanel);
   const ttsEnabled = useAppStore((s) => s.ttsEnabled);
   const setTtsEnabled = useAppStore((s) => s.setTtsEnabled);
+  const newChat = useAppStore((s) => s.newChat);
   const mobileSheet = useAppStore((s) => s.mobileSheetState);
   const setMobileSheet = useAppStore((s) => s.setMobileSheetState);
   const sheetContentMode = useAppStore((s) => s.sheetContentMode);
@@ -120,64 +157,28 @@ export default function AppShell() {
     if (typeof window !== "undefined" && window.speechSynthesis) {
       window.speechSynthesis.cancel();
     }
-  }, [activePanel]);
-
-  const cycleSheet = useCallback(() => {
-    setMobileSheet(
-      mobileSheet === "collapsed"
-        ? "peek"
-        : mobileSheet === "peek"
-          ? "expanded"
-          : "collapsed",
-    );
-  }, [mobileSheet, setMobileSheet]);
-
-  // Mobile swipe gesture for bottom sheet
-  const sheetTouchStartY = useRef(0);
-  const sheetTouchCurrentY = useRef(0);
-  const isSheetDragging = useRef(false);
-
-  const handleSheetTouchStart = useCallback((e: React.TouchEvent) => {
-    sheetTouchStartY.current = e.touches[0].clientY;
-    sheetTouchCurrentY.current = e.touches[0].clientY;
-    isSheetDragging.current = true;
   }, []);
 
-  const handleSheetTouchMove = useCallback((e: React.TouchEvent) => {
-    if (!isSheetDragging.current) return;
-    sheetTouchCurrentY.current = e.touches[0].clientY;
-  }, []);
+  const handleSnapChange = useCallback((snap: SnapName) => {
+    const mapping: Record<SnapName, MobileSheetState> = {
+      mini: "collapsed",
+      peek: "peek",
+      half: "expanded",
+      full: "expanded",
+    };
+    setMobileSheet(mapping[snap]);
+  }, [setMobileSheet]);
 
-  const handleSheetTouchEnd = useCallback(() => {
-    if (!isSheetDragging.current) return;
-    isSheetDragging.current = false;
-    const deltaY = sheetTouchCurrentY.current - sheetTouchStartY.current;
-    const threshold = 40;
+  const mobileSnapToRef = useRef<((snap: SnapName) => void) | null>(null);
 
-    if (deltaY < -threshold) {
-      // Swipe up — expand
-      setMobileSheet(
-        mobileSheet === "collapsed"
-          ? "peek"
-          : "expanded",
-      );
-    } else if (deltaY > threshold) {
-      // Swipe down — collapse or close detail
-      if (mobileSheet === "peek" && sheetContentMode !== "default") {
-        // Swiping down on detail in peek → close detail, go back to default
-        setSheetContentMode("default");
-        setSelectedPOI(null);
-        setSelectedEvent(null);
-        setMobileSheet("collapsed");
-      } else {
-        setMobileSheet(
-          mobileSheet === "expanded"
-            ? "peek"
-            : "collapsed",
-        );
-      }
-    }
-  }, [mobileSheet, setMobileSheet, sheetContentMode, setSheetContentMode, setSelectedPOI, setSelectedEvent]);
+  useEffect(() => {
+    const mapping: Record<MobileSheetState, SnapName> = {
+      collapsed: "mini",
+      peek: "peek",
+      expanded: "half",
+    };
+    mobileSnapToRef.current?.(mapping[mobileSheet]);
+  }, [mobileSheet]);
 
   const toggleTts = useCallback(
     () => setTtsEnabled(!ttsEnabled),
@@ -196,19 +197,7 @@ export default function AppShell() {
   const handleNavigatePOI = useCallback(() => {
     if (selectedPOI) {
       setSelectedDestination(selectedPOI);
-      setStreetViewEvent({
-        id: `poi-${selectedPOI.id}`,
-        title: selectedPOI.name,
-        date: "",
-        time: "",
-        location: selectedPOI.address || selectedPOI.name,
-        category: selectedPOI.category,
-        description: selectedPOI.description,
-        type: "On-Campus",
-        school: "SUSS",
-        lat: selectedPOI.lat,
-        lng: selectedPOI.lng,
-      } as CampusEvent);
+      setStreetViewEvent(createStreetViewEventFromPOI(selectedPOI));
     }
     setSelectedPOI(null);
     setSheetContentMode("default");
@@ -254,15 +243,17 @@ export default function AppShell() {
     };
   }, []);
 
-  // Determine mobile sheet height class
-  const sheetHeightClass =
-    mobileSheet === "expanded"
-      ? "h-[75dvh]"
-      : mobileSheet === "peek"
-        ? sheetContentMode !== "default"
-          ? "h-[280px]"  // Taller peek for detail cards
-          : "h-[140px]"
-        : "h-16";
+  useEffect(() => {
+    const heightMap: Record<string, string> = {
+      collapsed: "64px",
+      peek: sheetContentMode !== "default" ? "280px" : "140px",
+      expanded: "75dvh",
+    };
+    document.documentElement.style.setProperty(
+      "--sheet-height",
+      heightMap[mobileSheet] ?? "64px"
+    );
+  }, [mobileSheet, sheetContentMode]);
 
   return (
     <div className="h-dvh w-full flex flex-col md:flex-row overflow-hidden">
@@ -279,6 +270,7 @@ export default function AppShell() {
         <BrandHeader
           ttsEnabled={ttsEnabled}
           onToggleTts={toggleTts}
+          onNewChat={newChat}
           extraButtons={
             <button
               type="button"
@@ -356,44 +348,10 @@ export default function AppShell() {
         </button>
       )}
 
-      {/* Mobile bottom sheet */}
-      <aside
-        aria-label="Chat and Events (mobile)"
-        className={`
-          md:hidden fixed bottom-0 left-0 right-0 z-30
-          ${sheetHeightClass}
-          bg-background/95 backdrop-blur-xl
-          transition-all duration-350 ease-[cubic-bezier(0.32,0.72,0,1)]
-          flex flex-col overflow-hidden
-          rounded-t-2xl shadow-[0_-4px_30px_rgba(0,0,0,0.1)]
-          border-t border-border/50
-        `}
-        style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)" }}
-      >
-        {/* Drag handle area — swipeable */}
-        <div
-          role="button"
-          tabIndex={0}
-          aria-label={
-            mobileSheet === "expanded" ? "Collapse panel" : "Expand panel"
-          }
-          className="flex flex-col items-center pt-2 pb-1.5 shrink-0 cursor-grab active:cursor-grabbing touch-none select-none"
-          onClick={cycleSheet}
-          onKeyDown={(e) => {
-            if (e.key === "Enter" || e.key === " ") cycleSheet();
-          }}
-          onTouchStart={handleSheetTouchStart}
-          onTouchMove={handleSheetTouchMove}
-          onTouchEnd={handleSheetTouchEnd}
-        >
-          <div className="w-12 h-1.5 rounded-full bg-muted-foreground/30 mb-1" />
-          {mobileSheet === "collapsed" && (
-            <ChevronUp size={14} className="text-muted-foreground/40 animate-pulse" aria-hidden="true" />
-          )}
-        </div>
-
-        {/* Collapsed state: show mini status */}
-        {mobileSheet === "collapsed" && (
+      <MobileSheet
+        onSnapChange={handleSnapChange}
+        snapToRef={mobileSnapToRef}
+        miniContent={
           <div className="flex items-center justify-between px-4 pb-2 shrink-0">
             <div className="flex items-center gap-2.5 text-sm text-muted-foreground">
               <div className="flex items-center justify-center w-7 h-7 rounded-full bg-primary/10">
@@ -405,80 +363,73 @@ export default function AppShell() {
               </div>
             </div>
           </div>
-        )}
-
-        {mobileSheet !== "collapsed" && (
+        }
+      >
+        {sheetContentMode === "poi-detail" && selectedPOI ? (
+          <POIDetailCard
+            poi={selectedPOI}
+            onClose={handleCloseDetail}
+            onNavigate={handleNavigatePOI}
+            compact={mobileSheet === "peek"}
+          />
+        ) : sheetContentMode === "event-detail" && selectedEvent ? (
+          <EventDetailCard
+            event={selectedEvent}
+            onClose={handleCloseDetail}
+            onNavigate={handleNavigateEvent}
+            compact={mobileSheet === "peek"}
+          />
+        ) : (
           <>
-            {/* Content mode routing */}
-            {sheetContentMode === "poi-detail" && selectedPOI ? (
-              <POIDetailCard
-                poi={selectedPOI}
-                onClose={handleCloseDetail}
-                onNavigate={handleNavigatePOI}
-                compact={mobileSheet === "peek"}
-              />
-            ) : sheetContentMode === "event-detail" && selectedEvent ? (
-              <EventDetailCard
-                event={selectedEvent}
-                onClose={handleCloseDetail}
-                onNavigate={handleNavigateEvent}
-                compact={mobileSheet === "peek"}
-              />
-            ) : (
-              <>
-                <BrandHeader ttsEnabled={ttsEnabled} onToggleTts={toggleTts} />
+            <BrandHeader ttsEnabled={ttsEnabled} onToggleTts={toggleTts} onNewChat={newChat} />
 
-                <Tabs
-                  value={activePanel}
-                  onValueChange={(v) =>
-                    setActivePanel(v as PanelId)
-                  }
-                  className="flex-1 flex flex-col min-h-0"
+            <Tabs
+              value={activePanel}
+              onValueChange={(v) => setActivePanel(v as PanelId)}
+              className="flex-1 flex flex-col min-h-0"
+            >
+              <TabsList className="mx-3 mt-2 shrink-0 h-12">
+                <TabsTrigger
+                  value="chat"
+                  className="flex-1 min-h-[44px] text-sm gap-1.5 font-medium"
                 >
-                  <TabsList className="mx-3 mt-2 shrink-0 h-12">
-                    <TabsTrigger
-                      value="chat"
-                      className="flex-1 min-h-[44px] text-sm gap-1.5 font-medium"
-                    >
-                      <MessageSquare size={15} aria-hidden="true" />
-                      Chat
-                    </TabsTrigger>
-                    <TabsTrigger
-                      value="events"
-                      className="flex-1 min-h-[44px] text-sm gap-1.5 font-medium"
-                    >
-                      <Calendar size={15} aria-hidden="true" />
-                      Events
-                    </TabsTrigger>
-                    <TabsTrigger
-                      value="aac-search"
-                      className="flex-1 min-h-[44px] text-sm gap-1.5 font-medium"
-                    >
-                      <Building2 size={15} aria-hidden="true" />
-                      AAC
-                    </TabsTrigger>
-                  </TabsList>
-                  <TabsContent value="chat" className="flex-1 min-h-0 mt-0">
-                    <ChatPanel />
-                  </TabsContent>
-                  <TabsContent
-                    value="events"
-                    className="flex-1 min-h-0 mt-0 overflow-y-auto"
-                  >
-                    <EventsPanel />
-                  </TabsContent>
-                  <TabsContent
-                    value="aac-search"
-                    className="flex-1 min-h-0 mt-0 overflow-y-auto"
-                  >
-                    <AACSearchPanel />
-                  </TabsContent>
-                </Tabs>
-              </>
-            )}
+                  <MessageSquare size={15} aria-hidden="true" />
+                  Chat
+                </TabsTrigger>
+                <TabsTrigger
+                  value="events"
+                  className="flex-1 min-h-[44px] text-sm gap-1.5 font-medium"
+                >
+                  <Calendar size={15} aria-hidden="true" />
+                  Events
+                </TabsTrigger>
+                <TabsTrigger
+                  value="aac-search"
+                  className="flex-1 min-h-[44px] text-sm gap-1.5 font-medium"
+                >
+                  <Building2 size={15} aria-hidden="true" />
+                  AAC
+                </TabsTrigger>
+              </TabsList>
+              <TabsContent value="chat" className="flex-1 min-h-0 mt-0">
+                <ChatPanel />
+              </TabsContent>
+              <TabsContent
+                value="events"
+                className="flex-1 min-h-0 mt-0 overflow-y-auto"
+              >
+                <EventsPanel />
+              </TabsContent>
+              <TabsContent
+                value="aac-search"
+                className="flex-1 min-h-0 mt-0 overflow-y-auto"
+              >
+                <AACSearchPanel />
+              </TabsContent>
+            </Tabs>
           </>
         )}
-      </aside>
+      </MobileSheet>
 
       <APIProvider
         apiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || ""}
