@@ -48,6 +48,30 @@ export interface RouteStep {
   maneuver?: string;
 }
 
+export type MobilityLevel = "normal" | "slow" | "walker" | "wheelchair";
+
+export interface EnhancedRouteStep {
+  instruction: string;
+  distanceMeters: number;
+  durationSeconds: number;
+  maneuver?: string;
+  hasStairs: boolean;
+}
+
+export interface EnhancedRoute {
+  polyline: string;
+  steps: EnhancedRouteStep[];
+  totalDistanceMeters: number;
+  totalDurationSeconds: number;
+  mobilityAdjustedDurationSeconds: number;
+  hasStairs: boolean;
+}
+
+export interface EnhancedRouteResponse {
+  routes: EnhancedRoute[];
+  mobilityLevel: MobilityLevel;
+}
+
 export interface RouteInfo {
   polyline: google.maps.LatLngLiteral[];
   distanceMeters: number;
