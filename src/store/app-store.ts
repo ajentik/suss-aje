@@ -153,7 +153,7 @@ const createMapSlice: StateCreator<AppState, [], [], MapSlice> = (set) => ({
 });
 
 const createUiSlice: StateCreator<AppState, [], [], UiSlice> = (set) => ({
-  activePanel: "chat",
+  activePanel: "aac-search",
   setActivePanel: (panel) => set({ activePanel: panel }),
   sheetContentMode: "default",
   setSheetContentMode: (mode) => set({ sheetContentMode: mode }),

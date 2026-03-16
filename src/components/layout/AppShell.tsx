@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useRef, useEffect, useSyncExternalStore } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import Image from "next/image";
 import dynamic from "next/dynamic";
 import {
@@ -12,11 +12,10 @@ import {
   MessageSquare,
   Calendar,
   Building2,
-  SquarePen,
-  Sun,
-  Moon,
+  // SquarePen — hidden for senior UX
+  // Sun, Moon — theme toggle hidden for senior UX
 } from "lucide-react";
-import { useTheme } from "next-themes";
+// import { useTheme } from "next-themes"; — theme toggle hidden for senior UX
 import { APIProvider } from "@vis.gl/react-google-maps";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAppStore, type PanelId } from "@/store/app-store";
@@ -48,7 +47,6 @@ type MobileSheetState = "collapsed" | "peek" | "expanded";
 function BrandHeader({
   ttsEnabled,
   onToggleTts,
-  onNewChat,
   extraButtons,
 }: {
   ttsEnabled: boolean;
@@ -56,13 +54,6 @@ function BrandHeader({
   onNewChat?: () => void;
   extraButtons?: React.ReactNode;
 }) {
-  const { resolvedTheme, setTheme } = useTheme();
-  const mounted = useSyncExternalStore(
-    () => () => undefined,
-    () => true,
-    () => false,
-  );
-
   return (
     <div className="flex items-center justify-between px-4 py-2.5 border-b bg-surface-brand/90 backdrop-blur text-surface-brand-foreground shrink-0">
       <div className="flex items-center gap-2.5">
@@ -80,6 +71,7 @@ function BrandHeader({
         </span>
       </div>
       <div className="flex items-center gap-1">
+        {/* Feedback / New-chat button hidden for senior UX
         {onNewChat && (
           <button
             type="button"
@@ -91,6 +83,8 @@ function BrandHeader({
             <SquarePen size={18} />
           </button>
         )}
+        */}
+        {/* Theme toggle removed — forcing light mode (handled externally)
         {mounted && (
           <button
             type="button"
@@ -102,6 +96,7 @@ function BrandHeader({
             {resolvedTheme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
           </button>
         )}
+        */}
         <button
           type="button"
           onClick={onToggleTts}
