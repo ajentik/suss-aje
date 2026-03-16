@@ -12,6 +12,7 @@ import {
   ExternalLink,
 } from "lucide-react";
 import { useAppStore } from "@/store/app-store";
+import { createStreetViewEventFromPOI } from "@/lib/maps/poi-utils";
 import type { POI, CampusEvent } from "@/types";
 import campusEventsData from "@/../public/campus-events.json";
 import AACEventsSection from "@/components/ui/AACEventsSection";
@@ -26,22 +27,6 @@ function validateCampusEvents(data: typeof campusEventsData): CampusEvent[] {
 }
 
 const campusEvents = validateCampusEvents(campusEventsData);
-
-function createStreetViewEventFromPOI(poi: POI): CampusEvent {
-  return {
-    id: `poi-${poi.id}`,
-    title: poi.name,
-    date: "",
-    time: "",
-    location: poi.address || poi.name,
-    category: poi.category,
-    description: poi.description,
-    type: "On-Campus",
-    school: "SUSS",
-    lat: poi.lat,
-    lng: poi.lng,
-  };
-}
 
 function findUpcomingEventsNear(poi: POI): CampusEvent[] {
   const today = new Date().toISOString().slice(0, 10);

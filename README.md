@@ -338,7 +338,8 @@ Create a `.env.local` file in the root directory and add the following keys:
 | Variable | Required | Description |
 |---|---|---|
 | `GOOGLE_GENERATIVE_AI_API_KEY` | Yes | Gemini API key for chat |
-| `NEXT_PUBLIC_GOOGLE_MAPS_API_KEY` | Yes | Google Maps API key (Maps 3D, Routes, Solar) |
+| `NEXT_PUBLIC_GOOGLE_MAPS_API_KEY` | Yes | Browser Maps API key for Maps 3D and client-side map features |
+| `GOOGLE_MAPS_API_KEY` | Yes | Server-side Google Routes API key used by `/api/route` |
 
 ### Development
 
