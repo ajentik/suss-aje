@@ -433,7 +433,7 @@ export default function AppShell() {
 
       <APIProvider
         apiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || ""}
-        version="alpha"
+        version="beta"
       >
         <main id="main-content" className="flex-1 h-full relative">
           <MapView />

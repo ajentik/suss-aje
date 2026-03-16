@@ -166,12 +166,14 @@ describe("MapView", () => {
     expect(state.selectedPOI).not.toBeNull();
   });
 
-  it("shows Street View hint text", async () => {
+  it("does not render the Street View hint text", async () => {
     await act(async () => {
       await renderMapView();
     });
 
-    expect(screen.getByText("Double-click to enter Street View")).toBeInTheDocument();
+    expect(
+      screen.queryByText("Double-click to enter Street View"),
+    ).not.toBeInTheDocument();
   });
 
   it("renders event markers when mapEventMarkers are set", async () => {
