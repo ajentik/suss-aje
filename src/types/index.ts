@@ -62,3 +62,10 @@ export interface ChatMessage {
 }
 
 export type DateRangePreset = "all" | "1d" | "3d" | "7d";
+
+export interface FeedbackEntry {
+  original: string;
+  corrected: string | null;
+  timestamp: number;
+  provider: string;
+}
