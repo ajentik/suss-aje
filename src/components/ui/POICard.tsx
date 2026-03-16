@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useState, useMemo } from "react";
+import { useCallback, useState, useEffect } from "react";
 import {
   MapPin,
   Clock,
@@ -17,7 +17,7 @@ import { useAppStore } from "@/store/app-store";
 import type { POI } from "@/types";
 import { Badge } from "@/components/ui/badge";
 import AACEventsSection from "@/components/ui/AACEventsSection";
-import { getAACEventsForPOI } from "@/lib/maps/aac-events";
+import { getAACEventsForPOI, type AACEventsByKind } from "@/lib/maps/aac-events";
 
 interface POICardProps {
   poi: POI;
@@ -32,10 +32,17 @@ export default function POICard({ poi }: POICardProps) {
   const setSelectedPOI = useAppStore((s) => s.setSelectedPOI);
   const [isExpanded, setIsExpanded] = useState(false);
   const isAAC = poi.category === "Active Ageing Centre";
+  const [eventsByKind, setEventsByKind] = useState<AACEventsByKind | null>(null);
 
-  const eventsByKind = useMemo(() => {
-    if (!isAAC) return null;
-    return getAACEventsForPOI(poi.name);
+  useEffect(() => {
+    if (!isAAC) return;
+    let cancelled = false;
+    getAACEventsForPOI(poi.name).then((result) => {
+      if (!cancelled) setEventsByKind(result);
+    });
+    return () => {
+      cancelled = true;
+    };
   }, [isAAC, poi.name]);
 
   const eventCount = eventsByKind

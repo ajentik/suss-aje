@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Calendar } from "lucide-react";
 import type { POI, CampusEvent } from "@/types";
 import { useAppStore } from "@/store/app-store";
@@ -25,14 +25,24 @@ export default function AACEventsSection({ poi, precomputedEvents }: AACEventsSe
   const setSelectedEvent = useAppStore((s) => s.setSelectedEvent);
   const setFlyToTarget = useAppStore((s) => s.setFlyToTarget);
   const [activeTab, setActiveTab] = useState<AACEventKind>("regular");
-
-  const eventsByKind = useMemo(
-    () => precomputedEvents ?? getAACEventsForPOI(poi.name),
-    [precomputedEvents, poi.name],
+  const [eventsByKind, setEventsByKind] = useState<AACEventsByKind | null>(
+    precomputedEvents ?? null,
   );
 
-  const totalCount =
-    eventsByKind.regular.length + eventsByKind.special.length;
+  useEffect(() => {
+    if (precomputedEvents) {
+      setEventsByKind(precomputedEvents);
+      return;
+    }
+
+    let cancelled = false;
+    getAACEventsForPOI(poi.name).then((result) => {
+      if (!cancelled) setEventsByKind(result);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [precomputedEvents, poi.name]);
 
   const handleEventClick = useCallback(
     (event: CampusEvent) => {
@@ -41,6 +51,11 @@ export default function AACEventsSection({ poi, precomputedEvents }: AACEventsSe
     },
     [setFlyToTarget, setSelectedEvent],
   );
+
+  if (!eventsByKind) return null;
+
+  const totalCount =
+    eventsByKind.regular.length + eventsByKind.special.length;
 
   if (totalCount === 0) return null;
 

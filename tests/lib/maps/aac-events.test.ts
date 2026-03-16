@@ -79,31 +79,71 @@ describe("isOffSiteEvent", () => {
 });
 
 describe("getAACEventsForPOI", () => {
+  const regularEvent = makeEvent({
+    id: "reg-1",
+    title: "Tai Chi",
+    description: "Morning exercise",
+    location: "Test Centre",
+    date: "2026-03-15",
+    endDate: "2026-06-30",
+  });
+
+  const specialEvent = makeEvent({
+    id: "sp-1",
+    title: "Cooking Workshop",
+    description: "Community cooking session",
+    location: "Test Centre",
+    date: "2026-03-16",
+    endDate: "2026-06-30",
+  });
+
   beforeEach(() => {
     vi.useFakeTimers();
     vi.setSystemTime(new Date("2026-03-14T12:00:00Z"));
+
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue({
+        ok: true,
+        json: () =>
+          Promise.resolve({
+            data: [regularEvent, specialEvent],
+            total: 2,
+            limit: 200,
+            offset: 0,
+          }),
+      }),
+    );
   });
 
   afterEach(() => {
     vi.useRealTimers();
+    vi.restoreAllMocks();
   });
 
-  it("returns events grouped by kind", () => {
-    const result = getAACEventsForPOI("NTUC Health Active Ageing Hub (Jurong Point)");
+  it("returns events grouped by kind", async () => {
+    const result = await getAACEventsForPOI("Test Centre");
     expect(result).toHaveProperty("regular");
     expect(result).toHaveProperty("special");
     expect(Array.isArray(result.regular)).toBe(true);
     expect(Array.isArray(result.special)).toBe(true);
   });
 
-  it("returns empty arrays for unknown POI", () => {
-    const result = getAACEventsForPOI("Nonexistent Centre");
+  it("returns empty arrays when API returns no events", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue({
+        ok: true,
+        json: () => Promise.resolve({ data: [], total: 0, limit: 200, offset: 0 }),
+      }),
+    );
+    const result = await getAACEventsForPOI("Nonexistent Centre");
     expect(result.regular).toHaveLength(0);
     expect(result.special).toHaveLength(0);
   });
 
-  it("sorts events by date and time", () => {
-    const result = getAACEventsForPOI("NTUC Health Active Ageing Hub (Jurong Point)");
+  it("sorts events by date and time", async () => {
+    const result = await getAACEventsForPOI("Test Centre");
     for (const kind of ["regular", "special"] as const) {
       const events = result[kind];
       for (let i = 1; i < events.length; i++) {
@@ -114,14 +154,11 @@ describe("getAACEventsForPOI", () => {
     }
   });
 
-  it("excludes past events", () => {
-    const result = getAACEventsForPOI("NTUC Health Active Ageing Hub (Jurong Point)");
-    const today = "2026-03-14";
-    for (const events of [result.regular, result.special]) {
-      for (const event of events) {
-        const endDate = event.endDate || event.date;
-        expect(endDate >= today).toBe(true);
-      }
-    }
+  it("classifies events correctly into regular and special", async () => {
+    const result = await getAACEventsForPOI("Test Centre");
+    expect(result.regular).toHaveLength(1);
+    expect(result.special).toHaveLength(1);
+    expect(result.regular[0].id).toBe("reg-1");
+    expect(result.special[0].id).toBe("sp-1");
   });
 });

@@ -1,17 +1,4 @@
 import type { CampusEvent } from "@/types";
-import aacEventsData from "@/../public/aac-events.json";
-
-function validateAACEvents(data: typeof aacEventsData): CampusEvent[] {
-  return data.map((e) => ({
-    ...e,
-    type: e.type as CampusEvent["type"],
-    school: e.school as CampusEvent["school"],
-    endDate: e.endDate ?? undefined,
-    recurrence: e.recurrence ?? undefined,
-  }));
-}
-
-const allAacEvents = validateAACEvents(aacEventsData);
 
 const SPECIAL_KEYWORDS = [
   "workshop",
@@ -43,19 +30,57 @@ export interface AACEventsByKind {
   special: CampusEvent[];
 }
 
+export interface AACEventsFilters {
+  location?: string;
+  operator?: string;
+  date?: string;
+  limit?: number;
+  offset?: number;
+}
+
+interface AACEventsResponse {
+  data: CampusEvent[];
+  total: number;
+  limit: number;
+  offset: number;
+}
+
+export async function fetchAACEvents(
+  filters: AACEventsFilters = {},
+): Promise<AACEventsResponse> {
+  const params = new URLSearchParams();
+  if (filters.location) params.set("location", filters.location);
+  if (filters.operator) params.set("operator", filters.operator);
+  if (filters.date) params.set("date", filters.date);
+  if (filters.limit !== undefined) params.set("limit", String(filters.limit));
+  if (filters.offset !== undefined)
+    params.set("offset", String(filters.offset));
+
+  const qs = params.toString();
+  const url = `/api/aac-events${qs ? `?${qs}` : ""}`;
+  const res = await fetch(url);
+  if (!res.ok) {
+    throw new Error(`Failed to fetch AAC events: ${res.status}`);
+  }
+  return res.json();
+}
+
 /**
  * Finds all AAC events that belong to a given POI by matching the AAC name
- * in the event's `location` field.
+ * in the event's `location` field. Returns events split by kind.
  */
-export function getAACEventsForPOI(poiName: string): AACEventsByKind {
+export async function getAACEventsForPOI(
+  poiName: string,
+): Promise<AACEventsByKind> {
   const today = new Date().toISOString().slice(0, 10);
-  const matching = allAacEvents.filter((e) => {
-    const endDate = e.endDate || e.date;
-    return e.location === poiName && endDate >= today;
+  const { data: events } = await fetchAACEvents({
+    location: poiName,
+    date: today,
+    limit: 200,
   });
 
   const result: AACEventsByKind = { regular: [], special: [] };
-  for (const event of matching) {
+  for (const event of events) {
     result[classifyAACEvent(event)].push(event);
   }
 
@@ -67,10 +92,6 @@ export function getAACEventsForPOI(poiName: string): AACEventsByKind {
   return result;
 }
 
-/**
- * Checks whether an event's venue differs from the parent AAC centre's location.
- * Returns true when the event lat/lng is more than ~200m away from the POI.
- */
 export function isOffSiteEvent(
   event: CampusEvent,
   poiLat: number,
