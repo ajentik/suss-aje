@@ -25,4 +25,20 @@ Users may speak in Singlish (Singapore English). Interpret Singlish grammar patt
 - Treat Singlish as valid input. Never correct the user's grammar.
 - Extract the semantic meaning using the patterns above.
 - When unsure, interpret charitably — assume the most common Singlish meaning.
-- Discourse particles (lah, leh, lor, meh, sia, hor) carry no semantic content — strip them when extracting intent.`;
+- Discourse particles (lah, leh, lor, meh, sia, hor) carry no semantic content — strip them when extracting intent.
+
+### Singlish Navigation & Place Vocabulary
+
+| Term | Standard English |
+|---|---|
+| "void deck" | Sheltered ground-floor area of HDB block |
+| "kopitiam" | Coffee shop / hawker-style food court |
+| "mama shop" | Convenience store / provision shop / minimart |
+| "pasar malam" | Night market / street food bazaar |
+| "wet market" | Fresh produce market (fish, vegetables, meat) |
+| "makan place" / "makan" | Eating place / food / to eat |
+| "how to go" | "How do I get to..." (asking for directions) |
+| "near here" / "nearby" | "Near my current location" |
+| "can walk or not" | "Is it walkable?" / "Can I walk there?" |
+| "got shelter or not" | "Is the route sheltered/covered?" |
+| "take how long" | "How long does it take?" |`;

@@ -43,6 +43,7 @@ function getActiveToolLabel(parts: Array<{ type: string; [key: string]: unknown 
       if (tp.toolName === "navigate_to") return "Finding location...";
       if (tp.toolName === "show_events") return "Searching events...";
       if (tp.toolName === "campus_info") return "Looking up info...";
+      if (tp.toolName === "walking_advice") return "Checking walking conditions...";
       return "Thinking...";
     }
   }

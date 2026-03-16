@@ -1,8 +1,8 @@
-import { describe, expect, it } from "vitest";
-import { navigateTo, showEvents, campusInfo, tools } from "@/lib/ai/tools";
+import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
+import { navigateTo, showEvents, campusInfo, walkingAdvice, tools } from "@/lib/ai/tools";
 import type { POI } from "@/types";
 
-interface NavigateSuccess { success: true; poi: POI; message: string }
+interface NavigateSuccess { success: true; poi: POI; source: string; message: string }
 interface NavigateFailure { success: false; message: string }
 type NavigateResult = NavigateSuccess | NavigateFailure;
 
@@ -20,19 +20,29 @@ interface CampusInfoResult {
   venues?: POI[];
 }
 
+interface WalkingAdviceResult {
+  success: true;
+  destination: string;
+  mobilityLevel: string;
+  advice: string;
+  isOnCampus: boolean;
+}
+
 const callCtx = { toolCallId: "test", messages: [] as never[], abortSignal: undefined as unknown as AbortSignal };
 
 describe("AI tools export", () => {
-  it("exports tools object with navigate_to, show_events, and campus_info", () => {
+  it("exports tools object with navigate_to, show_events, campus_info, and walking_advice", () => {
     expect(tools).toBeDefined();
     expect(tools.navigate_to).toBe(navigateTo);
     expect(tools.show_events).toBe(showEvents);
     expect(tools.campus_info).toBe(campusInfo);
+    expect(tools.walking_advice).toBe(walkingAdvice);
   });
 
   it("navigateTo has correct description and inputSchema", () => {
     expect(navigateTo.description).toContain("Navigate");
     expect(navigateTo.description).toContain("3D campus map");
+    expect(navigateTo.description).toContain("Google Maps");
     expect(navigateTo.inputSchema).toBeDefined();
   });
 
@@ -44,6 +54,12 @@ describe("AI tools export", () => {
   it("campusInfo has correct description and inputSchema", () => {
     expect(campusInfo.description).toContain("campus");
     expect(campusInfo.inputSchema).toBeDefined();
+  });
+
+  it("walkingAdvice has correct description and inputSchema", () => {
+    expect(walkingAdvice.description).toContain("walking advice");
+    expect(walkingAdvice.description).toContain("elderly");
+    expect(walkingAdvice.inputSchema).toBeDefined();
   });
 });
 
@@ -57,10 +73,11 @@ describe("navigateTo.execute", () => {
       expect(result.poi).toBeDefined();
       expect(result.poi.name.toLowerCase()).toContain("library");
       expect(result.message).toContain("Navigating to");
+      expect(result.source).toBe("campus");
     }
   });
 
-  it("returns failure with helpful message for unknown destination", async () => {
+  it("returns failure with helpful message for unknown destination when Google Places unavailable", async () => {
     const raw = await navigateTo.execute!({ destination: "nonexistent-place-xyz-123" }, callCtx);
     const result = raw as NavigateResult;
 
@@ -89,6 +106,163 @@ describe("navigateTo.execute", () => {
     if (result.success && result.poi.rating) {
       expect(result.message).toContain("Rating:");
     }
+  });
+
+  it("resolves Singlish term 'kopitiam' to find food-related POIs", async () => {
+    const raw = await navigateTo.execute!({ destination: "kopitiam" }, callCtx);
+    const result = raw as NavigateResult;
+
+    if (result.success) {
+      expect(result.source).toBe("campus");
+    }
+  });
+
+  it("accepts optional userLat and userLng parameters", async () => {
+    const raw = await navigateTo.execute!(
+      { destination: "library", userLat: 1.33, userLng: 103.77 },
+      callCtx,
+    );
+    const result = raw as NavigateResult;
+
+    expect(result.success).toBe(true);
+  });
+});
+
+describe("navigateTo Google Places fallback", () => {
+  const originalEnv = process.env;
+
+  beforeEach(() => {
+    process.env = { ...originalEnv, GOOGLE_MAPS_API_KEY: "test-key" };
+  });
+
+  afterEach(() => {
+    process.env = originalEnv;
+    vi.restoreAllMocks();
+  });
+
+  it("falls back to Google Places when POI not found and API returns result", async () => {
+    const mockResponse = {
+      places: [{
+        displayName: { text: "Test Restaurant" },
+        formattedAddress: "123 Test Street, Singapore",
+        location: { latitude: 1.33, longitude: 103.77 },
+        rating: 4.5,
+        types: ["restaurant"],
+      }],
+    };
+
+    vi.spyOn(globalThis, "fetch").mockResolvedValueOnce({
+      ok: true,
+      json: () => Promise.resolve(mockResponse),
+    } as Response);
+
+    const raw = await navigateTo.execute!(
+      { destination: "some unique restaurant xyz" },
+      callCtx,
+    );
+    const result = raw as NavigateResult;
+
+    expect(result.success).toBe(true);
+    if (result.success) {
+      expect(result.source).toBe("google_places");
+      expect(result.poi.name).toBe("Test Restaurant");
+      expect(result.poi.address).toBe("123 Test Street, Singapore");
+      expect(result.poi.rating).toBe(4.5);
+    }
+  });
+
+  it("returns failure when Google Places API also finds nothing", async () => {
+    vi.spyOn(globalThis, "fetch").mockResolvedValueOnce({
+      ok: true,
+      json: () => Promise.resolve({ places: [] }),
+    } as Response);
+
+    const raw = await navigateTo.execute!(
+      { destination: "completely-unknown-xyz" },
+      callCtx,
+    );
+    const result = raw as NavigateResult;
+
+    expect(result.success).toBe(false);
+  });
+
+  it("returns failure gracefully when Google Places API errors", async () => {
+    vi.spyOn(globalThis, "fetch").mockRejectedValueOnce(new Error("Network error"));
+
+    const raw = await navigateTo.execute!(
+      { destination: "some-place-with-api-error" },
+      callCtx,
+    );
+    const result = raw as NavigateResult;
+
+    expect(result.success).toBe(false);
+  });
+});
+
+describe("walkingAdvice.execute", () => {
+  it("returns advice for an on-campus destination", async () => {
+    const result = (await walkingAdvice.execute!(
+      { destination: "library" },
+      callCtx,
+    )) as WalkingAdviceResult;
+
+    expect(result.success).toBe(true);
+    expect(result.isOnCampus).toBe(true);
+    expect(result.mobilityLevel).toBe("moderate");
+    expect(result.advice).toContain("campus");
+  });
+
+  it("returns advice for an off-campus destination", async () => {
+    const result = (await walkingAdvice.execute!(
+      { destination: "Clementi Mall" },
+      callCtx,
+    )) as WalkingAdviceResult;
+
+    expect(result.success).toBe(true);
+    expect(result.isOnCampus).toBe(false);
+    expect(result.advice).toContain("Clementi Mall");
+  });
+
+  it("adjusts advice for low mobility level", async () => {
+    const result = (await walkingAdvice.execute!(
+      { destination: "library", mobilityLevel: "low" },
+      callCtx,
+    )) as WalkingAdviceResult;
+
+    expect(result.success).toBe(true);
+    expect(result.mobilityLevel).toBe("low");
+    expect(result.advice).toContain("ramp");
+  });
+
+  it("adjusts advice for high mobility level", async () => {
+    const result = (await walkingAdvice.execute!(
+      { destination: "library", mobilityLevel: "high" },
+      callCtx,
+    )) as WalkingAdviceResult;
+
+    expect(result.success).toBe(true);
+    expect(result.mobilityLevel).toBe("high");
+    expect(result.advice).toContain("sheltered");
+  });
+
+  it("returns advice for unknown destination", async () => {
+    const result = (await walkingAdvice.execute!(
+      { destination: "some unknown place" },
+      callCtx,
+    )) as WalkingAdviceResult;
+
+    expect(result.success).toBe(true);
+    expect(result.isOnCampus).toBe(false);
+    expect(result.advice.length).toBeGreaterThan(0);
+  });
+
+  it("includes nearby rest stops in advice", async () => {
+    const result = (await walkingAdvice.execute!(
+      { destination: "library" },
+      callCtx,
+    )) as WalkingAdviceResult;
+
+    expect(result.advice).toContain("rest");
   });
 });
 

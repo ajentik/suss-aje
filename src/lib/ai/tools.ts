@@ -1,35 +1,270 @@
 import { z } from "zod";
 import { tool } from "ai";
-import { CAMPUS_POIS, findPOI, findPOIs } from "@/lib/maps/campus-pois";
+import { CAMPUS_POIS, CAMPUS_CENTER, findPOI, findPOIs } from "@/lib/maps/campus-pois";
 import { getDateRange } from "@/lib/date-utils";
 import campusEvents from "@/../public/campus-events.json";
-import type { CampusEvent } from "@/types";
+import type { CampusEvent, POI } from "@/types";
+
+// ── Singlish navigation vocabulary ──────────────────────────────────────
+const SINGLISH_NAV_MAP: Record<string, string> = {
+  "void deck": "sheltered area ground floor HDB",
+  kopitiam: "coffee shop food court hawker",
+  "mama shop": "convenience store minimart provision shop",
+  "pasar malam": "night market street food bazaar",
+  "wet market": "fresh market produce fish vegetables",
+  "char kway teow": "fried noodles hawker stall",
+  "makan place": "eating place food restaurant",
+  "teh tarik": "pulled tea drink stall",
+  "roti prata": "flatbread restaurant Indian",
+  "ice kachang": "shaved ice dessert stall",
+};
+
+function resolveSinglishNavTerm(query: string): string {
+  const q = query.toLowerCase().trim();
+  for (const [singlish, expansion] of Object.entries(SINGLISH_NAV_MAP)) {
+    if (q.includes(singlish)) {
+      return expansion;
+    }
+  }
+  return query;
+}
+
+// ── Google Places API fallback ──────────────────────────────────────────
+
+interface PlaceResult {
+  name: string;
+  lat: number;
+  lng: number;
+  address: string;
+  rating?: number;
+  types?: string[];
+}
+
+async function searchGooglePlaces(
+  query: string,
+  userLat: number,
+  userLng: number,
+): Promise<PlaceResult | null> {
+  const apiKey = process.env.GOOGLE_MAPS_API_KEY;
+  if (!apiKey) return null;
+
+  try {
+    const response = await fetch(
+      "https://places.googleapis.com/v1/places:searchText",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-Goog-Api-Key": apiKey,
+          "X-Goog-FieldMask":
+            "places.displayName,places.formattedAddress,places.location,places.rating,places.types",
+        },
+        body: JSON.stringify({
+          textQuery: query,
+          locationBias: {
+            circle: {
+              center: { latitude: userLat, longitude: userLng },
+              radius: 5000,
+            },
+          },
+          maxResultCount: 1,
+          languageCode: "en",
+          regionCode: "SG",
+        }),
+      },
+    );
+
+    if (!response.ok) return null;
+
+    const data = await response.json();
+    const place = data.places?.[0];
+    if (!place) return null;
+
+    return {
+      name: place.displayName?.text ?? query,
+      lat: place.location?.latitude ?? userLat,
+      lng: place.location?.longitude ?? userLng,
+      address: place.formattedAddress ?? "",
+      rating: place.rating,
+      types: place.types,
+    };
+  } catch {
+    return null;
+  }
+}
+
+// ── Tools ───────────────────────────────────────────────────────────────
 
 export const navigateTo = tool({
   description:
-    "Navigate the 3D campus map to a specific destination and show walking directions. Use this when a student asks where something is or how to get somewhere. Works for on-campus locations and nearby venues (supermarkets, restaurants, malls, bars, hawker centres).",
+    "Navigate the 3D campus map to a specific destination and show walking directions. Use this when a user asks where something is or how to get somewhere. Works for on-campus locations, nearby venues, Active Ageing Centres, AND any other place in Singapore via Google Maps.",
   inputSchema: z.object({
     destination: z
       .string()
-      .describe("The name or type of place to navigate to, e.g. 'library', 'FairPrice', 'Clementi Mall', 'Sukiya'"),
+      .describe(
+        "The name or type of place to navigate to, e.g. 'library', 'FairPrice', 'Clementi Mall', 'kopitiam', 'void deck'",
+      ),
+    userLat: z
+      .number()
+      .optional()
+      .describe("User's current latitude (if available)"),
+    userLng: z
+      .number()
+      .optional()
+      .describe("User's current longitude (if available)"),
   }),
-  execute: async ({ destination }) => {
-    const poi = findPOI(destination);
-    if (!poi) {
-      const categories = [...new Set(CAMPUS_POIS.map((p) => p.category))];
+  execute: async ({ destination, userLat, userLng }) => {
+    // 1. Try Singlish resolution first
+    const resolvedQuery = resolveSinglishNavTerm(destination);
+
+    // 2. Search CAMPUS_POIS with both original and resolved queries
+    const poi = findPOI(destination) ?? findPOI(resolvedQuery);
+    if (poi) {
+      let msg = `Navigating to ${poi.name}. ${poi.description}`;
+      if (poi.address) msg += ` Address: ${poi.address}.`;
+      if (poi.hours) msg += ` Hours: ${poi.hours}.`;
+      if (poi.rating) msg += ` Rating: ${poi.rating}/5.`;
       return {
-        success: false as const,
-        message: `I couldn't find "${destination}". Try searching by name or category: ${categories.join(", ")}. Available locations include: ${CAMPUS_POIS.map((p) => p.name).join(", ")}`,
+        success: true as const,
+        poi,
+        source: "campus" as const,
+        message: msg,
       };
     }
-    let msg = `Navigating to ${poi.name}. ${poi.description}`;
-    if (poi.address) msg += ` Address: ${poi.address}.`;
-    if (poi.hours) msg += ` Hours: ${poi.hours}.`;
-    if (poi.rating) msg += ` Rating: ${poi.rating}/5.`;
+
+    // 3. Fallback: search Google Places API
+    const lat = userLat ?? CAMPUS_CENTER.lat;
+    const lng = userLng ?? CAMPUS_CENTER.lng;
+    const placeResult = await searchGooglePlaces(resolvedQuery, lat, lng);
+
+    if (placeResult) {
+      const externalPoi: POI = {
+        id: `places-${placeResult.name.toLowerCase().replace(/\s+/g, "-")}`,
+        name: placeResult.name,
+        lat: placeResult.lat,
+        lng: placeResult.lng,
+        category: "External",
+        description: `Found via Google Maps search for "${destination}"`,
+        address: placeResult.address,
+        rating: placeResult.rating,
+      };
+
+      let msg = `Navigating to ${placeResult.name}.`;
+      if (placeResult.address) msg += ` Address: ${placeResult.address}.`;
+      if (placeResult.rating) msg += ` Rating: ${placeResult.rating}/5.`;
+      return {
+        success: true as const,
+        poi: externalPoi,
+        source: "google_places" as const,
+        message: msg,
+      };
+    }
+
+    // 4. Nothing found anywhere
+    const categories = [...new Set(CAMPUS_POIS.map((p) => p.category))];
+    return {
+      success: false as const,
+      message: `I couldn't find "${destination}". Try searching by name or category: ${categories.join(", ")}. Available campus locations include: ${CAMPUS_POIS.slice(0, 20).map((p) => p.name).join(", ")}, and more.`,
+    };
+  },
+});
+
+export const walkingAdvice = tool({
+  description:
+    "Give walking advice for elderly users — shade, accessibility, rest stops, safety. Use this when the user asks about walking conditions, route comfort, or needs mobility-aware guidance.",
+  inputSchema: z.object({
+    destination: z
+      .string()
+      .describe("The destination the user is walking to"),
+    mobilityLevel: z
+      .enum(["high", "moderate", "low"])
+      .optional()
+      .describe(
+        "User's mobility level: 'high' = fully mobile, 'moderate' = can walk but needs breaks, 'low' = uses walking aid or wheelchair",
+      ),
+  }),
+  execute: async ({ destination, mobilityLevel }) => {
+    const level = mobilityLevel ?? "moderate";
+
+    const poi = findPOI(destination);
+    const isOnCampus = poi?.distanceFromCampus === "On campus";
+    const advice: string[] = [];
+
+    if (isOnCampus && poi) {
+      advice.push(
+        `${poi.name} is on campus. The campus walkways between blocks are mostly sheltered.`,
+      );
+
+      const hasWheelchair = poi.tags?.includes("Wheelchair Accessible");
+      if (hasWheelchair) {
+        advice.push(
+          "This location is wheelchair accessible with ramp access available.",
+        );
+      }
+
+      if (poi.category === "Building") {
+        advice.push(
+          "All campus buildings have lifts. Use them to avoid stairs.",
+        );
+      }
+    } else if (poi) {
+      const distance = poi.distanceFromCampus ?? "unknown distance";
+      advice.push(
+        `${poi.name} is ${distance} from campus.`,
+      );
+
+      if (parseFloat(distance) > 1.5) {
+        advice.push(
+          "This is a longer walk. Consider taking the campus shuttle to Clementi MRT and walking from there, or using a bus.",
+        );
+      }
+    } else {
+      advice.push(
+        `For "${destination}": check for sheltered walkways and rest points along the route.`,
+      );
+    }
+
+    if (level === "low") {
+      advice.push(
+        "Take it slow and use the sheltered corridors where possible. Look for benches every 100-200m along HDB walkways.",
+      );
+      advice.push(
+        "If the route involves stairs, look for nearby ramps or lifts. Most MRT stations and malls have barrier-free access.",
+      );
+      advice.push(
+        "Consider bringing water. Singapore's heat and humidity can be taxing.",
+      );
+    } else if (level === "moderate") {
+      advice.push(
+        "Rest stops are available at void decks and covered walkways along most routes. Aim to rest every 10-15 minutes if needed.",
+      );
+      advice.push(
+        "Stay hydrated — Singapore's tropical climate means high heat and humidity year-round.",
+      );
+    } else {
+      advice.push(
+        "Stay on sheltered walkways when possible, especially between 11AM-3PM when sun exposure is highest.",
+      );
+    }
+
+    advice.push(
+      "Tip: Most HDB blocks have sheltered linkways between them. Use overhead bridges and covered walkways to stay out of the rain and sun.",
+    );
+
+    const nearbyHawkers = findPOIs("Hawker").slice(0, 2);
+    if (nearbyHawkers.length > 0) {
+      const names = nearbyHawkers.map((h) => h.name).join(" and ");
+      advice.push(
+        `Nearby rest and hydration stops: ${names}.`,
+      );
+    }
+
     return {
       success: true as const,
-      poi,
-      message: msg,
+      destination,
+      mobilityLevel: level,
+      advice: advice.join("\n\n"),
+      isOnCampus: isOnCampus ?? false,
     };
   },
 });
@@ -216,4 +451,5 @@ export const tools = {
   navigate_to: navigateTo,
   show_events: showEvents,
   campus_info: campusInfo,
+  walking_advice: walkingAdvice,
 };
