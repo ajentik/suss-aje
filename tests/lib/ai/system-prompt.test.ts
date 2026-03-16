@@ -15,6 +15,7 @@ describe("SYSTEM_PROMPT", () => {
     expect(SYSTEM_PROMPT).toContain("navigate_to");
     expect(SYSTEM_PROMPT).toContain("show_events");
     expect(SYSTEM_PROMPT).toContain("campus_info");
+    expect(SYSTEM_PROMPT).toContain("walking_advice");
   });
 
   it("contains SUSS campus context", () => {
@@ -55,5 +56,23 @@ describe("SYSTEM_PROMPT", () => {
   it("mentions language and tone guidelines", () => {
     expect(SYSTEM_PROMPT).toContain("Singlish");
     expect(SYSTEM_PROMPT).toContain("friendly");
+  });
+
+  it("mentions Google Maps fallback for any location", () => {
+    expect(SYSTEM_PROMPT).toContain("Google Maps");
+    expect(SYSTEM_PROMPT).toContain("ANY location");
+  });
+
+  it("mentions elderly mobility considerations", () => {
+    expect(SYSTEM_PROMPT).toContain("elderly mobility");
+    expect(SYSTEM_PROMPT).toContain("rest stops");
+    expect(SYSTEM_PROMPT).toContain("sheltered routes");
+  });
+
+  it("contains Singlish navigation vocabulary", () => {
+    expect(SYSTEM_PROMPT).toContain("void deck");
+    expect(SYSTEM_PROMPT).toContain("kopitiam");
+    expect(SYSTEM_PROMPT).toContain("mama shop");
+    expect(SYSTEM_PROMPT).toContain("how to go");
   });
 });
