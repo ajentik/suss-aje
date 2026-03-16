@@ -1,15 +1,16 @@
 "use client";
 
-import { useState } from "react";
 import AppShell from "@/components/layout/AppShell";
 import HeroIntro from "@/components/layout/HeroIntro";
+import { useAppStore } from "@/store/app-store";
 
 export default function Home() {
-  const [showIntro, setShowIntro] = useState(true);
+  const introDismissed = useAppStore((s) => s.introDismissed);
+  const setIntroDismissed = useAppStore((s) => s.setIntroDismissed);
 
   return (
     <>
-      {showIntro && <HeroIntro onEnter={() => setShowIntro(false)} />}
+      {!introDismissed && <HeroIntro onEnter={() => setIntroDismissed(true)} />}
       <AppShell />
     </>
   );
