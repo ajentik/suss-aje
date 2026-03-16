@@ -1,20 +1,12 @@
-import { streamText, stepCountIs } from "ai";
-import { z } from "zod";
+import { convertToModelMessages, streamText, stepCountIs, UIMessage } from "ai";
 import { google } from "@/lib/ai/provider";
 import { SYSTEM_PROMPT } from "@/lib/ai/system-prompt";
 import { tools } from "@/lib/ai/tools";
 
-const messageSchema = z.object({
-  role: z.enum(["user", "assistant"]),
-  content: z.string().max(2000),
-});
-
-const chatRequestSchema = z.object({
-  messages: z.array(messageSchema).min(1).max(20),
-});
+export const maxDuration = 30;
 
 export async function POST(req: Request) {
-  let body: unknown;
+  let body: { messages: UIMessage[] };
   try {
     body = await req.json();
   } catch {
@@ -23,17 +15,10 @@ export async function POST(req: Request) {
     });
   }
 
-  const parsed = chatRequestSchema.safeParse(body);
-  if (!parsed.success) {
-    return new Response(JSON.stringify({ error: "Invalid request" }), {
-      status: 400,
-    });
-  }
-
   const result = streamText({
     model: google("gemini-3.1-flash-lite-preview"),
     system: SYSTEM_PROMPT,
-    messages: parsed.data.messages,
+    messages: await convertToModelMessages(body.messages),
     tools,
     stopWhen: stepCountIs(5),
   });
