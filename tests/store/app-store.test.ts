@@ -1,15 +1,5 @@
-import { describe, expect, it, beforeEach, vi } from "vitest";
+import { describe, expect, it, beforeEach } from "vitest";
 import type { POI, CampusEvent } from "@/types";
-
-const _lsStore: Record<string, string> = {};
-vi.stubGlobal("localStorage", {
-  getItem(key: string) { return _lsStore[key] ?? null; },
-  setItem(key: string, value: string) { _lsStore[key] = value; },
-  removeItem(key: string) { delete _lsStore[key]; },
-  clear() { for (const k of Object.keys(_lsStore)) delete _lsStore[k]; },
-  get length() { return Object.keys(_lsStore).length; },
-  key(index: number) { return Object.keys(_lsStore)[index] ?? null; },
-});
 
 const { useAppStore } = await import("@/store/app-store");
 
