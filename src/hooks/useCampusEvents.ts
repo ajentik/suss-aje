@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { toast } from "sonner";
 import type { CampusEvent, DateRangePreset } from "@/types";
 import { getDateRange } from "@/lib/date-utils";
@@ -12,7 +12,8 @@ export function useCampusEvents() {
   const [schoolFilter, setSchoolFilter] = useState("");
   const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
+  const fetchEvents = useCallback(() => {
+    setIsLoading(true);
     fetch("/campus-events.json")
       .then((res) => res.json())
       .then((data) => {
@@ -24,6 +25,11 @@ export function useCampusEvents() {
         setIsLoading(false);
       });
   }, []);
+
+  useEffect(() => {
+    const timeoutId = window.setTimeout(fetchEvents, 0);
+    return () => window.clearTimeout(timeoutId);
+  }, [fetchEvents]);
 
   const filteredEvents = useMemo(() => {
     let result = events;
@@ -60,6 +66,7 @@ export function useCampusEvents() {
     allEvents: events,
     categories,
     isLoading,
+    refetch: fetchEvents,
     dateFilter,
     setDateFilter,
     categoryFilter,
