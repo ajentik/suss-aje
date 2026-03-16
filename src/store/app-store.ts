@@ -215,13 +215,14 @@ export const useAppStore = create<AppState>()(
     }),
     {
       name: "asksussi-prefs",
+      // Security: chat messages are intentionally excluded from persistence.
+      // They may contain sensitive user input that must not survive browser sessions.
+      // Only non-sensitive UI preferences are persisted here.
       partialize: (state) => ({
         ttsEnabled: state.ttsEnabled,
         activePanel: state.activePanel,
         onboardingDismissed: state.onboardingDismissed,
         introDismissed: state.introDismissed,
-        chatMessages: state.chatMessages,
-        conversationId: state.conversationId,
       }),
     }
   )
