@@ -24,18 +24,17 @@ import ChatPanel from "@/components/chat/ChatPanel";
 import EventsPanel from "@/components/events/EventsPanel";
 import AACSearchPanel from "@/components/aac/AACSearchPanel";
 import RouteOverlay from "@/components/map/RouteOverlay";
-import AerialViewButton from "@/components/map/AerialViewButton";
+
 import POIPopup, { POIDetailCard } from "@/components/map/POIPopup";
 import EventPopup, { EventDetailCard } from "@/components/map/EventPopup";
 import Onboarding from "@/components/layout/Onboarding";
 import { MobileSheet, type SnapName } from "@/components/layout/MobileSheet";
-import { createStreetViewEventFromPOI } from "@/lib/maps/poi-utils";
 
 const MapView = dynamic(() => import("@/components/map/MapView"), {
   ssr: false,
   loading: () => (
     <div className="w-full h-full bg-muted flex items-center justify-center">
-      <p className="text-muted-foreground text-sm">Loading 3D map...</p>
+      <p className="text-muted-foreground text-sm">Loading map...</p>
     </div>
   ),
 });
@@ -132,7 +131,6 @@ export default function AppShell() {
   const setSelectedPOI = useAppStore((s) => s.setSelectedPOI);
   const setSelectedEvent = useAppStore((s) => s.setSelectedEvent);
   const setSelectedDestination = useAppStore((s) => s.setSelectedDestination);
-  const setStreetViewEvent = useAppStore((s) => s.setStreetViewEvent);
 
   const [minimized, setMinimized] = useState(false);
   const [panelWidth, setPanelWidth] = useState(DEFAULT_WIDTH);
@@ -197,19 +195,15 @@ export default function AppShell() {
   const handleNavigatePOI = useCallback(() => {
     if (selectedPOI) {
       setSelectedDestination(selectedPOI);
-      setStreetViewEvent(createStreetViewEventFromPOI(selectedPOI));
     }
     setSelectedPOI(null);
     setSheetContentMode("default");
-  }, [selectedPOI, setSelectedDestination, setStreetViewEvent, setSelectedPOI, setSheetContentMode]);
+  }, [selectedPOI, setSelectedDestination, setSelectedPOI, setSheetContentMode]);
 
   const handleNavigateEvent = useCallback(() => {
-    if (selectedEvent && selectedEvent.type !== "Online") {
-      setStreetViewEvent(selectedEvent);
-    }
     setSelectedEvent(null);
     setSheetContentMode("default");
-  }, [selectedEvent, setStreetViewEvent, setSelectedEvent, setSheetContentMode]);
+  }, [setSelectedEvent, setSheetContentMode]);
 
   useEffect(() => {
     const handleMove = (e: MouseEvent | TouchEvent) => {
@@ -438,7 +432,6 @@ export default function AppShell() {
         <main id="main-content" className="flex-1 h-full relative">
           <MapView />
           <RouteOverlay />
-          <AerialViewButton />
           <POIPopup />
           <EventPopup />
         </main>

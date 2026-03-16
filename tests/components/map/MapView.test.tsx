@@ -1,21 +1,20 @@
-import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
+import { describe, expect, it, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent, act } from "@testing-library/react";
 
 vi.mock("@vis.gl/react-google-maps", () => ({
   useMap: vi.fn(() => null),
   useMapsLibrary: vi.fn(() => null),
-  Map3D: vi.fn(({ children, ...props }: { children?: React.ReactNode; [key: string]: unknown }) => (
-    <div data-testid="map-3d" data-mode={props.mode}>
+  Map: vi.fn(({ children, ...props }: { children?: React.ReactNode; [key: string]: unknown }) => (
+    <div data-testid="map-2d" data-map-type-id={props.mapTypeId}>
       {children}
     </div>
   )),
-  Marker3D: vi.fn(({ children, label, onClick }: { children?: React.ReactNode; label?: string; onClick?: () => void }) => (
-    <button type="button" data-testid="marker-3d" data-label={label} onClick={onClick}>
+  AdvancedMarker: vi.fn(({ children, title, onClick }: { children?: React.ReactNode; title?: string; onClick?: () => void }) => (
+    <button type="button" data-testid="advanced-marker" data-label={title} onClick={onClick}>
       {children}
     </button>
   )),
   Pin: vi.fn(() => <span data-testid="pin" />),
-  useMap3D: vi.fn(() => null),
   APIProvider: ({ children }: { children?: React.ReactNode }) => <div>{children}</div>,
 }));
 
@@ -31,41 +30,12 @@ vi.mock("@/components/ui/skeleton", () => ({
   ),
 }));
 
-vi.mock("@/components/map/StreetViewPanel", () => ({
-  default: ({ onClose }: { onClose: () => void }) => (
-    <div data-testid="street-view-panel">
-      <button type="button" onClick={onClose}>Close Street View</button>
-    </div>
-  ),
-}));
-
 vi.mock("@/components/map/RoutePolyline", () => ({
   default: () => <div data-testid="route-polyline" />,
 }));
 
 import { useAppStore } from "@/store/app-store";
 import { CAMPUS_POIS } from "@/lib/maps/campus-pois";
-
-function setupGoogleMaps() {
-  const mockImportLibrary = vi.fn().mockResolvedValue({});
-  Object.defineProperty(window, "google", {
-    value: {
-      maps: {
-        importLibrary: mockImportLibrary,
-      },
-    },
-    writable: true,
-    configurable: true,
-  });
-}
-
-function cleanupGoogleMaps() {
-  Object.defineProperty(window, "google", {
-    value: undefined,
-    writable: true,
-    configurable: true,
-  });
-}
 
 async function renderMapView() {
   const { default: MapView } = await import("@/components/map/MapView");
@@ -82,34 +52,23 @@ describe("MapView", () => {
       flyToTarget: null,
       mapEventMarkers: [],
       highlightedEventIds: [],
-      streetViewEvent: null,
-    });
-    setupGoogleMaps();
-    Object.defineProperty(window, "speechSynthesis", {
-      value: { cancel: vi.fn() },
-      writable: true,
-      configurable: true,
     });
   });
 
-  afterEach(() => {
-    cleanupGoogleMaps();
-  });
-
-  it("renders the Map3D wrapper once loaded", async () => {
+  it("renders the 2D map wrapper", async () => {
     await act(async () => {
       await renderMapView();
     });
 
-    expect(screen.getByTestId("map-3d")).toBeInTheDocument();
+    expect(screen.getByTestId("map-2d")).toBeInTheDocument();
   });
 
-  it("renders Map3D in SATELLITE mode", async () => {
+  it("renders map in roadmap mode", async () => {
     await act(async () => {
       await renderMapView();
     });
 
-    expect(screen.getByTestId("map-3d")).toHaveAttribute("data-mode", "SATELLITE");
+    expect(screen.getByTestId("map-2d")).toHaveAttribute("data-map-type-id", "roadmap");
   });
 
   it("shows markers for CAMPUS_POIS", async () => {
@@ -117,7 +76,7 @@ describe("MapView", () => {
       await renderMapView();
     });
 
-    const markers = screen.getAllByTestId("marker-3d");
+    const markers = screen.getAllByTestId("advanced-marker");
     expect(markers.length).toBeGreaterThanOrEqual(CAMPUS_POIS.length);
 
     const libraryMarker = markers.find((m) => m.getAttribute("data-label") === "SUSS Library");
@@ -159,21 +118,20 @@ describe("MapView", () => {
       await renderMapView();
     });
 
-    const markers = screen.getAllByTestId("marker-3d");
+    const markers = screen.getAllByTestId("advanced-marker");
     fireEvent.click(markers[0]);
 
     const state = useAppStore.getState();
     expect(state.selectedPOI).not.toBeNull();
   });
 
-  it("does not render the Street View hint text", async () => {
+  it("renders zoom controls", async () => {
     await act(async () => {
       await renderMapView();
     });
 
-    expect(
-      screen.queryByText("Double-click to enter Street View"),
-    ).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Zoom in" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Zoom out" })).toBeInTheDocument();
   });
 
   it("renders event markers when mapEventMarkers are set", async () => {
@@ -199,7 +157,7 @@ describe("MapView", () => {
       await renderMapView();
     });
 
-    const markers = screen.getAllByTestId("marker-3d");
+    const markers = screen.getAllByTestId("advanced-marker");
     const eventMarker = markers.find((m) => m.getAttribute("data-label") === "Test Event");
     expect(eventMarker).toBeTruthy();
   });

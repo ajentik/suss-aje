@@ -4,11 +4,10 @@ import { render, screen, fireEvent } from "@testing-library/react";
 vi.mock("@vis.gl/react-google-maps", () => ({
   useMap: vi.fn(() => null),
   useMapsLibrary: vi.fn(() => null),
-  Map3D: ({ children }: { children?: React.ReactNode }) => (
-    <div data-testid="map-3d">{children}</div>
+  Map: ({ children }: { children?: React.ReactNode }) => (
+    <div data-testid="map-2d">{children}</div>
   ),
-  Marker3DInteractive: () => <div data-testid="marker" />,
-  AdvancedMarker: () => <div data-testid="adv-marker" />,
+  AdvancedMarker: () => <div data-testid="advanced-marker" />,
 }));
 
 const mockSendMessage = vi.fn();

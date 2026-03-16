@@ -1,20 +1,18 @@
 "use client";
 
-import { Component, useEffect, useRef, useState, useCallback } from "react";
+import { Component, useEffect, useState, useCallback } from "react";
 import type { ReactNode } from "react";
-import { Map3D, Marker3D, Pin } from "@vis.gl/react-google-maps";
-import type {
-  Map3DRef,
-  Map3DClickEvent,
-  Map3DCameraChangedEvent,
+import {
+  Map as GoogleMap,
+  AdvancedMarker,
+  Pin,
+  useMap,
 } from "@vis.gl/react-google-maps";
-import { ErrorState } from "@/components/ui/error-state";
-import { Skeleton } from "@/components/ui/skeleton";
 import { useAppStore } from "@/store/app-store";
 import { CAMPUS_CENTER, CAMPUS_POIS } from "@/lib/maps/campus-pois";
 import type { POI, CampusEvent } from "@/types";
 import RoutePolyline from "./RoutePolyline";
-import StreetViewPanel from "./StreetViewPanel";
+import { Plus, Minus } from "lucide-react";
 
 class PinErrorBoundary extends Component<
   { children: ReactNode; fallback?: ReactNode },
@@ -39,78 +37,57 @@ class PinErrorBoundary extends Component<
   }
 }
 
-let mapsReady: Promise<void> | null = null;
-
-function loadMapsAPI(): Promise<void> {
-  if (mapsReady) return mapsReady;
-
-  mapsReady = (async () => {
-    if (!window.google?.maps) {
-      const existing = document.querySelector(
-        'script[src*="maps.googleapis.com/maps/api/js"]'
-      );
-      if (!existing) {
-        const script = document.createElement("script");
-        script.src = `https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || ""}&v=beta&libraries=maps3d,streetView`;
-        script.async = true;
-        document.head.appendChild(script);
-      }
-
-      const deadline = Date.now() + 15000;
-      while (!window.google?.maps?.importLibrary) {
-        if (Date.now() > deadline) {
-          throw new Error(
-            "Google Maps API failed to initialize — ensure Maps JavaScript API and Map Tiles API are enabled in your GCP project."
-          );
-        }
-        await new Promise((r) => setTimeout(r, 100));
-      }
-    }
-
-    await window.google.maps.importLibrary("maps3d");
-  })();
-
-  mapsReady.catch(() => {
-    mapsReady = null;
-  });
-
-  return mapsReady;
-}
+const SENIOR_MAP_STYLE: google.maps.MapTypeStyle[] = [
+  {
+    featureType: "all",
+    elementType: "labels.text.fill",
+    stylers: [{ color: "#1a1a1a" }, { weight: 1.5 }],
+  },
+  {
+    featureType: "all",
+    elementType: "labels.text.stroke",
+    stylers: [{ color: "#ffffff" }, { weight: 3 }],
+  },
+  {
+    featureType: "road",
+    elementType: "geometry",
+    stylers: [{ color: "#ffffff" }],
+  },
+  {
+    featureType: "road",
+    elementType: "geometry.stroke",
+    stylers: [{ color: "#cccccc" }],
+  },
+  {
+    featureType: "poi",
+    elementType: "labels",
+    stylers: [{ visibility: "off" }],
+  },
+  {
+    featureType: "poi.park",
+    elementType: "geometry",
+    stylers: [{ color: "#c8e6c9" }],
+  },
+  {
+    featureType: "transit",
+    elementType: "labels",
+    stylers: [{ visibility: "simplified" }],
+  },
+  {
+    featureType: "landscape.man_made",
+    elementType: "geometry.stroke",
+    stylers: [{ visibility: "off" }],
+  },
+  {
+    featureType: "water",
+    elementType: "geometry",
+    stylers: [{ color: "#a3d5f7" }],
+  },
+];
 
 export default function MapView() {
-  const [loaded, setLoaded] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    loadMapsAPI()
-      .then(() => setLoaded(true))
-      .catch((err) => setError(err.message));
-  }, []);
-
-  if (error) {
-    return (
-      <div className="w-full h-full flex items-center justify-center bg-muted/80">
-        <ErrorState message={error} />
-      </div>
-    );
-  }
-
-  if (!loaded) {
-    return (
-      <div className="w-full h-full bg-muted/80 flex items-center justify-center">
-        <div className="space-y-3 w-48">
-          <Skeleton className="h-4 w-full" />
-          <Skeleton className="h-4 w-3/4" />
-          <Skeleton className="h-32 w-full rounded-lg" />
-        </div>
-      </div>
-    );
-  }
-
-  return <Map3DInner />;
+  return <Map2DInner />;
 }
-
-// -- Marker style helpers --------------------------------------------------
 
 type PinStyle = {
   background: string;
@@ -186,25 +163,8 @@ function getEventPinStyle(
   };
 }
 
-function Map3DInner() {
-  const defaultCamera = {
-    center: {
-      lat: CAMPUS_CENTER.lat,
-      lng: CAMPUS_CENTER.lng,
-      altitude: 300,
-    },
-    range: 800,
-    tilt: 55,
-    heading: 0,
-    roll: 0,
-  };
-  const mapRef = useRef<Map3DRef>(null);
-  const lastCameraRef = useRef(defaultCamera);
-  const previousStreetViewRef = useRef(false);
-  const lastMapClickRef = useRef<{
-    timestamp: number;
-    position: { lat: number; lng: number } | null;
-  }>({ timestamp: 0, position: null });
+function Map2DInner() {
+  const map = useMap();
   const flyToTarget = useAppStore((s) => s.flyToTarget);
   const setFlyToTarget = useAppStore((s) => s.setFlyToTarget);
   const routeInfo = useAppStore((s) => s.routeInfo);
@@ -214,119 +174,27 @@ function Map3DInner() {
   const selectedDestination = useAppStore((s) => s.selectedDestination);
   const highlightedEventIds = useAppStore((s) => s.highlightedEventIds);
   const setSelectedEvent = useAppStore((s) => s.setSelectedEvent);
-  const streetViewEvent = useAppStore((s) => s.streetViewEvent);
-  const setStreetViewEvent = useAppStore((s) => s.setStreetViewEvent);
-  const [inStreetView, setInStreetView] = useState(false);
-  const [streetViewLocation, setStreetViewLocation] = useState<{
-    lat: number;
-    lng: number;
-  } | null>(null);
-  const [mapViewCamera, setMapViewCamera] = useState(defaultCamera);
+  const [, setCurrentZoom] = useState(17);
 
   useEffect(() => {
-    if (!flyToTarget || !mapRef.current) return;
-    const altitude = flyToTarget.altitude || 200;
-    mapRef.current.flyCameraTo({
-      endCamera: {
-        center: {
-          lat: flyToTarget.lat,
-          lng: flyToTarget.lng,
-          altitude,
-        },
-        range: altitude * 2,
-        tilt: 60,
-        heading: 0,
-      },
-      durationMillis: 2000,
-    });
+    if (!flyToTarget || !map) return;
+    map.panTo({ lat: flyToTarget.lat, lng: flyToTarget.lng });
+    map.setZoom(18);
     setFlyToTarget(null);
-  }, [flyToTarget, setFlyToTarget]);
+  }, [flyToTarget, setFlyToTarget, map]);
 
-  // Save camera state when entering street view, restore when exiting
-  useEffect(() => {
-    const isNowInStreetView = inStreetView && !!streetViewLocation;
-    if (isNowInStreetView && !previousStreetViewRef.current) {
-      // Entering street view — snapshot camera
-      const currentMap = mapRef.current?.map3d;
-      if (
-        currentMap?.center &&
-        typeof currentMap.range === "number" &&
-        typeof currentMap.tilt === "number" &&
-        typeof currentMap.heading === "number" &&
-        typeof currentMap.roll === "number"
-      ) {
-        lastCameraRef.current = {
-          center: currentMap.center,
-          range: currentMap.range,
-          tilt: currentMap.tilt,
-          heading: currentMap.heading,
-          roll: currentMap.roll,
-        };
-      }
-    }
-    previousStreetViewRef.current = isNowInStreetView;
-  }, [inStreetView, streetViewLocation]);
-
-  const handleCameraChanged = useCallback((event: Map3DCameraChangedEvent) => {
-    lastCameraRef.current = event.detail;
-  }, []);
-
-  const handleCloseStreetView = useCallback(() => {
-    setMapViewCamera(lastCameraRef.current);
-    setInStreetView(false);
-    setStreetViewEvent(null);
-  }, [setStreetViewEvent]);
-
-  const handleMapClick = useCallback((e: Map3DClickEvent) => {
-    const now = Date.now();
-    const positionFromEvent = e.detail.position
-      ? { lat: e.detail.position.lat, lng: e.detail.position.lng }
-      : null;
-    const streetViewTarget =
-      positionFromEvent ??
-      lastMapClickRef.current.position ?? {
-        lat: CAMPUS_CENTER.lat,
-        lng: CAMPUS_CENTER.lng,
-      };
-
-    if (now - lastMapClickRef.current.timestamp <= 300) {
-      setStreetViewLocation(streetViewTarget);
-      setInStreetView(true);
-    }
-
-    lastMapClickRef.current = {
-      timestamp: now,
-      position: positionFromEvent ?? lastMapClickRef.current.position,
-    };
-  }, []);
-
-  // On mobile, after selecting a marker, nudge the camera so the marker
-  // sits in the upper 60% of the viewport (above the bottom sheet peek).
   const nudgeCameraForMobile = useCallback(
     (lat: number, lng: number) => {
       if (typeof window === "undefined" || window.innerWidth >= 768) return;
-      if (!mapRef.current) return;
-      // Offset the center southward so the marker appears above the sheet.
-      // The bottom sheet peek is ~280px; shift center down proportionally.
+      if (!map) return;
       const viewportHeight = window.innerHeight;
       const sheetPeekPx = 280;
-      // We want the marker at roughly 40% from top → 60% visible area.
-      // Nudge lat south by a fraction of the current camera range.
-      const currentMap = mapRef.current.map3d;
-      const range = typeof currentMap?.range === "number" ? currentMap.range : 800;
-      // Approximate: 1 degree lat ≈ 111km. Range is in meters.
-      const latOffsetDeg = (range / 111000) * (sheetPeekPx / viewportHeight) * 0.5;
-      mapRef.current.flyCameraTo({
-        endCamera: {
-          center: { lat: lat - latOffsetDeg, lng, altitude: 200 },
-          range: Math.min(range, 600),
-          tilt: 55,
-          heading: typeof currentMap?.heading === "number" ? currentMap.heading : 0,
-        },
-        durationMillis: 800,
-      });
+      const currentZoomLevel = map.getZoom() ?? 17;
+      const latOffsetDeg = (sheetPeekPx / viewportHeight) * 0.002;
+      map.panTo({ lat: lat - latOffsetDeg, lng });
+      map.setZoom(Math.max(currentZoomLevel, 17));
     },
-    [],
+    [map],
   );
 
   const handleMarkerClick = useCallback(
@@ -345,96 +213,111 @@ function Map3DInner() {
     [setSelectedEvent, nudgeCameraForMobile]
   );
 
-  useEffect(() => {
-    if (typeof window !== "undefined" && window.speechSynthesis) {
-      window.speechSynthesis.cancel();
-    }
-    if (streetViewEvent && streetViewEvent.type !== "Online") {
-      const timeoutId = window.setTimeout(() => {
-        setStreetViewLocation({ lat: streetViewEvent.lat, lng: streetViewEvent.lng });
-        setInStreetView(true);
-      }, 0);
+  const handleZoomIn = useCallback(() => {
+    if (!map) return;
+    const z = map.getZoom() ?? 17;
+    map.setZoom(z + 1);
+    setCurrentZoom(z + 1);
+  }, [map]);
 
-      return () => window.clearTimeout(timeoutId);
-    }
-  }, [streetViewEvent]);
+  const handleZoomOut = useCallback(() => {
+    if (!map) return;
+    const z = map.getZoom() ?? 17;
+    map.setZoom(z - 1);
+    setCurrentZoom(z - 1);
+  }, [map]);
+
+  const handleZoomChanged = useCallback(() => {
+    if (!map) return;
+    setCurrentZoom(map.getZoom() ?? 17);
+  }, [map]);
 
   return (
     <div className="w-full h-full relative">
-      {inStreetView && streetViewLocation ? (
-        <StreetViewPanel
-          location={streetViewLocation}
-          onClose={handleCloseStreetView}
-          eventInfo={streetViewEvent ?? undefined}
-        />
-      ) : (
-        <>
-          <Map3D
-            ref={mapRef}
-            mode="SATELLITE"
-            defaultCenter={mapViewCamera.center}
-            defaultRange={mapViewCamera.range}
-            defaultTilt={mapViewCamera.tilt}
-            defaultHeading={mapViewCamera.heading}
-            defaultRoll={mapViewCamera.roll}
-            onCameraChanged={handleCameraChanged}
-            onClick={handleMapClick}
-          >
-            {CAMPUS_POIS.map((poi) => {
-              const isSelected =
-                selectedPOI?.id === poi.id ||
-                selectedDestination?.id === poi.id;
-              const pinStyle = getPOIPinStyle(poi.category, isSelected);
-              return (
-                <Marker3D
-                  key={poi.id}
-                  position={{ lat: poi.lat, lng: poi.lng, altitude: 20 }}
-                  altitudeMode="RELATIVE_TO_GROUND"
-                  label={poi.name}
-                  title={poi.name}
-                  onClick={() => handleMarkerClick(poi)}
-                >
-                  <PinErrorBoundary>
-                    <Pin
-                      background={pinStyle.background}
-                      borderColor={pinStyle.borderColor}
-                      glyphColor={pinStyle.glyphColor}
-                      scale={pinStyle.scale}
-                    />
-                  </PinErrorBoundary>
-                </Marker3D>
-              );
-            })}
+      <GoogleMap
+        defaultCenter={{ lat: CAMPUS_CENTER.lat, lng: CAMPUS_CENTER.lng }}
+        defaultZoom={17}
+        mapId="senior-friendly-2d"
+        mapTypeId="roadmap"
+        gestureHandling="greedy"
+        disableDefaultUI
+        styles={SENIOR_MAP_STYLE}
+        tilt={0}
+        isFractionalZoomEnabled={false}
+        onZoomChanged={handleZoomChanged}
+      >
+        {CAMPUS_POIS.map((poi) => {
+          const isSelected =
+            selectedPOI?.id === poi.id ||
+            selectedDestination?.id === poi.id;
+          const pinStyle = getPOIPinStyle(poi.category, isSelected);
+          return (
+            <AdvancedMarker
+              key={poi.id}
+              position={{ lat: poi.lat, lng: poi.lng }}
+              title={poi.name}
+              onClick={() => handleMarkerClick(poi)}
+            >
+              <PinErrorBoundary>
+                <Pin
+                  background={pinStyle.background}
+                  borderColor={pinStyle.borderColor}
+                  glyphColor={pinStyle.glyphColor}
+                  scale={pinStyle.scale}
+                />
+              </PinErrorBoundary>
+            </AdvancedMarker>
+          );
+        })}
 
-            {mapEventMarkers.map((event: CampusEvent) => {
-              const isHighlighted = highlightedEventIds.includes(event.id);
-              const eventPin = getEventPinStyle(event.type, isHighlighted);
-              return (
-                <Marker3D
-                  key={event.id}
-                  position={{ lat: event.lat, lng: event.lng, altitude: 25 }}
-                  altitudeMode="RELATIVE_TO_GROUND"
-                  label={event.title}
-                  title={event.title}
-                  onClick={() => handleEventMarkerClick(event)}
-                >
-                  <PinErrorBoundary>
-                    <Pin
-                      background={eventPin.background}
-                      borderColor={eventPin.borderColor}
-                      glyphColor={eventPin.glyphColor}
-                      scale={eventPin.scale}
-                    />
-                  </PinErrorBoundary>
-                </Marker3D>
-              );
-            })}
+        {mapEventMarkers.map((event: CampusEvent) => {
+          const isHighlighted = highlightedEventIds.includes(event.id);
+          const eventPin = getEventPinStyle(event.type, isHighlighted);
+          return (
+            <AdvancedMarker
+              key={event.id}
+              position={{ lat: event.lat, lng: event.lng }}
+              title={event.title}
+              onClick={() => handleEventMarkerClick(event)}
+            >
+              <PinErrorBoundary>
+                <Pin
+                  background={eventPin.background}
+                  borderColor={eventPin.borderColor}
+                  glyphColor={eventPin.glyphColor}
+                  scale={eventPin.scale}
+                />
+              </PinErrorBoundary>
+            </AdvancedMarker>
+          );
+        })}
 
-            {routeInfo && routeInfo.polyline.length > 0 && <RoutePolyline />}
-          </Map3D>
+        {routeInfo && routeInfo.polyline.length > 0 && <RoutePolyline />}
+      </GoogleMap>
 
-        </>
-      )}
+      <div
+        className="absolute right-3 z-10 flex flex-col gap-2"
+        style={{ bottom: "calc(var(--sheet-height, 64px) + 16px)" }}
+      >
+        <button
+          type="button"
+          aria-label="Zoom in"
+          onClick={handleZoomIn}
+          className="flex items-center justify-center bg-card/90 backdrop-blur-xl border border-border/30 shadow-lg text-card-foreground hover:bg-card active:scale-95 transition-all duration-200 rounded-xl"
+          style={{ width: 56, height: 56 }}
+        >
+          <Plus size={28} strokeWidth={2.5} aria-hidden="true" />
+        </button>
+        <button
+          type="button"
+          aria-label="Zoom out"
+          onClick={handleZoomOut}
+          className="flex items-center justify-center bg-card/90 backdrop-blur-xl border border-border/30 shadow-lg text-card-foreground hover:bg-card active:scale-95 transition-all duration-200 rounded-xl"
+          style={{ width: 56, height: 56 }}
+        >
+          <Minus size={28} strokeWidth={2.5} aria-hidden="true" />
+        </button>
+      </div>
     </div>
   );
 }
