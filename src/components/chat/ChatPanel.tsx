@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useAppStore } from "@/store/app-store";
 import { useSpeechSynthesis } from "@/lib/voice/speech-synthesis";
+import { useGeolocation } from "@/hooks/useGeolocation";
 import { findPOI } from "@/lib/maps/campus-pois";
 import type { DateRangePreset } from "@/types";
 
@@ -51,7 +52,8 @@ function getActiveToolLabel(parts: Array<{ type: string; [key: string]: unknown 
 
 function renderAssistantParts(
   parts: Array<{ type: string; [key: string]: unknown }>,
-  messageId: string
+  messageId: string,
+  timestamp?: Date
 ): ReactNode[] {
   const nodes: ReactNode[] = [];
   let textAccumulator: TextUIPart[] = [];
@@ -67,6 +69,7 @@ function renderAssistantParts(
           role={"assistant" as const}
           content={text}
           isStreaming={isStreaming}
+          timestamp={timestamp}
         />
       );
     }
@@ -108,6 +111,7 @@ export default function ChatPanel() {
   const [hasNewMessages, setHasNewMessages] = useState(false);
   const [lastFailedInput, setLastFailedInput] = useState<string | null>(null);
   const processedToolsRef = useRef<Set<string>>(new Set());
+  const messageTimestamps = useRef<Map<string, Date>>(new Map());
   const setFlyToTarget = useAppStore((s) => s.setFlyToTarget);
   const setSelectedDestination = useAppStore((s) => s.setSelectedDestination);
   const setRouteInfo = useAppStore((s) => s.setRouteInfo);
@@ -118,7 +122,14 @@ export default function ChatPanel() {
   const mapEventMarkers = useAppStore((s) => s.mapEventMarkers);
   const setHighlightedEventIds = useAppStore((s) => s.setHighlightedEventIds);
   const ttsEnabled = useAppStore((s) => s.ttsEnabled);
+  const pendingChatMessage = useAppStore((s) => s.pendingChatMessage);
+  const setPendingChatMessage = useAppStore((s) => s.setPendingChatMessage);
   const { speak } = useSpeechSynthesis();
+  const { lat: geoLat, lng: geoLng, requestLocation } = useGeolocation();
+
+  useEffect(() => {
+    requestLocation();
+  }, [requestLocation]);
 
   const { messages, sendMessage, status, error } = useChat({
     onError: (err) => {
@@ -164,14 +175,14 @@ export default function ChatPanel() {
           );
           setFlyToTarget({ lat: poi.lat, lng: poi.lng });
 
-          const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || "";
-          if (apiKey) {
+          const origin = geoLat && geoLng
+              ? { lat: geoLat, lng: geoLng }
+              : { lat: 1.3299, lng: 103.7764 };
             import("@/lib/maps/route-utils")
               .then(({ computeWalkingRoute }) =>
                 computeWalkingRoute(
-                  { lat: 1.3299, lng: 103.7764 },
+                  origin,
                   { lat: poi.lat, lng: poi.lng },
-                  apiKey
                 ).then((route) => {
                   if (route) {
                     setRouteInfo({
@@ -183,7 +194,6 @@ export default function ChatPanel() {
                 })
               )
               .catch(() => toast.error("Could not compute walking route."));
-          }
         }
 
         if (tp.toolName === "show_events") {
@@ -210,7 +220,16 @@ export default function ChatPanel() {
     setActivePanel,
     setEventDateFilter,
     setEventCategoryFilter,
+    geoLat,
+    geoLng,
   ]);
+
+  useEffect(() => {
+    if (pendingChatMessage) {
+      sendMessage({ text: pendingChatMessage });
+      setPendingChatMessage(null);
+    }
+  }, [pendingChatMessage, sendMessage, setPendingChatMessage]);
 
   const isWaiting = status === "submitted";
   const isStreaming = status === "streaming";
@@ -231,6 +250,14 @@ export default function ChatPanel() {
   }
 
   const hasToolInProgress = thinkingLabel !== null;
+
+  useEffect(() => {
+    for (const msg of messages) {
+      if (!messageTimestamps.current.has(msg.id)) {
+        messageTimestamps.current.set(msg.id, new Date());
+      }
+    }
+  }, [messages]);
 
   useEffect(() => {
     if (userScrolledUpRef.current) {
@@ -326,6 +353,7 @@ export default function ChatPanel() {
         )}
 
         {messages.map((msg) => {
+          const ts = messageTimestamps.current.get(msg.id);
           if (msg.role === "user") {
             const { text } = extractTextContent(msg.parts ?? []);
             if (!text) return null;
@@ -334,12 +362,13 @@ export default function ChatPanel() {
                 key={msg.id}
                 role={"user" as const}
                 content={text}
+                timestamp={ts}
               />
             );
           }
 
           const parts = msg.parts ?? [];
-          const rendered = renderAssistantParts(parts, msg.id);
+          const rendered = renderAssistantParts(parts, msg.id, ts);
           if (rendered.length === 0) return null;
           return <div key={msg.id}>{rendered}</div>;
         })}
