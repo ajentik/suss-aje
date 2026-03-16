@@ -9,6 +9,7 @@ import { useGeolocation } from "@/hooks/useGeolocation";
 import { haversineDistance } from "@/lib/maps/geo-utils";
 import { ACTIVE_AGEING_CENTRES } from "@/lib/maps/active-ageing-centres";
 import AACResultCard from "./AACResultCard";
+import MyAACCard from "@/components/senior/MyAACCard";
 import type { POI } from "@/types";
 
 const INITIAL_DISPLAY_COUNT = 10;
@@ -71,6 +72,7 @@ export default function AACSearchPanel() {
 
   return (
     <div className="flex flex-col h-full">
+      <MyAACCard />
       <div className="px-3 pt-3 pb-2 space-y-2 shrink-0">
         <div className="relative">
           <Search

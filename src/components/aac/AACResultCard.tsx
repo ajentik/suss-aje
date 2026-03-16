@@ -1,8 +1,10 @@
 "use client";
 
 import type { POI } from "@/types";
-import { MapPin, Footprints, Loader2 } from "lucide-react";
+import { MapPin, Footprints, Loader2, Star } from "lucide-react";
 import { useWalkingRoute } from "@/hooks/useWalkingRoute";
+import { useMyAAC } from "@/hooks/useMyAAC";
+import { toast } from "sonner";
 
 interface AACResultCardProps {
   poi: POI;
@@ -17,6 +19,8 @@ function formatDistance(km: number): string {
 
 export default function AACResultCard({ poi, distanceKm, onSelect }: AACResultCardProps) {
   const { walkTo, isLoading: isWalking } = useWalkingRoute();
+  const { myAAC, setMyAAC } = useMyAAC();
+  const isSaved = myAAC?.name === poi.name && myAAC?.lat === poi.lat && myAAC?.lng === poi.lng;
 
   return (
     <button
@@ -30,7 +34,7 @@ export default function AACResultCard({ poi, distanceKm, onSelect }: AACResultCa
           <MapPin size={14} className="text-poi-aac" />
         </div>
         <div className="min-w-0 flex-1">
-          <p className="text-sm font-medium leading-snug text-foreground group-hover:text-primary transition-colors truncate pr-8">
+          <p className="text-sm font-medium leading-snug text-foreground group-hover:text-primary transition-colors truncate pr-16">
             {poi.name}
           </p>
           {poi.address && (
@@ -50,22 +54,42 @@ export default function AACResultCard({ poi, distanceKm, onSelect }: AACResultCa
           </span>
         )}
       </div>
-      <button
-        type="button"
-        aria-label={`Walk to ${poi.name}`}
-        disabled={isWalking}
-        onClick={(e) => {
-          e.stopPropagation();
-          walkTo(poi);
-        }}
-        className="absolute top-2 right-2 flex items-center justify-center w-7 h-7 rounded-full bg-primary/10 hover:bg-primary/20 active:scale-90 transition-all disabled:opacity-60"
-      >
-        {isWalking ? (
-          <Loader2 size={14} className="animate-spin text-primary" aria-hidden="true" />
-        ) : (
-          <Footprints size={14} className="text-primary" aria-hidden="true" />
-        )}
-      </button>
+      <div className="absolute top-2 right-2 flex items-center gap-1">
+        <button
+          type="button"
+          aria-label={isSaved ? `${poi.name} is your saved AAC` : `Set ${poi.name} as My AAC`}
+          onClick={(e) => {
+            e.stopPropagation();
+            if (!isSaved) {
+              setMyAAC(poi);
+              toast.success(`${poi.name} set as My AAC`);
+            }
+          }}
+          className={`flex items-center justify-center w-7 h-7 rounded-full transition-all ${
+            isSaved
+              ? "bg-yellow-400/20 text-yellow-600 dark:text-yellow-400"
+              : "bg-muted/60 hover:bg-yellow-400/15 text-muted-foreground hover:text-yellow-600 dark:hover:text-yellow-400 active:scale-90"
+          }`}
+        >
+          <Star size={14} fill={isSaved ? "currentColor" : "none"} aria-hidden="true" />
+        </button>
+        <button
+          type="button"
+          aria-label={`Walk to ${poi.name}`}
+          disabled={isWalking}
+          onClick={(e) => {
+            e.stopPropagation();
+            walkTo(poi);
+          }}
+          className="flex items-center justify-center w-7 h-7 rounded-full bg-primary/10 hover:bg-primary/20 active:scale-90 transition-all disabled:opacity-60"
+        >
+          {isWalking ? (
+            <Loader2 size={14} className="animate-spin text-primary" aria-hidden="true" />
+          ) : (
+            <Footprints size={14} className="text-primary" aria-hidden="true" />
+          )}
+        </button>
+      </div>
     </button>
   );
 }

@@ -1,8 +1,33 @@
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, it, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 
+const mockWalkTo = vi.fn();
+const mockSetMyAAC = vi.fn();
+
+vi.mock("@/hooks/useWalkingRoute", () => ({
+  useWalkingRoute: vi.fn(() => ({
+    walkTo: mockWalkTo,
+    isLoading: false,
+  })),
+}));
+
+vi.mock("@/hooks/useMyAAC", () => ({
+  useMyAAC: vi.fn(() => ({
+    myAAC: null,
+    setMyAAC: mockSetMyAAC,
+    clearMyAAC: vi.fn(),
+  })),
+}));
+
+vi.mock("sonner", () => ({
+  toast: { success: vi.fn(), error: vi.fn(), info: vi.fn() },
+}));
+
 import AACResultCard, { formatDistance } from "@/components/aac/AACResultCard";
+import { useMyAAC } from "@/hooks/useMyAAC";
 import type { POI } from "@/types";
+
+const mockedUseMyAAC = vi.mocked(useMyAAC);
 
 const basePOI: POI = {
   id: "aac-test",
@@ -30,6 +55,15 @@ describe("formatDistance", () => {
 });
 
 describe("AACResultCard", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockedUseMyAAC.mockReturnValue({
+      myAAC: null,
+      setMyAAC: mockSetMyAAC,
+      clearMyAAC: vi.fn(),
+    });
+  });
+
   it("renders name and address", () => {
     render(<AACResultCard poi={basePOI} distanceKm={1.2} onSelect={vi.fn()} />);
     expect(screen.getByText("Test Active Ageing Centre")).toBeInTheDocument();
@@ -58,5 +92,38 @@ describe("AACResultCard", () => {
     fireEvent.click(screen.getByText("Test Active Ageing Centre"));
     expect(onSelect).toHaveBeenCalledOnce();
     expect(onSelect).toHaveBeenCalledWith(basePOI);
+  });
+
+  it("shows Set as My AAC button when not saved", () => {
+    render(<AACResultCard poi={basePOI} distanceKm={1.0} onSelect={vi.fn()} />);
+    expect(screen.getByLabelText(`Set ${basePOI.name} as My AAC`)).toBeInTheDocument();
+  });
+
+  it("calls setMyAAC when star button is clicked", () => {
+    render(<AACResultCard poi={basePOI} distanceKm={1.0} onSelect={vi.fn()} />);
+    fireEvent.click(screen.getByLabelText(`Set ${basePOI.name} as My AAC`));
+    expect(mockSetMyAAC).toHaveBeenCalledOnce();
+    expect(mockSetMyAAC).toHaveBeenCalledWith(basePOI);
+  });
+
+  it("shows saved state when AAC matches", () => {
+    mockedUseMyAAC.mockReturnValue({
+      myAAC: { name: basePOI.name, lat: basePOI.lat, lng: basePOI.lng, address: basePOI.address! },
+      setMyAAC: mockSetMyAAC,
+      clearMyAAC: vi.fn(),
+    });
+    render(<AACResultCard poi={basePOI} distanceKm={1.0} onSelect={vi.fn()} />);
+    expect(screen.getByLabelText(`${basePOI.name} is your saved AAC`)).toBeInTheDocument();
+  });
+
+  it("does not call setMyAAC when already saved and star is clicked", () => {
+    mockedUseMyAAC.mockReturnValue({
+      myAAC: { name: basePOI.name, lat: basePOI.lat, lng: basePOI.lng, address: basePOI.address! },
+      setMyAAC: mockSetMyAAC,
+      clearMyAAC: vi.fn(),
+    });
+    render(<AACResultCard poi={basePOI} distanceKm={1.0} onSelect={vi.fn()} />);
+    fireEvent.click(screen.getByLabelText(`${basePOI.name} is your saved AAC`));
+    expect(mockSetMyAAC).not.toHaveBeenCalled();
   });
 });
