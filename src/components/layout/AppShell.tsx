@@ -24,6 +24,7 @@ import ChatPanel from "@/components/chat/ChatPanel";
 import EventsPanel from "@/components/events/EventsPanel";
 import AACSearchPanel from "@/components/aac/AACSearchPanel";
 import RouteOverlay from "@/components/map/RouteOverlay";
+import VoiceNavigationBar from "@/components/navigation/VoiceNavigationBar";
 import AerialViewButton from "@/components/map/AerialViewButton";
 import POIPopup, { POIDetailCard } from "@/components/map/POIPopup";
 import EventPopup, { EventDetailCard } from "@/components/map/EventPopup";
@@ -438,6 +439,7 @@ export default function AppShell() {
         <main id="main-content" className="flex-1 h-full relative">
           <MapView />
           <RouteOverlay />
+          <VoiceNavigationBar />
           <AerialViewButton />
           <POIPopup />
           <EventPopup />

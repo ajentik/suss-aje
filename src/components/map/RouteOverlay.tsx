@@ -2,9 +2,10 @@
 
 import { useEffect, useState, useRef, useCallback } from "react";
 import { toast } from "sonner";
-import { Footprints, X, ChevronUp, ChevronDown } from "lucide-react";
+import { Footprints, X, ChevronUp, ChevronDown, Navigation } from "lucide-react";
 import { useAppStore } from "@/store/app-store";
 import { getBuildingInsights, type SolarInsight } from "@/lib/maps/solar-utils";
+import { useVoiceNavigation } from "@/hooks/useVoiceNavigation";
 import type { RouteStep } from "@/types";
 
 const MAPS_API_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || "";
@@ -70,6 +71,7 @@ function StepRow({ step }: { step: RouteStep }) {
 export default function RouteOverlay() {
   const routeInfo = useAppStore((s) => s.routeInfo);
   const selectedDestination = useAppStore((s) => s.selectedDestination);
+  const voiceNav = useVoiceNavigation();
   const [solar, setSolar] = useState<SolarInsight | null>(null);
   const [dismissedId, setDismissedId] = useState<string | null>(null);
   const [swipeY, setSwipeY] = useState(0);
@@ -181,6 +183,17 @@ export default function RouteOverlay() {
             <span>{SUN_ICONS[solar.sunExposure]}</span>
             <span className="text-muted-foreground">{SUN_TIPS[solar.sunExposure]}</span>
           </div>
+        )}
+        {!voiceNav.isNavigating && routeInfo.steps.length > 0 && (
+          <button
+            type="button"
+            onClick={voiceNav.start}
+            aria-label="Start voice navigation"
+            className="mt-2 w-full flex items-center justify-center gap-2 h-10 rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 active:scale-[0.98] transition-all duration-200 text-sm font-semibold"
+          >
+            <Navigation size={15} />
+            Start Navigation
+          </button>
         )}
         <div
           className="overflow-hidden transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]"

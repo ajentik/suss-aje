@@ -583,3 +583,12 @@
 @utility animate-aac-tab-fade-in {
   animation: aac-tab-fade-in 200ms cubic-bezier(0.32, 0.72, 0, 1) both;
 }
+
+@keyframes nav-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 oklch(0.30 0.07 240 / 0.3); }
+  50% { box-shadow: 0 0 0 6px oklch(0.30 0.07 240 / 0); }
+}
+
+@utility animate-nav-pulse {
+  animation: nav-pulse 1.5s ease-in-out infinite;
+}
