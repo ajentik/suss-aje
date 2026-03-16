@@ -5,6 +5,9 @@ import { toast } from "sonner";
 import { Footprints, X, ChevronUp, ChevronDown } from "lucide-react";
 import { useAppStore } from "@/store/app-store";
 import { getBuildingInsights, type SolarInsight } from "@/lib/maps/solar-utils";
+import { estimateElderlyWalkTime, assessRouteAccessibility } from "@/utils/elderNavigation";
+import MobilitySelector from "@/components/navigation/MobilitySelector";
+import RestStopMarkers from "@/components/navigation/RestStopMarkers";
 import type { RouteStep } from "@/types";
 
 const MAPS_API_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || "";
@@ -70,12 +73,25 @@ function StepRow({ step }: { step: RouteStep }) {
 export default function RouteOverlay() {
   const routeInfo = useAppStore((s) => s.routeInfo);
   const selectedDestination = useAppStore((s) => s.selectedDestination);
+  const mobilityLevel = useAppStore((s) => s.mobilityLevel);
   const [solar, setSolar] = useState<SolarInsight | null>(null);
   const [dismissedId, setDismissedId] = useState<string | null>(null);
   const [swipeY, setSwipeY] = useState(0);
   const [expanded, setExpanded] = useState(false);
   const dismissed = dismissedId === selectedDestination?.id;
   const touchStartRef = useRef(0);
+
+  const elderlyMinutes = routeInfo
+    ? estimateElderlyWalkTime(routeInfo.distanceMeters, mobilityLevel)
+    : 0;
+  const displayDuration =
+    mobilityLevel === "normal"
+      ? routeInfo?.duration ?? ""
+      : `~${elderlyMinutes} min walk`;
+
+  const accessibility = routeInfo
+    ? assessRouteAccessibility(routeInfo.steps)
+    : null;
 
   useEffect(() => {
     if (!selectedDestination || !MAPS_API_KEY) {
@@ -147,7 +163,7 @@ export default function RouteOverlay() {
                 {selectedDestination.name}
               </span>
               <span className="text-muted-foreground shrink-0">
-                {routeInfo.duration} &middot; {Math.round(routeInfo.distanceMeters)}m
+                {displayDuration} &middot; {Math.round(routeInfo.distanceMeters)}m
               </span>
             </div>
           </div>
@@ -182,6 +198,20 @@ export default function RouteOverlay() {
             <span className="text-muted-foreground">{SUN_TIPS[solar.sunExposure]}</span>
           </div>
         )}
+        <div className="mt-2 pt-2 border-t border-border/30">
+          <MobilitySelector />
+        </div>
+        {accessibility && (accessibility.hasStairs || accessibility.hasSteepSlope) && (
+          <div className="mt-2 pt-2 border-t border-border/30 flex flex-wrap gap-2 text-xs">
+            {accessibility.hasStairs && (
+              <span className="text-amber-600">⚠️ Stairs on route</span>
+            )}
+            {accessibility.hasSteepSlope && (
+              <span className="text-amber-600">⚠️ Steep slope</span>
+            )}
+          </div>
+        )}
+        <RestStopMarkers />
         <div
           className="overflow-hidden transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]"
           style={{ maxHeight: expanded ? "280px" : "0px" }}

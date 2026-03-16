@@ -61,6 +61,23 @@ export interface ChatMessage {
   content: string;
 }
 
+export type MobilityLevel = "normal" | "slow" | "walker" | "wheelchair";
+
+export interface RestStop {
+  /** Index into the original RouteStep[] array */
+  stepIndex: number;
+  /** Cumulative distance from route start (meters) */
+  cumulativeDistance: number;
+  /** Human-readable label, e.g. "Rest after 200 m" */
+  label: string;
+}
+
+export interface RouteAccessibility {
+  hasStairs: boolean;
+  hasSteepSlope: boolean;
+  isSheltered: boolean;
+}
+
 export type DateRangePreset = "all" | "1d" | "3d" | "7d";
 
 export interface FeedbackEntry {
