@@ -7,8 +7,8 @@ describe("SYSTEM_PROMPT", () => {
     expect(SYSTEM_PROMPT.length).toBeGreaterThan(100);
   });
 
-  it("identifies as AskSUSSi", () => {
-    expect(SYSTEM_PROMPT).toContain("AskSUSSi");
+  it("identifies as AAC Near Me", () => {
+    expect(SYSTEM_PROMPT).toContain("AAC Near Me");
   });
 
   it("mentions available tools", () => {

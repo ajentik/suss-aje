@@ -1,4 +1,4 @@
-const CACHE_NAME = "asksussi-v1";
+const CACHE_NAME = "aac-near-me-v1";
 const SHELL_URLS = ["/"];
 
 self.addEventListener("install", (event) => {

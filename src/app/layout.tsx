@@ -17,8 +17,8 @@ const sourceCodePro = Source_Code_Pro({
 });
 
 export const metadata: Metadata = {
-  title: "AskSUSSi — Your Smart Campus Companion",
-  description: "Resolve campus affairs with one sentence. AI-powered assistant with 3D campus map, navigation, and events.",
+  title: "AAC Near Me — Activities for Seniors",
+  description: "Find activities at Active Ageing Centres near you",
   manifest: "/manifest.json",
 };
 

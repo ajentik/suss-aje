@@ -1,7 +1,7 @@
 {
-  "name": "AskSUSSi — Your Smart Campus Companion",
-  "short_name": "AskSUSSi",
-  "description": "Resolve campus affairs with one sentence. Navigate, discover events, and explore SUSS in 3D.",
+  "name": "AAC Near Me — Activities for Seniors",
+  "short_name": "AAC Near Me",
+  "description": "Find activities at Active Ageing Centres near you.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",

@@ -5,7 +5,9 @@ export const maxDuration = 60;
 
 const ADAPTATION_PHRASES: google.cloud.speech.v2.PhraseSet.IPhrase[] = [
   { value: "SUSS", boost: 20 },
-  { value: "AskSUSSi", boost: 20 },
+  { value: "AAC Near Me", boost: 20 },
+  { value: "AAC", boost: 15 },
+  { value: "Active Ageing Centre", boost: 15 },
   { value: "Clementi", boost: 10 },
   { value: "hawker centre", boost: 10 },
   { value: "kopitiam", boost: 10 },

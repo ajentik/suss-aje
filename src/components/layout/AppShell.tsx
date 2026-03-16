@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useCallback, useRef, useEffect, useSyncExternalStore } from "react";
-import Image from "next/image";
 import dynamic from "next/dynamic";
 import {
   Volume2,
@@ -15,6 +14,7 @@ import {
   SquarePen,
   Sun,
   Moon,
+  Heart,
 } from "lucide-react";
 import { useTheme } from "next-themes";
 import { APIProvider } from "@vis.gl/react-google-maps";
@@ -66,17 +66,9 @@ function BrandHeader({
   return (
     <div className="flex items-center justify-between px-4 py-2.5 border-b bg-surface-brand/90 backdrop-blur text-surface-brand-foreground shrink-0">
       <div className="flex items-center gap-2.5">
-        <Image
-          src="/suss-logo.png"
-          alt="SUSS"
-          width={80}
-          height={28}
-          className="h-7 w-auto brightness-0 invert"
-          priority
-        />
-        <div className="h-5 w-px bg-white/25" />
+        <Heart size={22} className="text-white/90" aria-hidden="true" />
         <span className="text-sm font-bold tracking-wide opacity-90">
-          AskSUSSi
+          AAC Near Me
         </span>
       </div>
       <div className="flex items-center gap-1">
@@ -344,7 +336,7 @@ export default function AppShell() {
           aria-label="Restore panel"
         >
           <Maximize2 size={14} />
-          AskSUSSi
+          AAC Near Me
         </button>
       )}
 
@@ -358,7 +350,7 @@ export default function AppShell() {
                 <MessageSquare size={14} className="text-primary" aria-hidden="true" />
               </div>
               <div className="flex flex-col">
-                <span className="font-semibold text-card-foreground text-[13px] leading-tight">AskSUSSi</span>
+                <span className="font-semibold text-card-foreground text-[13px] leading-tight">AAC Near Me</span>
                 <span className="text-[11px] text-muted-foreground/70">Swipe up to chat</span>
               </div>
             </div>

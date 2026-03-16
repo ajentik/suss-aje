@@ -257,9 +257,9 @@ describe("AppShell", () => {
     expect(useAppStore.getState().activePanel).toBe("aac-search");
   });
 
-  it("renders brand header with AskSUSSi text", async () => {
+  it("renders brand header with AAC Near Me text", async () => {
     await renderAppShell();
-    const brandTexts = screen.getAllByText("AskSUSSi");
+    const brandTexts = screen.getAllByText("AAC Near Me");
     expect(brandTexts.length).toBeGreaterThanOrEqual(1);
   });
 

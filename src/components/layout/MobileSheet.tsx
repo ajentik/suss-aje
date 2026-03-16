@@ -35,7 +35,7 @@ function DefaultMiniContent() {
       </div>
       <div className="flex flex-col min-w-0">
         <span className="font-semibold text-card-foreground text-[13px] leading-tight truncate">
-          AskSUSSi
+          AAC Near Me
         </span>
         <span className="text-[11px] text-muted-foreground/70">
           Swipe up

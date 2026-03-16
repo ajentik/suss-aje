@@ -11,11 +11,11 @@ interface ChatInputProps {
 }
 
 const PLACEHOLDERS = [
-  "Ask me anything about campus...",
-  "Where is the library?",
-  "What events are on today?",
-  "How do I get to Block D?",
-  "Find me somewhere to eat",
+  "Ask me anything...",
+  "Find an AAC near me",
+  "What activities are today?",
+  "Where can I do Tai Chi?",
+  "How do I get there?",
 ];
 
 export default function ChatInput({ onSend, isLoading }: ChatInputProps) {

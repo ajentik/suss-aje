@@ -1,24 +1,23 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import Image from "next/image";
-import { X, MapPin, Calendar, Utensils, BookOpen, Bus, MessageCircle } from "lucide-react";
+import { X, MapPin, Calendar, Utensils, BookOpen, Bus, MessageCircle, Heart } from "lucide-react";
 import { useAppStore } from "@/store/app-store";
 
 const CAPABILITIES = [
-  { icon: MapPin, label: "Navigate campus", description: "Get walking directions to any building" },
-  { icon: Calendar, label: "Find events", description: "Discover what\u2019s happening on campus" },
+  { icon: MapPin, label: "Find nearby AACs", description: "Locate Active Ageing Centres close to you" },
+  { icon: Calendar, label: "Activities & events", description: "Browse exercises, classes & socials" },
   { icon: Utensils, label: "Food nearby", description: "Find restaurants, hawkers & cafes" },
-  { icon: BookOpen, label: "Library info", description: "Check hours, availability & services" },
-  { icon: Bus, label: "Transport", description: "Shuttle schedules & nearby transit" },
-  { icon: MessageCircle, label: "Ask anything", description: "Campus services, admin & more" },
+  { icon: BookOpen, label: "Senior services", description: "AIC, eldercare & caregiver support" },
+  { icon: Bus, label: "Getting there", description: "Bus routes & directions to any centre" },
+  { icon: MessageCircle, label: "Ask anything", description: "Chat or speak — we understand Singlish!" },
 ] as const;
 
 const TRY_SUGGESTIONS = [
-  "Where is the library?",
-  "What events are today?",
-  "Find me a place to eat nearby",
-  "How do I get to Block D?",
+  "Find an AAC near me",
+  "What activities are on today?",
+  "Where can I do Tai Chi?",
+  "How do I get to the nearest centre?",
 ];
 
 export default function Onboarding() {
@@ -72,7 +71,7 @@ export default function Onboarding() {
       className="fixed inset-0 z-[45] flex items-end md:items-center justify-center bg-black/50 backdrop-blur-sm p-0 md:p-4"
       role="dialog"
       aria-modal="true"
-      aria-label="Welcome to AskSUSSi"
+      aria-label="Welcome to AAC Near Me"
     >
       <div
         ref={dialogRef}
@@ -97,20 +96,12 @@ export default function Onboarding() {
             <X size={16} />
           </button>
           <div className="flex items-center gap-3 mb-3">
-            <Image
-              src="/suss-logo.png"
-              alt="SUSS"
-              width={80}
-              height={28}
-              className="h-7 w-auto brightness-0 invert"
-              priority
-            />
-            <div className="h-5 w-px bg-white/25" />
-            <span className="text-sm font-bold tracking-wider opacity-90">AskSUSSi</span>
+            <Heart size={24} className="text-white/90" aria-hidden="true" />
+            <span className="text-sm font-bold tracking-wider opacity-90">AAC Near Me</span>
           </div>
-          <h2 className="text-lg font-bold">Welcome to your campus assistant</h2>
+          <h2 className="text-lg font-bold">Welcome!</h2>
           <p className="text-sm opacity-80 mt-1">
-            I can help you navigate, find events, and discover what&apos;s around SUSS.
+            Find activities, events, and services at Active Ageing Centres near you.
           </p>
         </div>
 

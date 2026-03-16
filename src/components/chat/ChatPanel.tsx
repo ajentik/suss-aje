@@ -2,8 +2,7 @@
 
 import { useChat } from "@ai-sdk/react";
 import { useEffect, useRef, useState, type ReactNode } from "react";
-import Image from "next/image";
-import { AlertCircle, RotateCcw, ChevronDown } from "lucide-react";
+import { AlertCircle, RotateCcw, ChevronDown, Heart } from "lucide-react";
 import type { TextUIPart, DynamicToolUIPart } from "ai";
 import { toast } from "sonner";
 import ChatMessage from "./ChatMessage";
@@ -129,7 +128,7 @@ export default function ChatPanel() {
 
   const { messages, sendMessage, status, error } = useChat({
     onError: (err) => {
-      console.error("[AskSUSSi chat error]", err);
+      console.error("[AAC Near Me chat error]", err);
     },
     onFinish: ({ message }) => {
       setLastFailedInput(null);
@@ -309,28 +308,21 @@ export default function ChatPanel() {
       >
         {isEmpty && (
           <div className="text-center py-10 px-4 animate-chat-fade-in">
-            <Image
-              src="/suss-logo.png"
-              alt="SUSS — Singapore University of Social Sciences"
-              width={160}
-              height={56}
-              className="mx-auto mb-5 h-16 w-auto animate-welcome-float"
-              priority
-            />
+            <Heart size={48} className="mx-auto mb-5 text-primary animate-welcome-float" aria-hidden="true" />
             <p className="font-bold text-foreground text-xl tracking-tight">
-              Hi there!
+              Hello!
             </p>
             <p className="mt-1 text-muted-foreground text-sm leading-relaxed max-w-[260px] mx-auto">
-              I&apos;m your SUSS campus assistant. Ask me about directions, events, services, or anything campus-related.
+              I can help you find activities, events, and services at Active Ageing Centres nearby.
             </p>
             <section
               aria-label="Suggested questions"
               className="mt-6 flex flex-wrap justify-center gap-2.5"
             >
               {[
-                "Where is the library?",
-                "What events are today?",
-                "How to get to the canteen?",
+                "Find an AAC near me",
+                "What activities are on today?",
+                "Where can I do exercises?",
               ].map((q, i) => (
                 <button
                   type="button"

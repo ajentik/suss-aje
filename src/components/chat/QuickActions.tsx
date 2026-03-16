@@ -10,12 +10,12 @@ interface QuickAction {
 }
 
 const QUICK_ACTIONS: QuickAction[] = [
-  { emoji: "\u{1F5FA}\uFE0F", label: "Campus Map", message: "Show me the campus map" },
-  { emoji: "\u{1F4C5}", label: "Events Today", message: "What events are happening today?" },
-  { emoji: "\u{1F354}", label: "Where to Eat", message: "Where can I eat near campus?" },
-  { emoji: "\u{1F4DA}", label: "Library Hours", message: "What are the library hours?" },
-  { emoji: "\u{1F68C}", label: "Shuttle Schedule", message: "What is the shuttle bus schedule?" },
-  { emoji: "\u{1F3E5}", label: "Nearest AAC", message: "Where is the nearest AAC (Active Ageing Centre)?" },
+  { emoji: "❤️", label: "Nearest AAC", message: "Where is the nearest Active Ageing Centre?" },
+  { emoji: "📅", label: "Activities Today", message: "What activities are happening today?" },
+  { emoji: "🍜", label: "Where to Eat", message: "Where can I eat nearby?" },
+  { emoji: "🏃", label: "Exercise Classes", message: "What exercise classes are available at AACs?" },
+  { emoji: "🚌", label: "How to Get There", message: "How do I get to the nearest AAC?" },
+  { emoji: "📞", label: "AIC Helpline", message: "What is the AIC hotline number?" },
 ];
 
 interface QuickActionsProps {

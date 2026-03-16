@@ -1,18 +1,17 @@
 "use client";
 
 import { useEffect, useRef, useState, useCallback } from "react";
-import Image from "next/image";
-import { ArrowRight, Navigation, Globe, MessageCircle, CalendarDays } from "lucide-react";
+import { ArrowRight, Navigation, Globe, MessageCircle, CalendarDays, Heart } from "lucide-react";
 import { lookupAerialVideo } from "@/lib/maps/aerial-view";
 
 const SUSS_ADDRESS =
   "Singapore University of Social Sciences, 463 Clementi Road, Singapore 599494";
 
 const FEATURES = [
-  { icon: Navigation, label: "3D Campus Map", desc: "Explore SUSS in photorealistic 3D" },
-  { icon: Globe, label: "Street View", desc: "Walk through campus & indoor spaces" },
-  { icon: MessageCircle, label: "AI Chat & Voice", desc: "Ask SUSSi anything about campus" },
-  { icon: CalendarDays, label: "Events & Navigation", desc: "Discover events, navigate to venues" },
+  { icon: Navigation, label: "Find Nearby AACs", desc: "Locate Active Ageing Centres near you" },
+  { icon: Globe, label: "Street View", desc: "Preview centres before you visit" },
+  { icon: MessageCircle, label: "Voice & Chat", desc: "Ask questions in English or Singlish" },
+  { icon: CalendarDays, label: "Activities & Events", desc: "Discover exercises, classes & socials" },
 ];
 
 interface HeroIntroProps {
@@ -134,21 +133,14 @@ export default function HeroIntro({ onEnter }: HeroIntroProps) {
 
       {/* Content */}
       <div className="relative z-10 text-center px-6 max-w-2xl">
-        {/* SUSS Logo — spring scale-in */}
+        {/* App icon — spring scale-in */}
         <div
           className="mb-4 opacity-0"
           style={{
             animation: "hero-fade-in-up 0.9s cubic-bezier(0.34, 1.56, 0.64, 1) 300ms forwards",
           }}
         >
-          <Image
-            src="/suss-logo.png"
-            alt="SUSS — Singapore University of Social Sciences"
-            width={200}
-            height={70}
-            className="mx-auto h-14 md:h-16 w-auto brightness-0 invert drop-shadow-lg"
-            priority
-          />
+          <Heart size={56} className="mx-auto text-white drop-shadow-lg" aria-hidden="true" />
         </div>
 
         {/* Divider */}
@@ -163,13 +155,13 @@ export default function HeroIntro({ onEnter }: HeroIntroProps) {
             animation: "hero-fade-in-up 0.9s cubic-bezier(0.34, 1.56, 0.64, 1) 600ms forwards",
           }}
         >
-          AskSUSSi
+          AAC Near Me
         </h1>
 
         {/* Tagline */}
         <p className="text-white/80 text-sm md:text-base mb-8 leading-relaxed drop-shadow animate-hero-fade-in-up [animation-delay:800ms]">
-          Resolve campus affairs with one sentence. Navigate, discover events,
-          and explore SUSS in 3D.
+          Discover activities, exercises, and social events at Active Ageing
+          Centres near you.
         </p>
 
         {/* Feature pills */}
@@ -195,19 +187,19 @@ export default function HeroIntro({ onEnter }: HeroIntroProps) {
         >
           <button
             type="button"
-            aria-label="Enter AskSUSSi campus assistant"
+            aria-label="Enter AAC Near Me"
             onClick={handleEnter}
             className="inline-flex items-center gap-2.5 px-10 h-14 bg-white text-primary rounded-full font-semibold text-base shadow-lg hover:bg-white/95 hover:shadow-xl transition-all duration-300 hover:scale-105 active:scale-95 animate-subtle-glow"
           >
             <ArrowRight size={20} aria-hidden="true" />
-            Explore Campus
+            Get Started
           </button>
         </div>
       </div>
 
       {/* Bottom label */}
       <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-10 text-white/30 text-xs tracking-[0.2em] uppercase animate-hero-fade-in [animation-delay:1400ms]">
-        SUSS Campus Intelligent Assistant
+        AAC Near Me — Activities for Seniors
       </div>
     </header>
   );

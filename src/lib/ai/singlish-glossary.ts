@@ -1,5 +1,5 @@
 /**
- * Singlish comprehension glossary for the AskSUSSi system prompt.
+ * Singlish comprehension glossary for the AAC Near Me system prompt.
  *
  * Exported as a constant string so it can be embedded directly into
  * the system prompt and reused by other modules (e.g. tests, tooling).

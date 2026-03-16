@@ -125,7 +125,7 @@ export default function ChatMessage({
         "flex w-full mb-3 animate-chat-slide-up",
         role === "user" ? "justify-end" : "justify-start"
       )}
-      aria-label={`${role === "user" ? "You" : "AskSUSSi"} said`}
+      aria-label={`${role === "user" ? "You" : "AAC Near Me"} said`}
     >
       <div className={cn(
         "flex flex-col",

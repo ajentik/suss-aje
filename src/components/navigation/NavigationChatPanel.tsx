@@ -232,7 +232,7 @@ export default function NavigationChatPanel() {
                   Where do you need to go?
                 </p>
                 <p className="mt-1 text-muted-foreground text-xs leading-relaxed max-w-[200px] mx-auto">
-                  Ask about nearby places, polyclinics, food, or campus locations.
+                  Ask about nearby AACs, polyclinics, food, or places to visit.
                 </p>
                 <div className="mt-4 flex flex-wrap justify-center gap-2">
                   {[
