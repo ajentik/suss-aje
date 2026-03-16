@@ -1,4 +1,12 @@
 import { SINGLISH_GLOSSARY } from "./singlish-glossary";
+import type { LanguageCode } from "@/types";
+
+const LANGUAGE_NAMES: Record<LanguageCode, string> = {
+  en: "English",
+  zh: "Chinese (Simplified)",
+  ms: "Bahasa Melayu",
+  ta: "Tamil",
+};
 
 const BASE_PROMPT = `You are AskSUSSi, the SUSS Campus Intelligent Assistant. You help students at Singapore University of Social Sciences navigate campus, find events, and answer campus-related questions.
 
@@ -190,3 +198,10 @@ When students ask about AIC, eldercare, caregiver support, nursing homes, or sen
 export const SYSTEM_PROMPT = `${BASE_PROMPT}
 
 ${SINGLISH_GLOSSARY}`;
+
+export function getSystemPrompt(language: LanguageCode = "en"): string {
+  if (language === "en") return SYSTEM_PROMPT;
+  return `${SYSTEM_PROMPT}
+
+IMPORTANT: The user has selected ${LANGUAGE_NAMES[language]} as their preferred language. Respond in ${LANGUAGE_NAMES[language]}.`;
+}

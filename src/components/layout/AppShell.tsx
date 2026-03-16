@@ -30,6 +30,7 @@ import EventPopup, { EventDetailCard } from "@/components/map/EventPopup";
 import Onboarding from "@/components/layout/Onboarding";
 import { MobileSheet, type SnapName } from "@/components/layout/MobileSheet";
 import { createStreetViewEventFromPOI } from "@/lib/maps/poi-utils";
+import LanguageToggle from "@/components/senior/LanguageToggle";
 
 const MapView = dynamic(() => import("@/components/map/MapView"), {
   ssr: false,
@@ -64,54 +65,59 @@ function BrandHeader({
   );
 
   return (
-    <div className="flex items-center justify-between px-4 py-2.5 border-b bg-surface-brand/90 backdrop-blur text-surface-brand-foreground shrink-0">
-      <div className="flex items-center gap-2.5">
-        <Image
-          src="/suss-logo.png"
-          alt="SUSS"
-          width={80}
-          height={28}
-          className="h-7 w-auto brightness-0 invert"
-          priority
-        />
-        <div className="h-5 w-px bg-white/25" />
-        <span className="text-sm font-bold tracking-wide opacity-90">
-          AskSUSSi
-        </span>
+    <div className="border-b bg-surface-brand/90 backdrop-blur text-surface-brand-foreground shrink-0">
+      <div className="flex items-center justify-between px-4 py-2.5">
+        <div className="flex items-center gap-2.5">
+          <Image
+            src="/suss-logo.png"
+            alt="SUSS"
+            width={80}
+            height={28}
+            className="h-7 w-auto brightness-0 invert"
+            priority
+          />
+          <div className="h-5 w-px bg-white/25" />
+          <span className="text-sm font-bold tracking-wide opacity-90">
+            AskSUSSi
+          </span>
+        </div>
+        <div className="flex items-center gap-1">
+          {onNewChat && (
+            <button
+              type="button"
+              onClick={onNewChat}
+              className="flex items-center justify-center w-11 h-11 rounded-full bg-white/10 hover:bg-white/20 active:bg-white/25 transition-colors text-white/80 hover:text-white"
+              title="New chat"
+              aria-label="New chat"
+            >
+              <SquarePen size={18} />
+            </button>
+          )}
+          {mounted && (
+            <button
+              type="button"
+              onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
+              className="flex items-center justify-center w-11 h-11 rounded-full bg-white/10 hover:bg-white/20 active:bg-white/25 transition-colors text-white/80 hover:text-white"
+              title={resolvedTheme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+              aria-label={resolvedTheme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+            >
+              {resolvedTheme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
+            </button>
+          )}
+          <button
+            type="button"
+            onClick={onToggleTts}
+            className="flex items-center justify-center w-11 h-11 rounded-full bg-white/10 hover:bg-white/20 active:bg-white/25 transition-colors text-white/80 hover:text-white"
+            title={ttsEnabled ? "Disable voice" : "Enable voice"}
+            aria-label={ttsEnabled ? "Disable voice" : "Enable voice"}
+          >
+            {ttsEnabled ? <Volume2 size={18} /> : <VolumeX size={18} />}
+          </button>
+          {extraButtons}
+        </div>
       </div>
-      <div className="flex items-center gap-1">
-        {onNewChat && (
-          <button
-            type="button"
-            onClick={onNewChat}
-            className="flex items-center justify-center w-11 h-11 rounded-full bg-white/10 hover:bg-white/20 active:bg-white/25 transition-colors text-white/80 hover:text-white"
-            title="New chat"
-            aria-label="New chat"
-          >
-            <SquarePen size={18} />
-          </button>
-        )}
-        {mounted && (
-          <button
-            type="button"
-            onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
-            className="flex items-center justify-center w-11 h-11 rounded-full bg-white/10 hover:bg-white/20 active:bg-white/25 transition-colors text-white/80 hover:text-white"
-            title={resolvedTheme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
-            aria-label={resolvedTheme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
-          >
-            {resolvedTheme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
-          </button>
-        )}
-        <button
-          type="button"
-          onClick={onToggleTts}
-          className="flex items-center justify-center w-11 h-11 rounded-full bg-white/10 hover:bg-white/20 active:bg-white/25 transition-colors text-white/80 hover:text-white"
-          title={ttsEnabled ? "Disable voice" : "Enable voice"}
-          aria-label={ttsEnabled ? "Disable voice" : "Enable voice"}
-        >
-          {ttsEnabled ? <Volume2 size={18} /> : <VolumeX size={18} />}
-        </button>
-        {extraButtons}
+      <div className="px-4 pb-2.5">
+        <LanguageToggle />
       </div>
     </div>
   );

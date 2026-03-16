@@ -46,6 +46,7 @@ function resetStore() {
     onboardingDismissed: false,
     chatMessages: [],
     pendingChatMessage: null,
+    preferredLanguage: "en",
   });
 }
 
@@ -192,5 +193,19 @@ describe("app-store", () => {
     expect(state.routeInfo).toBeNull();
     expect(state.selectedDestination).toBeNull();
     expect(state.selectedPOI).toBeNull();
+  });
+
+  it("setPreferredLanguage changes language and writes to localStorage", () => {
+    useAppStore.getState().setPreferredLanguage("zh");
+    expect(useAppStore.getState().preferredLanguage).toBe("zh");
+    expect(localStorage.getItem("preferred-language")).toBe("zh");
+
+    useAppStore.getState().setPreferredLanguage("ta");
+    expect(useAppStore.getState().preferredLanguage).toBe("ta");
+    expect(localStorage.getItem("preferred-language")).toBe("ta");
+  });
+
+  it("preferredLanguage defaults to 'en'", () => {
+    expect(useAppStore.getState().preferredLanguage).toBe("en");
   });
 });

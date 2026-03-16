@@ -3,7 +3,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import type { StateCreator } from "zustand";
-import type { POI, RouteInfo, CampusEvent, ChatMessage, DateRangePreset, MobilityLevel } from "@/types";
+import type { POI, RouteInfo, CampusEvent, ChatMessage, DateRangePreset, MobilityLevel, LanguageCode } from "@/types";
 
 type SheetContentMode = "default" | "poi-detail" | "event-detail";
 type MobileSheetState = "collapsed" | "peek" | "expanded";
@@ -64,6 +64,9 @@ export interface AppState {
 
   mobilityLevel: MobilityLevel;
   setMobilityLevel: (level: MobilityLevel) => void;
+
+  preferredLanguage: LanguageCode;
+  setPreferredLanguage: (lang: LanguageCode) => void;
 }
 
 type MapSlice = Pick<
@@ -80,6 +83,8 @@ type MapSlice = Pick<
   | "setUserLocation"
   | "mobilityLevel"
   | "setMobilityLevel"
+  | "preferredLanguage"
+  | "setPreferredLanguage"
 >;
 
 type UiSlice = Pick<
@@ -150,6 +155,14 @@ const createMapSlice: StateCreator<AppState, [], [], MapSlice> = (set) => ({
   setUserLocation: (loc) => set({ userLocation: loc }),
   mobilityLevel: "normal",
   setMobilityLevel: (level) => set({ mobilityLevel: level }),
+  preferredLanguage: "en",
+  setPreferredLanguage: (lang) => {
+    set({ preferredLanguage: lang });
+    try {
+      localStorage.setItem("preferred-language", lang);
+    } catch {
+    }
+  },
 });
 
 const createUiSlice: StateCreator<AppState, [], [], UiSlice> = (set) => ({
@@ -231,6 +244,7 @@ export const useAppStore = create<AppState>()(
         onboardingDismissed: state.onboardingDismissed,
         introDismissed: state.introDismissed,
         mobilityLevel: state.mobilityLevel,
+        preferredLanguage: state.preferredLanguage,
       }),
     }
   )

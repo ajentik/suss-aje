@@ -127,7 +127,10 @@ export default function ChatPanel() {
   const userLocation = useAppStore((s) => s.userLocation);
   const { speak } = useSpeechSynthesis();
 
+  const preferredLanguage = useAppStore((s) => s.preferredLanguage);
+
   const { messages, sendMessage, status, error } = useChat({
+    body: { preferredLanguage },
     onError: (err) => {
       console.error("[AskSUSSi chat error]", err);
     },

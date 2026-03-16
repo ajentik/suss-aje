@@ -78,6 +78,8 @@ export interface RouteAccessibility {
   isSheltered: boolean;
 }
 
+export type LanguageCode = "en" | "zh" | "ms" | "ta";
+
 export type DateRangePreset = "all" | "1d" | "3d" | "7d";
 
 export interface FeedbackEntry {
