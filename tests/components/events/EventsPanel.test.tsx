@@ -86,6 +86,7 @@ describe("EventsPanel", () => {
       allEvents: [],
       categories: [],
       isLoading: true,
+      refetch: vi.fn(),
       dateFilter: "all",
       setDateFilter: vi.fn(),
       categoryFilter: "",

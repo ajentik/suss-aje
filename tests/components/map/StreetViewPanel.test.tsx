@@ -14,12 +14,20 @@ vi.mock("@vis.gl/react-google-maps", () => ({
   ),
 }));
 
-const mockStreetViewPanorama = vi.fn();
+const mockSetVisible = vi.fn();
+
+const mockStreetViewPanorama = vi.fn().mockImplementation(function (this: Record<string, unknown>) {
+  this.setVisible = mockSetVisible;
+});
+const mockClearInstanceListeners = vi.fn();
 
 Object.defineProperty(window, "google", {
   value: {
     maps: {
       StreetViewPanorama: mockStreetViewPanorama,
+      event: {
+        clearInstanceListeners: mockClearInstanceListeners,
+      },
     },
   },
   writable: true,
@@ -47,6 +55,8 @@ const mockEventInfo: CampusEvent = {
 describe("StreetViewPanel", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mockSetVisible.mockClear();
+    mockClearInstanceListeners.mockClear();
   });
 
   it("renders with given coordinates and creates StreetViewPanorama", () => {
@@ -89,5 +99,18 @@ describe("StreetViewPanel", () => {
     render(<StreetViewPanel location={mockLocation} onClose={vi.fn()} />);
 
     expect(screen.queryByText("Campus Tour")).not.toBeInTheDocument();
+  });
+
+  it("cleans up panorama on unmount", () => {
+    const { unmount } = render(
+      <StreetViewPanel location={mockLocation} onClose={vi.fn()} />,
+    );
+
+    expect(mockStreetViewPanorama).toHaveBeenCalledOnce();
+
+    unmount();
+
+    expect(mockSetVisible).toHaveBeenCalledWith(false);
+    expect(mockClearInstanceListeners).toHaveBeenCalledOnce();
   });
 });
