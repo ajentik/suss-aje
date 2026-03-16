@@ -51,7 +51,7 @@ function loadMapsAPI(): Promise<void> {
       );
       if (!existing) {
         const script = document.createElement("script");
-        script.src = `https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || ""}&v=alpha&libraries=maps3d,streetView`;
+        script.src = `https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || ""}&v=beta&libraries=maps3d,streetView`;
         script.async = true;
         document.head.appendChild(script);
       }
@@ -433,9 +433,6 @@ function Map3DInner() {
             {routeInfo && routeInfo.polyline.length > 0 && <RoutePolyline />}
           </Map3D>
 
-          <output aria-label="Street View hint" className="absolute bottom-36 md:bottom-3 right-3 z-10 text-xs text-white/90 bg-black/50 backdrop-blur-lg border border-white/10 px-3 py-1.5 rounded-xl pointer-events-none animate-in fade-in duration-500">
-            Double-click to enter Street View
-          </output>
         </>
       )}
     </div>
