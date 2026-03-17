@@ -1,24 +1,7 @@
 "use client";
 
 import { useState, useCallback } from "react";
-import {
-  MapPin,
-  Clock,
-  Star,
-  Navigation,
-  ExternalLink,
-  Phone,
-  DollarSign,
-  UtensilsCrossed,
-  Wine,
-  Store,
-  ShoppingBag,
-  ShoppingCart,
-  Footprints,
-  ChevronDown,
-  ChevronUp,
-} from "lucide-react";
-import type { LucideIcon } from "lucide-react";
+import { DooIcon, type IconName } from "@/lib/icons";
 import { Badge } from "@/components/ui/badge";
 import { useAppStore } from "@/store/app-store";
 import type { POI, PriceLevel } from "@/types";
@@ -27,12 +10,12 @@ interface VenueCardProps {
   venue: POI;
 }
 
-const categoryIconMap: Record<string, LucideIcon> = {
-  Restaurant: UtensilsCrossed,
-  Bar: Wine,
-  Hawker: Store,
-  Mall: ShoppingBag,
-  Supermarket: ShoppingCart,
+const categoryIconMap: Record<string, IconName> = {
+  Restaurant: "cutlery",
+  Bar: "drink",
+  Hawker: "shop",
+  Mall: "bag",
+  Supermarket: "shopping-cart",
 };
 
 const categoryColorMap: Record<string, string> = {
@@ -55,9 +38,8 @@ export default function VenueCard({ venue }: VenueCardProps) {
   const setSelectedPOI = useAppStore((s) => s.setSelectedPOI);
   const [isExpanded, setIsExpanded] = useState(false);
 
-  const CategoryIcon = categoryIconMap[venue.category] ?? MapPin;
-  const iconColors =
-    categoryColorMap[venue.category] ?? "bg-muted text-muted-foreground";
+  const categoryIcon = categoryIconMap[venue.category] ?? "location-pin";
+  const iconColors = categoryColorMap[venue.category] ?? "bg-muted text-muted-foreground";
 
   const toggleExpand = useCallback(() => {
     setIsExpanded((prev) => !prev);
@@ -94,7 +76,6 @@ export default function VenueCard({ venue }: VenueCardProps) {
 
   return (
     <div className="w-full rounded-xl border border-border bg-card transition-all duration-150 hover:shadow-md hover:border-primary/30 overflow-hidden">
-      {/* Collapsed header — always visible */}
       <button
         type="button"
         onClick={toggleExpand}
@@ -102,10 +83,8 @@ export default function VenueCard({ venue }: VenueCardProps) {
         aria-expanded={isExpanded}
         aria-label={`${venue.name} — tap to ${isExpanded ? "collapse" : "expand"}`}
       >
-        <div
-          className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ${iconColors}`}
-        >
-          <CategoryIcon size={20} aria-hidden="true" />
+        <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ${iconColors}`}>
+          <DooIcon name={categoryIcon} size={20} />
         </div>
 
         <div className="min-w-0 flex-1">
@@ -116,21 +95,13 @@ export default function VenueCard({ venue }: VenueCardProps) {
             <div className="flex shrink-0 items-center gap-2">
               {venue.rating != null && (
                 <span className="flex items-center gap-0.5 text-xs text-muted-foreground">
-                  <Star
-                    size={12}
-                    className="fill-yellow-500 text-yellow-500"
-                    aria-hidden="true"
-                  />
+                  <DooIcon name="star" size={12} className="text-yellow-500" />
                   {venue.rating.toFixed(1)}
                 </span>
               )}
               {venue.priceLevel != null && (
                 <span className="text-xs font-medium text-green-700 dark:text-green-400">
-                  <DollarSign
-                    size={10}
-                    className="inline -mt-px"
-                    aria-hidden="true"
-                  />
+                  <DooIcon name="dollar" size={10} className="inline -mt-px" />
                   {renderPriceLevel(venue.priceLevel).slice(1)}
                 </span>
               )}
@@ -138,15 +109,11 @@ export default function VenueCard({ venue }: VenueCardProps) {
           </div>
 
           <div className="mt-0.5 flex items-center gap-2 text-xs text-muted-foreground">
-            {venue.cuisine && (
-              <span className="truncate">{venue.cuisine}</span>
-            )}
-            {venue.cuisine && venue.distanceFromCampus && (
-              <span aria-hidden="true">&middot;</span>
-            )}
+            {venue.cuisine && <span className="truncate">{venue.cuisine}</span>}
+            {venue.cuisine && venue.distanceFromCampus && <span aria-hidden="true">&middot;</span>}
             {venue.distanceFromCampus && (
               <span className="flex shrink-0 items-center gap-0.5">
-                <Footprints size={11} aria-hidden="true" />
+                <DooIcon name="navigation2" size={11} />
                 {venue.distanceFromCampus}
               </span>
             )}
@@ -154,11 +121,10 @@ export default function VenueCard({ venue }: VenueCardProps) {
         </div>
 
         <div className="flex items-center justify-center w-7 h-7 rounded-full text-muted-foreground shrink-0">
-          {isExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+          {isExpanded ? <DooIcon name="chevron-up" size={16} /> : <DooIcon name="chevron-down" size={16} />}
         </div>
       </button>
 
-      {/* Expandable details */}
       <div
         className={`grid transition-[grid-template-rows] duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] ${
           isExpanded ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
@@ -174,14 +140,14 @@ export default function VenueCard({ venue }: VenueCardProps) {
 
             {venue.hours && (
               <div className="flex items-center gap-1.5 text-xs text-muted-foreground mb-2">
-                <Clock size={12} className="shrink-0" aria-hidden="true" />
+                <DooIcon name="clock" size={12} className="shrink-0" aria-hidden="true" />
                 <span className="truncate">{venue.hours}</span>
               </div>
             )}
 
             {venue.address && (
               <div className="flex items-center gap-1.5 text-xs text-muted-foreground mb-2">
-                <MapPin size={12} className="shrink-0" aria-hidden="true" />
+                <DooIcon name="location-pin" size={12} className="shrink-0" aria-hidden="true" />
                 <span className="truncate">{venue.address}</span>
               </div>
             )}
@@ -189,11 +155,7 @@ export default function VenueCard({ venue }: VenueCardProps) {
             {venue.tags && venue.tags.length > 0 && (
               <div className="flex flex-wrap gap-1 mb-3">
                 {venue.tags.map((tag) => (
-                  <Badge
-                    key={tag}
-                    variant="secondary"
-                    className="px-1.5 py-0 text-[0.625rem] leading-4"
-                  >
+                  <Badge key={tag} variant="secondary" className="px-1.5 py-0 text-[0.625rem] leading-4">
                     {tag}
                   </Badge>
                 ))}
@@ -206,7 +168,7 @@ export default function VenueCard({ venue }: VenueCardProps) {
                 onClick={handleShowOnMap}
                 className="inline-flex items-center gap-1.5 rounded-lg bg-surface-brand px-3.5 py-2 min-h-[44px] text-xs font-semibold text-surface-brand-foreground transition-colors hover:bg-surface-brand-hover active:scale-[0.97] flex-1 justify-center"
               >
-                <MapPin size={14} aria-hidden="true" />
+                <DooIcon name="location-pin" size={14} aria-hidden="true" />
                 Show on map
               </button>
 
@@ -215,7 +177,7 @@ export default function VenueCard({ venue }: VenueCardProps) {
                 onClick={handleNavigate}
                 className="inline-flex items-center gap-1 rounded-lg border border-border px-3 py-2 min-h-[44px] text-xs font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground active:scale-[0.97]"
               >
-                <Navigation size={12} aria-hidden="true" />
+                <DooIcon name="navigation" size={12} aria-hidden="true" />
                 Navigate
               </button>
 
@@ -226,7 +188,7 @@ export default function VenueCard({ venue }: VenueCardProps) {
                   className="inline-flex items-center justify-center rounded-lg border border-border w-[44px] h-[44px] text-muted-foreground transition-colors hover:bg-muted hover:text-foreground active:scale-[0.97]"
                   aria-label="Call"
                 >
-                  <Phone size={14} aria-hidden="true" />
+                  <DooIcon name="phone" size={14} aria-hidden="true" />
                 </button>
               )}
 
@@ -237,7 +199,7 @@ export default function VenueCard({ venue }: VenueCardProps) {
                   className="inline-flex items-center justify-center rounded-lg border border-border w-[44px] h-[44px] text-muted-foreground transition-colors hover:bg-muted hover:text-foreground active:scale-[0.97]"
                   aria-label="Website"
                 >
-                  <ExternalLink size={14} aria-hidden="true" />
+                  <DooIcon name="external-link" size={14} aria-hidden="true" />
                 </button>
               )}
             </div>

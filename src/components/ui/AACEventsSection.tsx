@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useMemo, useCallback } from "react";
-import { Calendar } from "lucide-react";
+import { DooIcon } from "@/lib/icons";
 import type { POI, CampusEvent } from "@/types";
 import { useAppStore } from "@/store/app-store";
 import {
@@ -50,7 +50,7 @@ export default function AACEventsSection({ poi, precomputedEvents }: AACEventsSe
   return (
     <div className="border-t border-border pt-3">
       <p className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-2.5 flex items-center gap-1.5">
-        <Calendar size={14} aria-hidden="true" />
+        <DooIcon name="calendar" size={14} />
         Events ({totalCount})
       </p>
 

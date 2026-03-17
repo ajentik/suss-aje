@@ -2,16 +2,16 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
-import { X, MapPin, Calendar, Utensils, BookOpen, Bus, MessageCircle } from "lucide-react";
+import { DooIcon, type IconName } from "@/lib/icons";
 import { useAppStore } from "@/store/app-store";
 
 const CAPABILITIES = [
-  { icon: MapPin, label: "Navigate campus", description: "Get walking directions to any building" },
-  { icon: Calendar, label: "Find events", description: "Discover what\u2019s happening on campus" },
-  { icon: Utensils, label: "Food nearby", description: "Find restaurants, hawkers & cafes" },
-  { icon: BookOpen, label: "Library info", description: "Check hours, availability & services" },
-  { icon: Bus, label: "Transport", description: "Shuttle schedules & nearby transit" },
-  { icon: MessageCircle, label: "Ask anything", description: "Campus services, admin & more" },
+  { icon: "location-pin" as IconName, label: "Navigate campus", description: "Get walking directions to any building" },
+  { icon: "calendar" as IconName, label: "Find events", description: "Discover what’s happening on campus" },
+  { icon: "cutlery" as IconName, label: "Food nearby", description: "Find restaurants, hawkers & cafes" },
+  { icon: "doc" as IconName, label: "Library info", description: "Check hours, availability & services" },
+  { icon: "bus" as IconName, label: "Transport", description: "Shuttle schedules & nearby transit" },
+  { icon: "message" as IconName, label: "Ask anything", description: "Campus services, admin & more" },
 ] as const;
 
 const TRY_SUGGESTIONS = [
@@ -41,7 +41,7 @@ export default function Onboarding() {
         setPendingChatMessage(text);
       }, 350);
     },
-    [setOnboardingDismissed, setPendingChatMessage]
+    [setOnboardingDismissed, setPendingChatMessage],
   );
 
   useEffect(() => {
@@ -60,7 +60,7 @@ export default function Onboarding() {
     if (!el) return;
 
     const focusable = el.querySelectorAll<HTMLElement>(
-      "button, [href], input, select, textarea, [tabindex]:not([tabindex='-1'])"
+      "button, [href], input, select, textarea, [tabindex]:not([tabindex='-1'])",
     );
     if (focusable.length > 0) focusable[0].focus();
   }, [onboardingDismissed]);
@@ -82,7 +82,6 @@ export default function Onboarding() {
             : "animate-onboarding-slide-up"
         } transition-all duration-300 ease-out`}
       >
-        {/* Drag handle (mobile) */}
         <div className="flex justify-center pt-2 pb-0 md:hidden">
           <div className="w-10 h-1 rounded-full bg-muted-foreground/25" />
         </div>
@@ -94,7 +93,7 @@ export default function Onboarding() {
             aria-label="Close welcome dialog"
             className="absolute top-4 right-4 flex items-center justify-center w-11 h-11 md:w-8 md:h-8 rounded-full bg-white/10 hover:bg-white/20 transition-colors duration-200 text-white/80 hover:text-white active:scale-95"
           >
-            <X size={16} />
+            <DooIcon name="cross" size={16} />
           </button>
           <div className="flex items-center gap-3 mb-3">
             <Image
@@ -119,13 +118,13 @@ export default function Onboarding() {
             What I can do
           </p>
           <div className="grid grid-cols-2 gap-2">
-            {CAPABILITIES.map(({ icon: Icon, label, description }, i) => (
+            {CAPABILITIES.map(({ icon, label, description }, i) => (
               <div
                 key={label}
                 className="flex items-start gap-2.5 rounded-lg border border-border/60 bg-muted/40 p-2.5 animate-onboarding-stagger-in"
                 style={{ animationDelay: `${100 + i * 50}ms` }}
               >
-                <Icon size={16} className="text-primary mt-0.5 shrink-0" aria-hidden="true" />
+                <DooIcon name={icon} size={16} className="text-primary mt-0.5 shrink-0" />
                 <div>
                   <p className="text-sm font-medium text-foreground">{label}</p>
                   <p className="text-xs text-muted-foreground">{description}</p>

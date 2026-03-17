@@ -274,7 +274,7 @@ The project follows five core principles that govern all development decisions:
 - **Styling**: Tailwind CSS 4 with OKLCH color tokens in `globals.css`. No inline style objects except for dynamic values.
 - **State**: Zustand 5 as the single global store at `src/store/app-store.ts`. No prop drilling beyond one level.
 - **Maps**: `APIProvider` wraps the map tree. Raw `gmp-*` web components only for elements without React bindings (e.g. `gmp-polyline-3d`).
-- **Icons**: Inline SVG or Lucide React. No icon font libraries.
+- **Icons**: doo-iconik bridge (`src/lib/icons/`) using `<DooIcon name="..." />`. Icon data sourced from [ajentik/doo-iconik](https://github.com/ajentik/doo-iconik) (MIT). No icon font libraries.
 
 ### Store Shape
 

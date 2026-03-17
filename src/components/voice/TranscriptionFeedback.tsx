@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { ThumbsUp, ThumbsDown, Send, X } from "lucide-react";
+import { DooIcon } from "@/lib/icons";
 import { cn } from "@/lib/utils";
 import { useTranscriptionFeedback } from "@/hooks/useTranscriptionFeedback";
 
@@ -72,7 +72,7 @@ export default function TranscriptionFeedback({
               aria-label="Transcription correct"
               title="Correct"
             >
-              <ThumbsUp size={14} />
+              <DooIcon name="tick" size={14} />
             </button>
             <button
               type="button"
@@ -85,7 +85,7 @@ export default function TranscriptionFeedback({
               aria-label="Transcription incorrect"
               title="Incorrect"
             >
-              <ThumbsDown size={14} />
+              <DooIcon name="cross" size={14} />
             </button>
           </div>
           <button
@@ -94,7 +94,7 @@ export default function TranscriptionFeedback({
             className="ml-auto inline-flex items-center justify-center rounded-md p-1 text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             aria-label="Dismiss feedback"
           >
-            <X size={14} />
+            <DooIcon name="cross" size={14} />
           </button>
         </div>
       )}
@@ -127,17 +127,17 @@ export default function TranscriptionFeedback({
               )}
               aria-label="Submit correction"
               title="Submit"
-            >
-              <Send size={14} />
-            </button>
+              >
+                <DooIcon name="send" size={14} />
+              </button>
             <button
               type="button"
               onClick={onDismiss}
               className="inline-flex items-center justify-center rounded-md p-1.5 text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               aria-label="Cancel correction"
-            >
-              <X size={14} />
-            </button>
+              >
+                <DooIcon name="cross" size={14} />
+              </button>
           </div>
         </div>
       )}

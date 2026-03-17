@@ -3,7 +3,7 @@
 import { useChat } from "@ai-sdk/react";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import Image from "next/image";
-import { AlertCircle, RotateCcw, ChevronDown } from "lucide-react";
+import { DooIcon } from "@/lib/icons";
 import type { TextUIPart, DynamicToolUIPart } from "ai";
 import { toast } from "sonner";
 import ChatMessage from "./ChatMessage";
@@ -371,7 +371,7 @@ export default function ChatPanel() {
           <div className="mx-2 mb-3 p-3.5 rounded-2xl bg-destructive/8 border border-destructive/15 text-sm animate-error-shake">
             <div className="flex items-start gap-2.5">
               <div className="shrink-0 mt-0.5 flex items-center justify-center w-7 h-7 rounded-lg bg-destructive/10">
-                <AlertCircle className="w-3.5 h-3.5 text-destructive" />
+                <DooIcon name="caution" size={14} className="text-destructive" />
               </div>
               <div className="flex-1 min-w-0">
                 <p className="font-medium text-destructive">
@@ -389,7 +389,7 @@ export default function ChatPanel() {
                   disabled={isActive}
                   className="text-destructive border-destructive/30 hover:bg-destructive/10"
                 >
-                  <RotateCcw className="w-3.5 h-3.5 mr-1.5" />
+                  <DooIcon name="sync" size={14} className="mr-1.5" />
                   Retry
                 </Button>
               </div>
@@ -437,7 +437,7 @@ export default function ChatPanel() {
           )}
         >
           New messages
-          <ChevronDown className="w-3.5 h-3.5" />
+          <DooIcon name="chevron-down" size={14} />
         </button>
       )}
 

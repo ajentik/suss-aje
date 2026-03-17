@@ -1,7 +1,7 @@
 "use client";
 
 import { type ReactNode, useCallback, useRef, useEffect } from "react";
-import { MessageSquare } from "lucide-react";
+import { DooIcon } from "@/lib/icons";
 import {
   useBottomSheet,
   type SnapName,
@@ -31,7 +31,7 @@ function DefaultMiniContent() {
   return (
     <div className="flex items-center gap-2.5 px-4 pb-1">
       <div className="flex items-center justify-center w-7 h-7 rounded-full bg-primary/10 shrink-0">
-        <MessageSquare size={14} className="text-primary" aria-hidden="true" />
+        <DooIcon name="message" size={14} className="text-primary" />
       </div>
       <div className="flex flex-col min-w-0">
         <span className="font-semibold text-card-foreground text-[13px] leading-tight truncate">

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Check, RefreshCw } from "lucide-react";
+import { DooIcon } from "@/lib/icons";
 import { cn } from "@/lib/utils";
 import type { QualityResult } from "@/utils/transcriptionQuality";
 
@@ -89,7 +89,7 @@ export default function TranscriptionConfirmation({
           )}
           aria-label="Confirm transcription"
         >
-          <Check size={14} />
+          <DooIcon name="tick" size={14} />
           Correct
         </button>
         <button
@@ -102,7 +102,7 @@ export default function TranscriptionConfirmation({
           )}
           aria-label="Try transcription again"
         >
-          <RefreshCw size={14} />
+          <DooIcon name="sync" size={14} />
           Try again
         </button>
       </div>

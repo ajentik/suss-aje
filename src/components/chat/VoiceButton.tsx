@@ -2,7 +2,7 @@
 
 import { toast } from "sonner";
 import { useSpeechRecognition } from "@/lib/voice/speech-recognition";
-import { Mic } from "lucide-react";
+import { DooIcon } from "@/lib/icons";
 import { cn } from "@/lib/utils";
 
 interface VoiceButtonProps {
@@ -36,7 +36,7 @@ export default function VoiceButton({ onTranscript }: VoiceButtonProps) {
       title={isListening ? "Stop recording" : "Start voice input"}
       aria-label={isListening ? "Stop recording" : "Start voice input"}
     >
-      <Mic size={18} />
+      <DooIcon name="mic" size={18} />
     </button>
   );
 }

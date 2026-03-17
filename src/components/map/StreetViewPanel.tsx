@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { ArrowLeft } from "lucide-react";
+import { DooIcon } from "@/lib/icons";
 import type { CampusEvent } from "@/types";
 
 interface StreetViewPanelProps {
@@ -25,21 +25,13 @@ function EventInfoOverlay({ event }: { event: CampusEvent }) {
 
         <div className="mt-1">
           <p className="text-xs text-muted-foreground">
-            {event.date}{event.endDate ? ` \u2013 ${event.endDate}` : ""} \u2022 {event.time}
+            {event.date}{event.endDate ? ` – ${event.endDate}` : ""} • {event.time}
           </p>
-          <p className="text-xs text-muted-foreground mt-0.5">
-            {event.location}
-          </p>
-          {event.venueAddress && (
-            <p className="text-xs text-muted-foreground">
-              {event.venueAddress}
-            </p>
-          )}
+          <p className="text-xs text-muted-foreground mt-0.5">{event.location}</p>
+          {event.venueAddress && <p className="text-xs text-muted-foreground">{event.venueAddress}</p>}
         </div>
 
-        <p className="text-xs text-muted-foreground mt-1">
-          {event.description}
-        </p>
+        <p className="text-xs text-muted-foreground mt-1">{event.description}</p>
 
         {event.longDescription && (
           <div className="mt-1.5">
@@ -75,7 +67,7 @@ function EventInfoOverlay({ event }: { event: CampusEvent }) {
             rel="noopener noreferrer"
             className="inline-block mt-2 text-xs text-primary hover:underline"
           >
-            Event Details \u2192
+            Event Details →
           </a>
         )}
       </div>
@@ -83,37 +75,29 @@ function EventInfoOverlay({ event }: { event: CampusEvent }) {
   );
 }
 
-export default function StreetViewPanel({
-  location,
-  onClose,
-  eventInfo,
-}: StreetViewPanelProps) {
+export default function StreetViewPanel({ location, onClose, eventInfo }: StreetViewPanelProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
-    // Trigger fade-in after mount
     requestAnimationFrame(() => setVisible(true));
   }, []);
 
   useEffect(() => {
     if (!containerRef.current || !window.google?.maps) return;
 
-    const panorama = new window.google.maps.StreetViewPanorama(
-      containerRef.current,
-      {
-        position: location,
-        pov: { heading: 0, pitch: 0 },
-        zoom: 1,
-        motionTracking: false,
-        motionTrackingControl: false,
-        addressControl: true,
-        fullscreenControl: false,
-        linksControl: true,
-        clickToGo: true,
-        scrollwheel: true,
-      } as google.maps.StreetViewPanoramaOptions,
-    );
+    const panorama = new window.google.maps.StreetViewPanorama(containerRef.current, {
+      position: location,
+      pov: { heading: 0, pitch: 0 },
+      zoom: 1,
+      motionTracking: false,
+      motionTrackingControl: false,
+      addressControl: true,
+      fullscreenControl: false,
+      linksControl: true,
+      clickToGo: true,
+      scrollwheel: true,
+    } as google.maps.StreetViewPanoramaOptions);
 
     return () => {
       panorama.setVisible(false);
@@ -122,10 +106,7 @@ export default function StreetViewPanel({
   }, [location]);
 
   return (
-    <div
-      className="w-full h-full relative transition-opacity duration-300"
-      style={{ opacity: visible ? 1 : 0 }}
-    >
+    <div className="w-full h-full relative transition-opacity duration-300" style={{ opacity: visible ? 1 : 0 }}>
       <div ref={containerRef} className="w-full h-full" />
       <button
         type="button"
@@ -133,13 +114,11 @@ export default function StreetViewPanel({
         className="absolute left-3 z-10 flex items-center gap-2 px-4 min-h-[44px] bg-card/80 backdrop-blur-xl border border-border/30 rounded-xl shadow-lg text-sm font-medium text-card-foreground hover:bg-card/95 active:scale-95 transition-all duration-200 animate-control-fade-in"
         style={{ top: "max(1rem, env(safe-area-inset-top, 1rem))" }}
       >
-        <ArrowLeft size={18} aria-hidden="true" />
+        <DooIcon name="arrow-left" size={18} />
         Back to Map
       </button>
 
-      {eventInfo && (
-        <EventInfoOverlay event={eventInfo} />
-      )}
+      {eventInfo && <EventInfoOverlay event={eventInfo} />}
     </div>
   );
 }

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useMemo, useEffect } from "react";
-import { Search, MapPin, Navigation, Loader2 } from "lucide-react";
+import { DooIcon } from "@/lib/icons";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { EmptyState } from "@/components/ui/empty-state";
 import { useAppStore } from "@/store/app-store";
@@ -73,10 +73,10 @@ export default function AACSearchPanel() {
     <div className="flex flex-col h-full">
       <div className="px-3 pt-3 pb-2 space-y-2 shrink-0">
         <div className="relative">
-          <Search
+          <DooIcon
+            name="search"
             size={15}
             className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none"
-            aria-hidden="true"
           />
           <input
             type="text"
@@ -97,9 +97,9 @@ export default function AACSearchPanel() {
           className="w-full flex items-center justify-center gap-2 px-3 py-2.5 text-sm font-medium rounded-lg border border-border bg-card hover:bg-accent/50 active:bg-accent transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {status === "loading" ? (
-            <Loader2 size={15} className="animate-spin" aria-hidden="true" />
+            <DooIcon name="loader" size={15} className="animate-spin" />
           ) : (
-            <Navigation size={15} aria-hidden="true" />
+            <DooIcon name="navigation" size={15} />
           )}
           {status === "loading" ? "Getting location…" : "Use My Location"}
         </button>
@@ -120,7 +120,7 @@ export default function AACSearchPanel() {
           <EmptyState
             icon={
               <div className="w-16 h-16 rounded-2xl bg-muted/60 flex items-center justify-center">
-                <MapPin className="h-8 w-8 text-muted-foreground/50" />
+                <DooIcon name="location-pin" size={32} className="text-muted-foreground/50" />
               </div>
             }
             title="No centres found"

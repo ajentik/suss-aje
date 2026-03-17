@@ -2,7 +2,7 @@
 
 import type { DateRangePreset } from "@/types";
 import { cn } from "@/lib/utils";
-import { X, SlidersHorizontal } from "lucide-react";
+import { DooIcon } from "@/lib/icons";
 import {
   Select,
   SelectContent,
@@ -47,7 +47,7 @@ export default function EventFilter({
       {/* Section header with filter count */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <SlidersHorizontal className="w-3.5 h-3.5 text-muted-foreground/70" />
+          <DooIcon name="grid2" size={14} className="text-muted-foreground/70" />
           <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Filters</span>
           {activeCount > 0 && (
              <span aria-live="polite" className="animate-hero-fade-in flex items-center justify-center w-5 h-5 rounded-full bg-primary text-primary-foreground text-[0.625rem] font-bold">
@@ -66,7 +66,7 @@ export default function EventFilter({
             }}
             className="animate-hero-fade-in flex items-center gap-1 text-xs text-primary hover:text-primary/80 font-medium transition-colors min-h-[44px] px-2"
           >
-            <X className="w-3 h-3" />
+            <DooIcon name="cross" size={12} />
             Clear all
           </button>
         )}

@@ -1,6 +1,6 @@
 "use client";
 
-import { TriangleAlert } from "lucide-react";
+import { DooIcon } from "@/lib/icons";
 import { Button } from "@/components/ui/button";
 
 interface ErrorStateProps {
@@ -15,8 +15,10 @@ export function ErrorState({
   return (
     <div className="flex flex-col items-center justify-center gap-3 py-12 px-6 text-center">
       <div className="flex items-center justify-center w-14 h-14 rounded-2xl bg-destructive/10">
-        <TriangleAlert
-          className="h-7 w-7 text-destructive"
+        <DooIcon
+          name="alert-triangle"
+          size={28}
+          className="text-destructive"
           aria-hidden="true"
         />
       </div>

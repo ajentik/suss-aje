@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useEffect } from "react";
 import FocusTrap from "focus-trap-react";
-import { Plane, X } from "lucide-react";
+import { DooIcon } from "@/lib/icons";
 import { useAppStore } from "@/store/app-store";
 import { lookupAerialVideo } from "@/lib/maps/aerial-view";
 
@@ -49,7 +49,6 @@ export default function AerialViewButton() {
 
   return (
     <>
-      {/* Desktop: top-right with label. Mobile: FAB above sheet */}
       <button
         type="button"
         aria-label="Aerial flyover"
@@ -60,13 +59,10 @@ export default function AerialViewButton() {
           bottom: "calc(var(--sheet-height, 64px) + 16px)",
         }}
       >
-        <Plane size={18} aria-hidden="true" />
-        <span className="hidden md:inline">
-          {loading ? "Loading\u2026" : "Aerial View"}
-        </span>
+        <DooIcon name="plane" size={18} />
+        <span className="hidden md:inline">{loading ? "Loading…" : "Aerial View"}</span>
       </button>
 
-      {/* Aerial video overlay */}
       {showVideo && videoUrl && (
         <FocusTrap active={showVideo}>
           <div
@@ -95,7 +91,7 @@ export default function AerialViewButton() {
                 className="absolute top-3 right-3 flex items-center justify-center w-11 h-11 bg-white/20 hover:bg-white/30 active:scale-95 rounded-full text-white transition-all duration-200"
                 style={{ marginTop: "env(safe-area-inset-top, 0px)" }}
               >
-                <X size={20} />
+                <DooIcon name="cross" size={20} />
               </button>
               <p className="absolute bottom-4 left-4 text-white/60 text-xs">
                 Aerial flyover of {selectedDestination.name}

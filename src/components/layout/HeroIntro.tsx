@@ -2,17 +2,17 @@
 
 import { useEffect, useRef, useState, useCallback } from "react";
 import Image from "next/image";
-import { ArrowRight, Navigation, Globe, MessageCircle, CalendarDays } from "lucide-react";
+import { DooIcon, type IconName } from "@/lib/icons";
 import { lookupAerialVideo } from "@/lib/maps/aerial-view";
 
 const SUSS_ADDRESS =
   "Singapore University of Social Sciences, 463 Clementi Road, Singapore 599494";
 
-const FEATURES = [
-  { icon: Navigation, label: "3D Campus Map", desc: "Explore SUSS in photorealistic 3D" },
-  { icon: Globe, label: "Street View", desc: "Walk through campus & indoor spaces" },
-  { icon: MessageCircle, label: "AI Chat & Voice", desc: "Ask SUSSi anything about campus" },
-  { icon: CalendarDays, label: "Events & Navigation", desc: "Discover events, navigate to venues" },
+const FEATURES: ReadonlyArray<{ icon: IconName; label: string; desc: string }> = [
+  { icon: "navigation", label: "3D Campus Map", desc: "Explore SUSS in photorealistic 3D" },
+  { icon: "globe", label: "Street View", desc: "Walk through campus & indoor spaces" },
+  { icon: "message", label: "AI Chat & Voice", desc: "Ask SUSSi anything about campus" },
+  { icon: "calendar", label: "Events & Navigation", desc: "Discover events, navigate to venues" },
 ];
 
 interface HeroIntroProps {
@@ -62,9 +62,7 @@ export default function HeroIntro({ onEnter }: HeroIntroProps) {
     if (!video) return;
     const updateProgress = () => {
       if (video.buffered.length > 0 && video.duration > 0) {
-        const pct =
-          (video.buffered.end(video.buffered.length - 1) / video.duration) *
-          100;
+        const pct = (video.buffered.end(video.buffered.length - 1) / video.duration) * 100;
         setProgress(pct);
       }
     };
@@ -74,7 +72,7 @@ export default function HeroIntro({ onEnter }: HeroIntroProps) {
       video.removeEventListener("progress", updateProgress);
       video.removeEventListener("loadeddata", updateProgress);
     };
-  }, [videoUrl]);
+  }, []);
 
   const handleEnter = useCallback(() => {
     setFadeOut(true);
@@ -87,18 +85,15 @@ export default function HeroIntro({ onEnter }: HeroIntroProps) {
         fadeOut ? "opacity-0 pointer-events-none" : "opacity-100"
       }`}
     >
-      {/* Animated gradient fallback */}
       <div
         className={`absolute inset-0 bg-gradient-to-br from-primary via-primary/90 to-surface-brand animate-gradient-shift transition-opacity duration-[2000ms] pointer-events-none ${
           videoReady ? "opacity-0" : "opacity-100"
         }`}
       />
 
-      {/* Radial glow accents */}
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_60%_40%,oklch(0.55_0.15_250_/_0.2)_0%,transparent_70%)] pointer-events-none" />
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_20%_80%,oklch(0.55_0.12_170_/_0.12)_0%,transparent_60%)] pointer-events-none" />
 
-      {/* Loading progress */}
       {!videoFailed && !videoReady && (
         <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 w-48">
           <div className="h-1 bg-white/20 rounded-full overflow-hidden">
@@ -110,7 +105,6 @@ export default function HeroIntro({ onEnter }: HeroIntroProps) {
         </div>
       )}
 
-      {/* Aerial video background */}
       {videoUrl && (
         <video
           ref={videoRef}
@@ -128,13 +122,10 @@ export default function HeroIntro({ onEnter }: HeroIntroProps) {
         />
       )}
 
-      {/* Overlay gradients */}
       <div className="absolute inset-x-0 top-0 h-[30%] bg-gradient-to-b from-black/30 to-transparent pointer-events-none" />
       <div className="absolute inset-x-0 bottom-0 h-[70%] bg-gradient-to-t from-black/70 via-black/30 to-transparent pointer-events-none" />
 
-      {/* Content */}
       <div className="relative z-10 text-center px-6 max-w-2xl">
-        {/* SUSS Logo — spring scale-in */}
         <div
           className="mb-4 opacity-0"
           style={{
@@ -151,12 +142,10 @@ export default function HeroIntro({ onEnter }: HeroIntroProps) {
           />
         </div>
 
-        {/* Divider */}
         <div className="flex justify-center mb-4 animate-hero-fade-in [animation-delay:500ms]">
           <div className="h-px bg-white/40 animate-hero-line-expand [animation-delay:600ms]" />
         </div>
 
-        {/* Brand name — gradient text */}
         <h1
           className="text-5xl md:text-7xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-white via-white/95 to-white/80 mb-2 tracking-wider drop-shadow-lg opacity-0"
           style={{
@@ -166,13 +155,11 @@ export default function HeroIntro({ onEnter }: HeroIntroProps) {
           AskSUSSi
         </h1>
 
-        {/* Tagline */}
         <p className="text-white/80 text-sm md:text-base mb-8 leading-relaxed drop-shadow animate-hero-fade-in-up [animation-delay:800ms]">
           Resolve campus affairs with one sentence. Navigate, discover events,
           and explore SUSS in 3D.
         </p>
 
-        {/* Feature pills */}
         <div className="flex flex-wrap justify-center gap-2.5 mb-10 animate-hero-fade-in-up [animation-delay:900ms]">
           {FEATURES.map((f) => (
             <div
@@ -180,13 +167,12 @@ export default function HeroIntro({ onEnter }: HeroIntroProps) {
               className="group flex items-center gap-2 bg-white/10 border border-white/20 backdrop-blur-sm rounded-full px-4 py-2 text-white/85 text-xs md:text-sm hover:bg-white/15 transition-colors cursor-default"
               title={f.desc}
             >
-              <f.icon size={16} className="text-white/70 group-hover:text-white transition-colors" aria-hidden="true" />
+              <DooIcon name={f.icon} size={16} className="text-white/70 group-hover:text-white transition-colors" />
               <span>{f.label}</span>
             </div>
           ))}
         </div>
 
-        {/* CTA — 56px, pill, subtle glow */}
         <div
           className="opacity-0"
           style={{
@@ -199,13 +185,12 @@ export default function HeroIntro({ onEnter }: HeroIntroProps) {
             onClick={handleEnter}
             className="inline-flex items-center gap-2.5 px-10 h-14 bg-white text-primary rounded-full font-semibold text-base shadow-lg hover:bg-white/95 hover:shadow-xl transition-all duration-300 hover:scale-105 active:scale-95 animate-subtle-glow"
           >
-            <ArrowRight size={20} aria-hidden="true" />
+            <DooIcon name="arrow-right" size={20} />
             Explore Campus
           </button>
         </div>
       </div>
 
-      {/* Bottom label */}
       <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-10 text-white/30 text-xs tracking-[0.2em] uppercase animate-hero-fade-in [animation-delay:1400ms]">
         SUSS Campus Intelligent Assistant
       </div>

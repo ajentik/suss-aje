@@ -1,6 +1,6 @@
 "use client";
 
-import { MapPin, ExternalLink } from "lucide-react";
+import { DooIcon } from "@/lib/icons";
 import type { CampusEvent } from "@/types";
 import { isOffSiteEvent } from "@/lib/maps/aac-events";
 import { formatEventDate, formatEventDateRange } from "@/lib/date-utils";
@@ -30,7 +30,7 @@ export default function EventRow({
     ? formatEventDate(event.date)
     : formatEventDateRange(event.date, event.endDate);
 
-  const CategoryIcon = CATEGORY_ICON[event.category] ?? DEFAULT_EVENT_ICON;
+  const categoryIcon = CATEGORY_ICON[event.category] ?? DEFAULT_EVENT_ICON;
 
   return (
     <div className="flex items-start gap-2.5 min-h-[44px]">
@@ -41,7 +41,7 @@ export default function EventRow({
       >
         {!compact && (
           <div className={`w-6 h-6 rounded-md shrink-0 flex items-center justify-center mt-0.5 ${CATEGORY_ICON_BG[event.category] ?? DEFAULT_ICON_BG}`}>
-            <CategoryIcon className="w-3.5 h-3.5" aria-hidden="true" />
+            <DooIcon name={categoryIcon} size={14} className="w-3.5 h-3.5" />
           </div>
         )}
         <span className="text-primary text-xs font-medium shrink-0 mt-0.5 min-w-[52px]">
@@ -63,7 +63,7 @@ export default function EventRow({
               )}
               {offSite && event.venueAddress && (
                 <span className="inline-flex items-center gap-1 text-[0.6875rem] text-amber-600 dark:text-amber-400 mt-1">
-                  <MapPin size={10} aria-hidden="true" />
+                  <DooIcon name="location-pin" size={10} />
                   {event.venueAddress}
                 </span>
               )}
@@ -80,7 +80,7 @@ export default function EventRow({
           className="shrink-0 mt-2.5 flex items-center justify-center w-7 h-7 rounded-md text-muted-foreground/50 hover:text-primary hover:bg-primary/10 transition-colors"
           aria-label={`Open ${event.title} details`}
         >
-          <ExternalLink size={12} aria-hidden="true" />
+          <DooIcon name="external-link" size={12} />
         </a>
       )}
     </div>

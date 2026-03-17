@@ -1,7 +1,7 @@
 "use client";
 
 import { memo } from "react";
-import { MapPin, Calendar, Info, Star, Clock, Navigation } from "lucide-react";
+import { DooIcon } from "@/lib/icons";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
@@ -75,7 +75,7 @@ function LocationCard({ output }: { output: NavigateOutput }) {
     return (
       <Card size="sm" className="bg-destructive/5 ring-destructive/20 animate-tool-card-enter">
         <CardContent className="flex items-start gap-2.5">
-          <MapPin className="w-4 h-4 text-destructive shrink-0 mt-0.5" />
+          <DooIcon name="location-pin" size={16} className="text-destructive shrink-0 mt-0.5" />
           <p className="text-sm text-destructive">{output.message}</p>
         </CardContent>
       </Card>
@@ -86,7 +86,7 @@ function LocationCard({ output }: { output: NavigateOutput }) {
     <Card size="sm" className="bg-surface-brand/[0.03] ring-primary/15 animate-tool-card-enter shadow-sm overflow-hidden">
       <CardContent className="flex items-start gap-3">
         <div className="shrink-0 mt-0.5 flex items-center justify-center w-9 h-9 rounded-xl bg-primary/10">
-          <MapPin className="w-[18px] h-[18px] text-primary" />
+          <DooIcon name="location-pin" size={18} className="text-primary" />
         </div>
         <div className="flex-1 min-w-0 space-y-1.5">
           <div className="flex items-center gap-2">
@@ -101,19 +101,19 @@ function LocationCard({ output }: { output: NavigateOutput }) {
           <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground pt-0.5">
             {poi.address && (
               <span className="flex items-center gap-1">
-                <Navigation className="w-3 h-3" />
+                <DooIcon name="navigation" size={12} />
                 {poi.address}
               </span>
             )}
             {poi.hours && (
               <span className="flex items-center gap-1">
-                <Clock className="w-3 h-3" />
+                <DooIcon name="clock" size={12} />
                 {poi.hours}
               </span>
             )}
             {poi.rating && (
               <span className="flex items-center gap-1">
-                <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
+                <DooIcon name="star" size={12} className="text-amber-400" />
                 {poi.rating}/5
               </span>
             )}
@@ -139,7 +139,7 @@ function EventListCard({ output }: { output: ShowEventsOutput }) {
     return (
       <Card size="sm" className="bg-muted/20 animate-tool-card-enter">
         <CardContent className="flex items-start gap-2.5">
-          <Calendar className="w-4 h-4 text-muted-foreground shrink-0 mt-0.5" />
+          <DooIcon name="calendar" size={16} className="text-muted-foreground shrink-0 mt-0.5" />
           <p className="text-sm text-muted-foreground">{message}</p>
         </CardContent>
       </Card>
@@ -154,7 +154,7 @@ function EventListCard({ output }: { output: ShowEventsOutput }) {
       <CardContent className="space-y-2.5">
         <div className="flex items-center gap-2">
           <div className="flex items-center justify-center w-7 h-7 rounded-lg bg-primary/10 shrink-0">
-            <Calendar className="w-3.5 h-3.5 text-primary" />
+            <DooIcon name="calendar" size={14} className="text-primary" />
           </div>
           <p className="text-xs font-medium text-muted-foreground">{message}</p>
         </div>
@@ -224,7 +224,7 @@ function CampusInfoCard({ output }: { output: CampusInfoOutput }) {
       <CardContent className="space-y-2.5">
         <div className="flex items-start gap-2.5">
           <div className="shrink-0 mt-0.5 flex items-center justify-center w-7 h-7 rounded-lg bg-primary/10">
-            <Info className="w-3.5 h-3.5 text-primary" />
+            <DooIcon name="info" size={14} className="text-primary" />
           </div>
           <p className="text-sm leading-relaxed whitespace-pre-line">
             {output.answer}
@@ -238,7 +238,7 @@ function CampusInfoCard({ output }: { output: CampusInfoOutput }) {
                 className="flex items-start gap-2 rounded-xl border border-border/50 p-2.5 text-xs
                   transition-colors duration-150 active:bg-muted/30"
               >
-                <MapPin className="w-3 h-3 text-primary shrink-0 mt-0.5" />
+                <DooIcon name="location-pin" size={12} className="text-primary shrink-0 mt-0.5" />
                 <div className="flex-1 min-w-0">
                   <span className="font-medium">{venue.name}</span>
                   {venue.address && (
@@ -250,13 +250,13 @@ function CampusInfoCard({ output }: { output: CampusInfoOutput }) {
                   <div className="flex items-center gap-2 text-muted-foreground mt-0.5">
                     {venue.hours && (
                       <span className="flex items-center gap-0.5">
-                        <Clock className="w-2.5 h-2.5" />
+                        <DooIcon name="clock" size={10} />
                         {venue.hours}
                       </span>
                     )}
                     {venue.rating && (
                       <span className="flex items-center gap-0.5">
-                        <Star className="w-2.5 h-2.5 fill-amber-400 text-amber-400" />
+                        <DooIcon name="star" size={10} className="text-amber-400" />
                         {venue.rating}
                       </span>
                     )}

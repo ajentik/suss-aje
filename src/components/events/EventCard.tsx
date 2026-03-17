@@ -3,9 +3,14 @@
 import { useRef, useState, useEffect } from "react";
 import type { CampusEvent } from "@/types";
 import { Badge } from "@/components/ui/badge";
-import { ExternalLink } from "lucide-react";
+import { DooIcon } from "@/lib/icons";
 import { useAppStore } from "@/store/app-store";
-import { CATEGORY_ICON, DEFAULT_EVENT_ICON, CATEGORY_ICON_BG, DEFAULT_ICON_BG } from "@/lib/event-icons";
+import {
+  CATEGORY_ICON,
+  DEFAULT_EVENT_ICON,
+  CATEGORY_ICON_BG,
+  DEFAULT_ICON_BG,
+} from "@/lib/event-icons";
 
 interface EventCardProps {
   event: CampusEvent;
@@ -40,13 +45,14 @@ export default function EventCard({ event, index = 0 }: EventCardProps) {
   const setStreetViewEvent = useAppStore((s) => s.setStreetViewEvent);
   const [isExpanded, setIsExpanded] = useState(false);
   const [contentHeight, setContentHeight] = useState(0);
+  const contentRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    if (!isExpanded) return;
     if (contentRef.current) {
       setContentHeight(contentRef.current.scrollHeight);
     }
   }, [isExpanded]);
-  const contentRef = useRef<HTMLDivElement>(null);
 
   const handleClick = () => {
     setFlyToTarget({ lat: event.lat, lng: event.lng });
@@ -58,11 +64,9 @@ export default function EventCard({ event, index = 0 }: EventCardProps) {
     setStreetViewEvent(event);
   };
 
-  const dateDisplay = event.endDate
-    ? `${event.date} – ${event.endDate}`
-    : event.date;
+  const dateDisplay = event.endDate ? `${event.date} – ${event.endDate}` : event.date;
 
-  const CategoryIcon = CATEGORY_ICON[event.category] ?? DEFAULT_EVENT_ICON;
+  const categoryIcon = CATEGORY_ICON[event.category] ?? DEFAULT_EVENT_ICON;
   const iconBg = CATEGORY_ICON_BG[event.category] ?? DEFAULT_ICON_BG;
 
   return (
@@ -73,10 +77,9 @@ export default function EventCard({ event, index = 0 }: EventCardProps) {
       style={{ "--card-index": index } as React.CSSProperties}
       className={`animate-card-slide-in w-full text-left rounded-2xl border border-border/60 border-l-4 ${CATEGORY_ACCENT[event.category] || "border-l-gray-300"} bg-card hover:bg-muted/30 active:bg-muted/50 active:scale-[0.985] transition-all duration-200 ease-out flex flex-col gap-3 shadow-[0_1px_3px_rgba(0,0,0,0.06)] hover:shadow-[0_4px_12px_rgba(0,0,0,0.08)] p-5`}
     >
-      {/* Header: icon + title + type indicator */}
       <div className="flex items-start gap-3.5 w-full">
         <div className={`w-10 h-10 rounded-xl shrink-0 flex items-center justify-center border border-border/40 ${iconBg}`}>
-          <CategoryIcon className="w-5 h-5" aria-hidden="true" />
+          <DooIcon name={categoryIcon} size={20} />
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-start justify-between gap-2">
@@ -88,7 +91,6 @@ export default function EventCard({ event, index = 0 }: EventCardProps) {
               </span>
             )}
           </div>
-          {/* Date & time — prominent */}
           <div className="flex items-center gap-1.5 mt-1.5">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-3.5 h-3.5 shrink-0 text-primary/70">
               <title>Date</title>
@@ -104,7 +106,6 @@ export default function EventCard({ event, index = 0 }: EventCardProps) {
         </div>
       </div>
 
-      {/* Location */}
       <div className="flex items-center gap-2 text-[0.8125rem] text-muted-foreground">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-3.5 h-3.5 shrink-0 text-muted-foreground/70">
           <title>Location</title>
@@ -120,7 +121,6 @@ export default function EventCard({ event, index = 0 }: EventCardProps) {
         )}
       </div>
 
-      {/* Tags row */}
       <div className="flex items-center gap-1.5 flex-wrap w-full">
         {event.type && (
           <span className={`text-xs px-2.5 py-1 rounded-full font-medium ${TYPE_COLORS[event.type] || "bg-muted text-muted-foreground"}`}>
@@ -137,26 +137,20 @@ export default function EventCard({ event, index = 0 }: EventCardProps) {
         )}
       </div>
 
-      {/* Description */}
       {event.description && (
         <p className="text-sm text-muted-foreground/90 leading-relaxed line-clamp-2 w-full">{event.description}</p>
       )}
 
-      {/* Expandable long description */}
       {event.longDescription && (
         <div className="w-full text-sm text-muted-foreground/90 leading-relaxed">
           <div
             ref={contentRef}
             className="overflow-hidden transition-[max-height] duration-300 ease-in-out"
             style={{
-              maxHeight: isExpanded
-                ? `${contentHeight || 500}px`
-                : "0px",
+              maxHeight: isExpanded ? `${contentHeight || 500}px` : "0px",
             }}
           >
-            <div className="pt-1">
-              {event.longDescription}
-            </div>
+            <div className="pt-1">{event.longDescription}</div>
           </div>
           <button
             type="button"
@@ -184,7 +178,6 @@ export default function EventCard({ event, index = 0 }: EventCardProps) {
         </div>
       )}
 
-      {/* Action buttons */}
       <div className="flex items-center justify-end gap-2.5 w-full mt-0.5">
         {event.registrationUrl && (
           <a
@@ -194,7 +187,7 @@ export default function EventCard({ event, index = 0 }: EventCardProps) {
             onClick={(e) => e.stopPropagation()}
             className="flex items-center justify-center gap-2 border-2 border-primary/80 text-primary px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-primary/10 active:bg-primary/20 transition-all min-h-[44px] min-w-[44px]"
           >
-            <ExternalLink className="w-4 h-4" />
+            <DooIcon name="external-link" size={16} />
             Register
           </a>
         )}
@@ -204,11 +197,7 @@ export default function EventCard({ event, index = 0 }: EventCardProps) {
             onClick={handleNavigate}
             className="flex items-center justify-center gap-2 bg-primary text-primary-foreground px-5 py-2.5 rounded-full text-sm font-semibold hover:opacity-90 active:opacity-80 active:scale-95 transition-all min-h-[44px] min-w-[44px] shadow-sm"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
-              <title>Navigate</title>
-              <circle cx="12" cy="12" r="10" />
-              <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76" />
-            </svg>
+            <DooIcon name="navigation" size={16} />
             Navigate
           </button>
         ) : event.url ? (
@@ -219,7 +208,7 @@ export default function EventCard({ event, index = 0 }: EventCardProps) {
             onClick={(e) => e.stopPropagation()}
             className="flex items-center justify-center gap-2 bg-primary text-primary-foreground px-5 py-2.5 rounded-full text-sm font-semibold hover:opacity-90 active:opacity-80 active:scale-95 transition-all min-h-[44px] min-w-[44px] shadow-sm"
           >
-            <ExternalLink className="w-4 h-4" />
+            <DooIcon name="external-link" size={16} />
             Join Online
           </a>
         ) : null}

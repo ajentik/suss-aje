@@ -1,34 +1,21 @@
-import type { LucideIcon } from "lucide-react";
-import {
-  Info,
-  DoorOpen,
-  Presentation,
-  Users,
-  Briefcase,
-  BookOpen,
-  MessageSquare,
-  Landmark,
-  PartyPopper,
-  Trophy,
-  Calendar,
-} from "lucide-react";
+import type { IconName } from "@/lib/icons";
 
-export const CATEGORY_ICON: Record<string, LucideIcon> = {
-  "Information Session": Info,
-  "Open House": DoorOpen,
-  "Public Lecture / Enrichment Talk": Presentation,
-  Symposium: Users,
-  "Competition / Hackathon": Trophy,
-  Career: Briefcase,
-  "Career Fair": Briefcase,
-  Lecture: BookOpen,
-  "Forum / Conference": MessageSquare,
-  Forum: MessageSquare,
-  Conference: Landmark,
-  Social: PartyPopper,
+export const CATEGORY_ICON: Record<string, IconName> = {
+  "Information Session": "info",
+  "Open House": "shop",
+  "Public Lecture / Enrichment Talk": "message2",
+  Symposium: "user",
+  "Competition / Hackathon": "star",
+  Career: "wallet",
+  "Career Fair": "wallet",
+  Lecture: "doc",
+  "Forum / Conference": "message",
+  Forum: "message",
+  Conference: "globe",
+  Social: "sparkle",
 };
 
-export const DEFAULT_EVENT_ICON: LucideIcon = Calendar;
+export const DEFAULT_EVENT_ICON: IconName = "calendar";
 
 export const CATEGORY_ICON_BG: Record<string, string> = {
   "Information Session": "bg-blue-500/10 text-blue-600 dark:text-blue-400",
