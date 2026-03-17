@@ -344,4 +344,106 @@ describe("useSpeechProvider", () => {
       }),
     );
   });
+
+  it("starts google recognition with MediaRecorder", async () => {
+    localStorage.setItem("asksussi-stt-provider", "google");
+    const mockStream = {
+      getTracks: () => [{ stop: vi.fn() }],
+    };
+    const mockGetUserMedia = vi.fn().mockResolvedValue(mockStream);
+    Object.defineProperty(navigator, "mediaDevices", {
+      value: { getUserMedia: mockGetUserMedia },
+      writable: true,
+      configurable: true,
+    });
+
+    const startFn = vi.fn();
+    const stopFn = vi.fn();
+
+    function MockMediaRecorder(this: Record<string, unknown>) {
+      this.ondataavailable = null;
+      this.onstop = null;
+      this.start = startFn;
+      this.stop = stopFn;
+    }
+    vi.stubGlobal("MediaRecorder", MockMediaRecorder);
+
+    const { useSpeechProvider } = await import("@/hooks/useSpeechProvider");
+    const { result } = renderHook(() => useSpeechProvider());
+
+    await act(async () => {
+      result.current.startListening();
+    });
+
+    await vi.waitFor(() => {
+      expect(startFn).toHaveBeenCalled();
+    });
+
+    expect(result.current.isListening).toBe(true);
+  });
+
+  it("stops google recognition by stopping MediaRecorder", async () => {
+    localStorage.setItem("asksussi-stt-provider", "google");
+    const mockStream = {
+      getTracks: () => [{ stop: vi.fn() }],
+    };
+    Object.defineProperty(navigator, "mediaDevices", {
+      value: { getUserMedia: vi.fn().mockResolvedValue(mockStream) },
+      writable: true,
+      configurable: true,
+    });
+
+    const startFn = vi.fn();
+    const stopFn = vi.fn();
+
+    function MockMediaRecorder(this: Record<string, unknown>) {
+      this.ondataavailable = null;
+      this.onstop = null;
+      this.start = startFn;
+      this.stop = stopFn;
+    }
+    vi.stubGlobal("MediaRecorder", MockMediaRecorder);
+
+    const { useSpeechProvider } = await import("@/hooks/useSpeechProvider");
+    const { result } = renderHook(() => useSpeechProvider());
+
+    await act(async () => {
+      result.current.startListening();
+    });
+
+    await vi.waitFor(() => {
+      expect(startFn).toHaveBeenCalled();
+    });
+
+    act(() => {
+      result.current.stopListening();
+    });
+
+    expect(stopFn).toHaveBeenCalled();
+  });
+
+  it("handles google mic permission denied", async () => {
+    localStorage.setItem("asksussi-stt-provider", "google");
+    Object.defineProperty(navigator, "mediaDevices", {
+      value: {
+        getUserMedia: vi.fn().mockRejectedValue(new Error("Permission denied")),
+      },
+      writable: true,
+      configurable: true,
+    });
+
+    const { useSpeechProvider } = await import("@/hooks/useSpeechProvider");
+    const { result } = renderHook(() => useSpeechProvider());
+
+    await act(async () => {
+      result.current.startListening();
+    });
+
+    await vi.waitFor(() => {
+      expect(result.current.error).toBe(
+        "Microphone access denied. Please allow microphone permissions.",
+      );
+      expect(result.current.isListening).toBe(false);
+    });
+  });
 });

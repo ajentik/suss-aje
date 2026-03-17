@@ -93,4 +93,60 @@ describe("POICard", () => {
     });
     expect(mockSetSelectedPOI).toHaveBeenCalledWith(basePOI);
   });
+
+  it("renders price level as dollar signs", () => {
+    render(<POICard poi={{ ...basePOI, priceLevel: 3 }} />);
+    expect(screen.getByText("$$$")).toBeInTheDocument();
+  });
+
+  it("renders website link when expanded", () => {
+    render(<POICard poi={{ ...basePOI, website: "https://example.com" }} />);
+    fireEvent.click(screen.getByRole("button", { name: /SUSS Library/i }));
+
+    const link = screen.getByText("Website");
+    expect(link.closest("a")).toHaveAttribute("href", "https://example.com");
+    expect(link.closest("a")).toHaveAttribute("target", "_blank");
+  });
+
+  it("renders phone contact when expanded", () => {
+    render(<POICard poi={{ ...basePOI, contact: "+65 1234 5678" }} />);
+    fireEvent.click(screen.getByRole("button", { name: /SUSS Library/i }));
+    expect(screen.getByText("+65 1234 5678")).toBeInTheDocument();
+  });
+
+  it("renders call button for AAC POI with contact", () => {
+    const aacPoi: POI = {
+      ...basePOI,
+      category: "Active Ageing Centre",
+      contact: "+65 9999 0000",
+    };
+    render(<POICard poi={aacPoi} />);
+    fireEvent.click(screen.getByRole("button", { name: new RegExp(aacPoi.name) }));
+
+    const callLink = screen.getByLabelText(`Call ${aacPoi.name}`);
+    expect(callLink).toBeInTheDocument();
+    expect(callLink).toHaveAttribute("href", "tel:+6599990000");
+  });
+
+  it("renders distance badge when distanceFromCampus is set", () => {
+    render(<POICard poi={{ ...basePOI, distanceFromCampus: "5 min walk" }} />);
+    expect(screen.getByText("5 min walk")).toBeInTheDocument();
+  });
+
+  it("does not render website link when not provided", () => {
+    render(<POICard poi={{ ...basePOI, website: undefined }} />);
+    fireEvent.click(screen.getByRole("button", { name: /SUSS Library/i }));
+    expect(screen.queryByText("Website")).not.toBeInTheDocument();
+  });
+
+  it("toggles expand/collapse", () => {
+    render(<POICard poi={basePOI} />);
+    const btn = screen.getByRole("button", { name: /SUSS Library/i });
+
+    fireEvent.click(btn);
+    expect(screen.getByText("The main university library")).toBeInTheDocument();
+
+    fireEvent.click(btn);
+    expect(btn).toHaveAttribute("aria-expanded", "false");
+  });
 });

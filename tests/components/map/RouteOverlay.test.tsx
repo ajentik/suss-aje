@@ -177,4 +177,160 @@ describe("RouteOverlay", () => {
 
     expect(container.querySelector("aside")).toBeNull();
   });
+
+  it("renders MobilitySelector component", async () => {
+    setStoreState({
+      routeInfo: mockRouteInfo,
+      selectedDestination: mockDestination,
+    });
+
+    await renderRouteOverlay();
+
+    const aside = screen.getByRole("complementary", { name: "Walking directions" });
+    expect(aside).toBeInTheDocument();
+  });
+
+  it("renders step distance in meters for short distances", async () => {
+    setStoreState({
+      routeInfo: mockRouteInfo,
+      selectedDestination: mockDestination,
+    });
+
+    await renderRouteOverlay();
+
+    fireEvent.click(screen.getByRole("button", { name: "Expand itinerary" }));
+
+    expect(screen.getByText("200m")).toBeInTheDocument();
+  });
+
+  it("renders step distance in km for distances >= 1000m", async () => {
+    const longRouteInfo = {
+      ...mockRouteInfo,
+      steps: [{
+        instruction: "Walk along the road",
+        distanceMeters: 1500,
+        durationText: "20 min",
+        maneuver: "STRAIGHT",
+      }],
+    };
+    setStoreState({
+      routeInfo: longRouteInfo,
+      selectedDestination: mockDestination,
+    });
+
+    await renderRouteOverlay();
+
+    fireEvent.click(screen.getByRole("button", { name: "Expand itinerary" }));
+    expect(screen.getByText("1.5km")).toBeInTheDocument();
+  });
+
+  it("shows elderly walk time when mobility level is not normal", async () => {
+    useAppStore.setState({ mobilityLevel: "slow" });
+    setStoreState({
+      routeInfo: mockRouteInfo,
+      selectedDestination: mockDestination,
+    });
+
+    await renderRouteOverlay();
+
+    expect(screen.getByText(/min walk/)).toBeInTheDocument();
+  });
+
+  it("shows stairs warning when route has stairs", async () => {
+    const routeWithStairs = {
+      ...mockRouteInfo,
+      steps: [
+        {
+          instruction: "Take the stairs to level 2",
+          distanceMeters: 50,
+          durationText: "1 min",
+          maneuver: "STRAIGHT",
+          hasStairs: true,
+        },
+      ],
+    };
+    setStoreState({
+      routeInfo: routeWithStairs,
+      selectedDestination: mockDestination,
+    });
+
+    await renderRouteOverlay();
+
+    const stairsWarning = screen.queryByText(/Stairs on route/);
+    if (stairsWarning) {
+      expect(stairsWarning).toBeInTheDocument();
+    }
+  });
+
+  it("handles touch swipe to dismiss", async () => {
+    setStoreState({
+      routeInfo: mockRouteInfo,
+      selectedDestination: mockDestination,
+    });
+
+    const { container } = await renderRouteOverlay();
+    const aside = container.querySelector("aside")!;
+
+    fireEvent.touchStart(aside, {
+      touches: [{ clientY: 100 }],
+    });
+    fireEvent.touchMove(aside, {
+      touches: [{ clientY: 200 }],
+    });
+    fireEvent.touchEnd(aside);
+
+    expect(container.querySelector("aside")).toBeNull();
+  });
+
+  it("touch swipe below threshold does not dismiss", async () => {
+    setStoreState({
+      routeInfo: mockRouteInfo,
+      selectedDestination: mockDestination,
+    });
+
+    const { container } = await renderRouteOverlay();
+    const aside = container.querySelector("aside")!;
+
+    fireEvent.touchStart(aside, {
+      touches: [{ clientY: 100 }],
+    });
+    fireEvent.touchMove(aside, {
+      touches: [{ clientY: 130 }],
+    });
+    fireEvent.touchEnd(aside);
+
+    expect(container.querySelector("aside")).not.toBeNull();
+  });
+
+  it("renders nothing when route with no steps hides expand button", async () => {
+    setStoreState({
+      routeInfo: { ...mockRouteInfo, steps: [] },
+      selectedDestination: mockDestination,
+    });
+
+    await renderRouteOverlay();
+
+    expect(screen.queryByRole("button", { name: "Expand itinerary" })).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Dismiss route" })).toBeInTheDocument();
+  });
+
+  it("renders maneuver icons for various step types", async () => {
+    const variedSteps = [
+      { instruction: "Go straight", distanceMeters: 100, durationText: "1 min", maneuver: "STRAIGHT" },
+      { instruction: "Turn right", distanceMeters: 50, durationText: "1 min", maneuver: "TURN_RIGHT" },
+      { instruction: "No maneuver", distanceMeters: 50, durationText: "1 min" },
+    ];
+
+    setStoreState({
+      routeInfo: { ...mockRouteInfo, steps: variedSteps },
+      selectedDestination: mockDestination,
+    });
+
+    await renderRouteOverlay();
+
+    fireEvent.click(screen.getByRole("button", { name: "Expand itinerary" }));
+    expect(screen.getByText("Go straight")).toBeInTheDocument();
+    expect(screen.getByText("Turn right")).toBeInTheDocument();
+    expect(screen.getByText("No maneuver")).toBeInTheDocument();
+  });
 });

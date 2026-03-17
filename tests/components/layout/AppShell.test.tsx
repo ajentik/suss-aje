@@ -304,4 +304,103 @@ describe("AppShell", () => {
     await renderAppShell();
     expect(screen.getByTestId("onboarding")).toBeInTheDocument();
   });
+
+  it("minimize button hides the sidebar panel", async () => {
+    await renderAppShell();
+    const minimizeBtn = screen.getByRole("button", { name: "Minimize panel" });
+    fireEvent.click(minimizeBtn);
+
+    expect(screen.getByRole("button", { name: "Restore panel" })).toBeInTheDocument();
+  });
+
+  it("restore button shows the sidebar panel again", async () => {
+    await renderAppShell();
+    fireEvent.click(screen.getByRole("button", { name: "Minimize panel" }));
+
+    fireEvent.click(screen.getByRole("button", { name: "Restore panel" }));
+    expect(screen.getByRole("button", { name: "Minimize panel" })).toBeInTheDocument();
+  });
+
+  it("renders POI detail card in mobile sheet when sheetContentMode is poi-detail", async () => {
+    useAppStore.setState({
+      sheetContentMode: "poi-detail",
+      selectedPOI: { id: "poi-1", name: "Test POI", lat: 1.33, lng: 103.77, category: "Building", description: "desc" },
+    } as Partial<MockStoreState>);
+    await renderAppShell();
+    expect(screen.getByTestId("poi-detail-card")).toBeInTheDocument();
+  });
+
+  it("renders event detail card in mobile sheet when sheetContentMode is event-detail", async () => {
+    useAppStore.setState({
+      sheetContentMode: "event-detail",
+      selectedEvent: {
+        id: "evt-1",
+        title: "Test Event",
+        date: "2026-01-01",
+        time: "10:00",
+        location: "Block A",
+        category: "Workshop",
+        description: "A test",
+        type: "On-Campus",
+        school: "SUSS",
+        lat: 1.33,
+        lng: 103.77,
+      },
+    } as Partial<MockStoreState>);
+    await renderAppShell();
+    expect(screen.getByTestId("event-detail-card")).toBeInTheDocument();
+  });
+
+  it("close detail resets to default sheet content mode", async () => {
+    useAppStore.setState({
+      sheetContentMode: "poi-detail",
+      selectedPOI: { id: "poi-1", name: "Test POI", lat: 1.33, lng: 103.77, category: "Building", description: "desc" },
+    } as Partial<MockStoreState>);
+    await renderAppShell();
+
+    fireEvent.click(screen.getByText("Close Detail"));
+    expect(useAppStore.getState().sheetContentMode).toBe("default");
+    expect(useAppStore.getState().selectedPOI).toBeNull();
+  });
+
+  it("navigate from POI detail sets destination", async () => {
+    const poi = { id: "poi-1", name: "Test POI", lat: 1.33, lng: 103.77, category: "Building", description: "desc" };
+    useAppStore.setState({
+      sheetContentMode: "poi-detail",
+      selectedPOI: poi,
+    } as Partial<MockStoreState>);
+    await renderAppShell();
+
+    fireEvent.click(screen.getByText("Navigate"));
+    expect(mockStoreState.setSelectedDestination).toHaveBeenCalledWith(poi);
+  });
+
+  it("navigate from event detail sets street view for On-Campus event", async () => {
+    const event = {
+      id: "evt-1",
+      title: "Test Event",
+      date: "2026-01-01",
+      time: "10:00",
+      location: "Block A",
+      category: "Workshop",
+      description: "A test",
+      type: "On-Campus",
+      school: "SUSS",
+      lat: 1.33,
+      lng: 103.77,
+    };
+    useAppStore.setState({
+      sheetContentMode: "event-detail",
+      selectedEvent: event,
+    } as Partial<MockStoreState>);
+    await renderAppShell();
+
+    fireEvent.click(screen.getByText("Navigate"));
+    expect(mockStoreState.setStreetViewEvent).toHaveBeenCalledWith(event);
+  });
+
+  it("renders resize handle when not minimized", async () => {
+    await renderAppShell();
+    expect(screen.getByRole("button", { name: "Resize panel" })).toBeInTheDocument();
+  });
 });

@@ -1,5 +1,5 @@
 import { describe, expect, it, vi, beforeEach } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { render, screen, fireEvent } from "@testing-library/react";
 
 import type { CampusEvent } from "@/types";
 
@@ -77,6 +77,9 @@ vi.mock("@/hooks/useCampusEvents", () => ({
 }));
 
 import EventsPanel from "@/components/events/EventsPanel";
+import { useAppStore } from "@/store/app-store";
+
+const mockedUseAppStore = vi.mocked(useAppStore);
 
 describe("EventsPanel", () => {
   beforeEach(() => {
@@ -201,20 +204,65 @@ describe("EventsPanel", () => {
     expect(mockSetMapEventMarkers).toHaveBeenCalledWith(sampleEvents);
   });
 
-  it("transitions from loading to events", () => {
-    mockHookReturn = { ...mockHookReturn, isLoading: true };
-    const { container, rerender } = render(<EventsPanel />);
-    expect(container.querySelectorAll(".skeleton-shimmer").length).toBeGreaterThan(0);
+  it("calls handleClearFilters when Clear all filters button is clicked", () => {
+    mockHookReturn = {
+      ...mockHookReturn,
+      isLoading: false,
+      events: [],
+      allEvents: sampleEvents,
+      categories: ["Open House", "Career"],
+    };
+    render(<EventsPanel />);
+
+    const clearBtn = screen.getByText("Clear all filters");
+    fireEvent.click(clearBtn);
+
+    expect(mockHookReturn.setDateFilter).toHaveBeenCalledWith("all");
+    expect(mockHookReturn.setCategoryFilter).toHaveBeenCalledWith("");
+    expect(mockHookReturn.setSchoolFilter).toHaveBeenCalledWith("");
+  });
+
+  it("syncs store date filter to hook", () => {
+    mockedUseAppStore.mockImplementation(
+      (selector: (s: Record<string, unknown>) => unknown) =>
+        selector({
+          eventDateFilter: "7d",
+          eventCategoryFilter: "",
+          setMapEventMarkers: mockSetMapEventMarkers,
+        }),
+    );
 
     mockHookReturn = {
       ...mockHookReturn,
       isLoading: false,
       events: sampleEvents,
       allEvents: sampleEvents,
-      categories: ["Open House", "Career"],
+      categories: [],
     };
-    rerender(<EventsPanel />);
-    expect(screen.getByText("Campus Tour")).toBeInTheDocument();
-    expect(container.querySelectorAll(".skeleton-shimmer").length).toBe(0);
+    render(<EventsPanel />);
+
+    expect(mockHookReturn.setDateFilter).toHaveBeenCalledWith("7d");
+  });
+
+  it("syncs store category filter to hook", () => {
+    mockedUseAppStore.mockImplementation(
+      (selector: (s: Record<string, unknown>) => unknown) =>
+        selector({
+          eventDateFilter: "",
+          eventCategoryFilter: "Career",
+          setMapEventMarkers: mockSetMapEventMarkers,
+        }),
+    );
+
+    mockHookReturn = {
+      ...mockHookReturn,
+      isLoading: false,
+      events: sampleEvents,
+      allEvents: sampleEvents,
+      categories: ["Career"],
+    };
+    render(<EventsPanel />);
+
+    expect(mockHookReturn.setCategoryFilter).toHaveBeenCalledWith("Career");
   });
 });

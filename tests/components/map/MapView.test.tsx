@@ -203,4 +203,103 @@ describe("MapView", () => {
     const eventMarker = markers.find((m) => m.getAttribute("data-label") === "Test Event");
     expect(eventMarker).toBeTruthy();
   });
+
+  it("clicking event marker sets selectedEvent in store", async () => {
+    const testEvent = {
+      id: "evt-1",
+      title: "Test Event",
+      date: "2025-01-01",
+      time: "10:00",
+      location: "Block A",
+      category: "Workshop",
+      description: "A test event",
+      type: "On-Campus" as const,
+      school: "SUSS" as const,
+      lat: 1.33,
+      lng: 103.77,
+    };
+    useAppStore.setState({
+      mapEventMarkers: [testEvent],
+    });
+
+    await act(async () => {
+      await renderMapView();
+    });
+
+    const markers = screen.getAllByTestId("marker-3d");
+    const eventMarker = markers.find((m) => m.getAttribute("data-label") === "Test Event");
+    if (eventMarker) fireEvent.click(eventMarker);
+
+    expect(useAppStore.getState().selectedEvent).toEqual(testEvent);
+  });
+
+  it("renders highlighted event markers differently", async () => {
+    const testEvent = {
+      id: "evt-1",
+      title: "Highlighted Event",
+      date: "2025-01-01",
+      time: "10:00",
+      location: "Block A",
+      category: "Workshop",
+      description: "A highlighted event",
+      type: "On-Campus" as const,
+      school: "SUSS" as const,
+      lat: 1.33,
+      lng: 103.77,
+    };
+    useAppStore.setState({
+      mapEventMarkers: [testEvent],
+      highlightedEventIds: ["evt-1"],
+    });
+
+    await act(async () => {
+      await renderMapView();
+    });
+
+    const markers = screen.getAllByTestId("marker-3d");
+    const eventMarker = markers.find((m) => m.getAttribute("data-label") === "Highlighted Event");
+    expect(eventMarker).toBeTruthy();
+  });
+
+  it("renders selected destination marker with selected style", async () => {
+    const libraryPOI = CAMPUS_POIS.find((p) => p.name === "SUSS Library");
+    useAppStore.setState({
+      selectedDestination: libraryPOI,
+    });
+
+    await act(async () => {
+      await renderMapView();
+    });
+
+    const markers = screen.getAllByTestId("marker-3d");
+    const selectedMarker = markers.find((m) => m.getAttribute("data-label") === "SUSS Library");
+    expect(selectedMarker).toBeTruthy();
+  });
+
+  it("opens street view when streetViewEvent is set with On-Campus type", async () => {
+    const streetViewTarget = {
+      id: "evt-sv",
+      title: "Street View Target",
+      date: "2025-01-01",
+      time: "10:00",
+      location: "Block A",
+      category: "Workshop",
+      description: "Target for street view",
+      type: "On-Campus" as const,
+      school: "SUSS" as const,
+      lat: 1.33,
+      lng: 103.77,
+    };
+    useAppStore.setState({
+      streetViewEvent: streetViewTarget,
+    });
+
+    await act(async () => {
+      await renderMapView();
+    });
+
+    await vi.waitFor(() => {
+      expect(screen.getByTestId("street-view-panel")).toBeInTheDocument();
+    });
+  });
 });

@@ -1,5 +1,5 @@
 import { describe, expect, it, vi, beforeEach } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { render, screen, fireEvent } from "@testing-library/react";
 
 vi.mock("@/hooks/useBottomSheet", () => ({
   useBottomSheet: vi.fn(() => ({
@@ -83,5 +83,185 @@ describe("MobileSheet", () => {
     render(<MobileSheet>Content</MobileSheet>);
     expect(screen.getByText("AskSUSSi")).toBeInTheDocument();
     expect(screen.getByText("Swipe up")).toBeInTheDocument();
+  });
+
+  it("tap on drag handle cycles snap state", () => {
+    const mockSnapTo = vi.fn();
+    mockedUseBottomSheet.mockReturnValue({
+      sheetRef: { current: null },
+      handleRef: { current: null },
+      currentHeight: 200,
+      snapState: "peek",
+      isDragging: false,
+      snapTo: mockSnapTo,
+      touchHandlers: {
+        onTouchStart: vi.fn(),
+        onTouchMove: vi.fn(),
+        onTouchEnd: vi.fn(),
+      },
+    });
+    render(<MobileSheet>Content</MobileSheet>);
+    const handle = screen.getByLabelText("Drag to resize or tap to cycle");
+    fireEvent.click(handle);
+    expect(mockSnapTo).toHaveBeenCalledWith("half");
+  });
+
+  it("Enter key on drag handle cycles snap", () => {
+    const mockSnapTo = vi.fn();
+    mockedUseBottomSheet.mockReturnValue({
+      sheetRef: { current: null },
+      handleRef: { current: null },
+      currentHeight: 200,
+      snapState: "half",
+      isDragging: false,
+      snapTo: mockSnapTo,
+      touchHandlers: {
+        onTouchStart: vi.fn(),
+        onTouchMove: vi.fn(),
+        onTouchEnd: vi.fn(),
+      },
+    });
+    render(<MobileSheet>Content</MobileSheet>);
+    const handle = screen.getByLabelText("Drag to resize or tap to cycle");
+    fireEvent.keyDown(handle, { key: "Enter" });
+    expect(mockSnapTo).toHaveBeenCalledWith("full");
+  });
+
+  it("Space key on drag handle cycles snap", () => {
+    const mockSnapTo = vi.fn();
+    mockedUseBottomSheet.mockReturnValue({
+      sheetRef: { current: null },
+      handleRef: { current: null },
+      currentHeight: 200,
+      snapState: "mini",
+      isDragging: false,
+      snapTo: mockSnapTo,
+      touchHandlers: {
+        onTouchStart: vi.fn(),
+        onTouchMove: vi.fn(),
+        onTouchEnd: vi.fn(),
+      },
+    });
+    render(<MobileSheet>Content</MobileSheet>);
+    const handle = screen.getByLabelText("Expand panel");
+    fireEvent.keyDown(handle, { key: " " });
+    expect(mockSnapTo).toHaveBeenCalledWith("peek");
+  });
+
+  it("ArrowUp key expands to next snap", () => {
+    const mockSnapTo = vi.fn();
+    mockedUseBottomSheet.mockReturnValue({
+      sheetRef: { current: null },
+      handleRef: { current: null },
+      currentHeight: 200,
+      snapState: "peek",
+      isDragging: false,
+      snapTo: mockSnapTo,
+      touchHandlers: {
+        onTouchStart: vi.fn(),
+        onTouchMove: vi.fn(),
+        onTouchEnd: vi.fn(),
+      },
+    });
+    render(<MobileSheet>Content</MobileSheet>);
+    const handle = screen.getByLabelText("Drag to resize or tap to cycle");
+    fireEvent.keyDown(handle, { key: "ArrowUp" });
+    expect(mockSnapTo).toHaveBeenCalledWith("half");
+  });
+
+  it("ArrowDown key collapses to previous snap", () => {
+    const mockSnapTo = vi.fn();
+    mockedUseBottomSheet.mockReturnValue({
+      sheetRef: { current: null },
+      handleRef: { current: null },
+      currentHeight: 200,
+      snapState: "half",
+      isDragging: false,
+      snapTo: mockSnapTo,
+      touchHandlers: {
+        onTouchStart: vi.fn(),
+        onTouchMove: vi.fn(),
+        onTouchEnd: vi.fn(),
+      },
+    });
+    render(<MobileSheet>Content</MobileSheet>);
+    const handle = screen.getByLabelText("Drag to resize or tap to cycle");
+    fireEvent.keyDown(handle, { key: "ArrowDown" });
+    expect(mockSnapTo).toHaveBeenCalledWith("peek");
+  });
+
+  it("ArrowDown at mini does not go below", () => {
+    const mockSnapTo = vi.fn();
+    mockedUseBottomSheet.mockReturnValue({
+      sheetRef: { current: null },
+      handleRef: { current: null },
+      currentHeight: 200,
+      snapState: "mini",
+      isDragging: false,
+      snapTo: mockSnapTo,
+      touchHandlers: {
+        onTouchStart: vi.fn(),
+        onTouchMove: vi.fn(),
+        onTouchEnd: vi.fn(),
+      },
+    });
+    render(<MobileSheet>Content</MobileSheet>);
+    const handle = screen.getByLabelText("Expand panel");
+    fireEvent.keyDown(handle, { key: "ArrowDown" });
+    expect(mockSnapTo).not.toHaveBeenCalled();
+  });
+
+  it("ArrowUp at full does not go above", () => {
+    const mockSnapTo = vi.fn();
+    mockedUseBottomSheet.mockReturnValue({
+      sheetRef: { current: null },
+      handleRef: { current: null },
+      currentHeight: 200,
+      snapState: "full",
+      isDragging: false,
+      snapTo: mockSnapTo,
+      touchHandlers: {
+        onTouchStart: vi.fn(),
+        onTouchMove: vi.fn(),
+        onTouchEnd: vi.fn(),
+      },
+    });
+    render(<MobileSheet>Content</MobileSheet>);
+    const handle = screen.getByLabelText("Drag to resize or tap to cycle");
+    fireEvent.keyDown(handle, { key: "ArrowUp" });
+    expect(mockSnapTo).not.toHaveBeenCalled();
+  });
+
+  it("calls onSnapChange when snap state changes", () => {
+    const onSnapChange = vi.fn();
+    setSnapState("peek");
+    const { rerender } = render(
+      <MobileSheet onSnapChange={onSnapChange}>Content</MobileSheet>,
+    );
+    setSnapState("half");
+    rerender(
+      <MobileSheet onSnapChange={onSnapChange}>Content</MobileSheet>,
+    );
+    expect(onSnapChange).toHaveBeenCalledWith("half");
+  });
+
+  it("exposes snapTo via snapToRef", () => {
+    const mockSnapTo = vi.fn();
+    mockedUseBottomSheet.mockReturnValue({
+      sheetRef: { current: null },
+      handleRef: { current: null },
+      currentHeight: 200,
+      snapState: "peek",
+      isDragging: false,
+      snapTo: mockSnapTo,
+      touchHandlers: {
+        onTouchStart: vi.fn(),
+        onTouchMove: vi.fn(),
+        onTouchEnd: vi.fn(),
+      },
+    });
+    const snapToRef = { current: null as ((snap: "mini" | "peek" | "half" | "full") => void) | null };
+    render(<MobileSheet snapToRef={snapToRef}>Content</MobileSheet>);
+    expect(snapToRef.current).toBe(mockSnapTo);
   });
 });
