@@ -360,7 +360,7 @@ function Map3DInner() {
   }, [streetViewEvent]);
 
   return (
-    <div className="w-full h-full relative">
+    <div className="w-full h-full relative" role="region" aria-label="Campus 3D map">
       {inStreetView && streetViewLocation ? (
         <StreetViewPanel
           location={streetViewLocation}

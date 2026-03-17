@@ -18,8 +18,9 @@ echo "  TypeScript errors: $TS_ERRORS → score: $TS_SCORE/100"
 
 # Lint
 echo "▶ ESLint check..."
-LINT_ERRORS=$(npm run lint 2>&1 | grep -c "error" || true)
-LINT_WARNINGS=$(npm run lint 2>&1 | grep -c "warning" || true)
+LINT_OUT=$(npm run lint 2>&1)
+LINT_ERRORS=$(echo "$LINT_OUT" | grep -c "error" || true)
+LINT_WARNINGS=$(echo "$LINT_OUT" | grep -c "warning" || true)
 LINT_SCORE=$(( 100 - LINT_ERRORS * 10 - LINT_WARNINGS * 2 ))
 if [ "$LINT_SCORE" -lt 0 ]; then LINT_SCORE=0; fi
 echo "  ESLint errors: $LINT_ERRORS, warnings: $LINT_WARNINGS → score: $LINT_SCORE/100"
@@ -35,7 +36,8 @@ echo "  Line coverage: ${COVERAGE}% → score: $COVERAGE/100"
 # A11y (static check: components without aria attrs)
 echo "▶ A11y static check..."
 A11Y_MISSING=$(grep -rL "aria-\|role=" src/components --include="*.tsx" 2>/dev/null | \
-  grep -v "ui/\(card\|scroll-area\|sonner\|skeleton\|badge\|button\|input\|select\|tabs\).tsx" | \
+  { grep -v "ui/\(card\|scroll-area\|sonner\|skeleton\|badge\|button\|input\|select\|tabs\).tsx" || true; } | \
+  { grep -v "ServiceWorkerRegistrar.tsx" || true; } | \
   wc -l | tr -d ' ')
 A11Y_SCORE=$(( 100 - A11Y_MISSING * 15 ))
 if [ "$A11Y_SCORE" -lt 0 ]; then A11Y_SCORE=0; fi

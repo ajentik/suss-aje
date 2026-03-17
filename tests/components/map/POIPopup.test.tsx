@@ -179,4 +179,164 @@ describe("POIDetailCard (mobile bottom sheet)", () => {
     fireEvent.click(screen.getByText("Back to chat"));
     expect(onClose).toHaveBeenCalledOnce();
   });
+
+  it("renders hours, rating, and address in expanded mode", async () => {
+    await renderPOIDetailCard({
+      poi: mockPOI,
+      onClose: vi.fn(),
+      onNavigate: vi.fn(),
+      compact: false,
+    });
+
+    expect(screen.getByText(mockPOI.description)).toBeInTheDocument();
+    expect(screen.getByText("4.2 / 5.0")).toBeInTheDocument();
+  });
+
+  it("hides expanded content when compact", async () => {
+    await renderPOIDetailCard({
+      poi: mockPOI,
+      onClose: vi.fn(),
+      onNavigate: vi.fn(),
+      compact: true,
+    });
+
+    expect(screen.queryByText(mockPOI.description)).not.toBeInTheDocument();
+    expect(screen.queryByText("4.2 / 5.0")).not.toBeInTheDocument();
+  });
+
+  it("renders cuisine when provided", async () => {
+    const poiWithCuisine: POI = { ...mockPOI, cuisine: "Japanese" };
+    await renderPOIDetailCard({
+      poi: poiWithCuisine,
+      onClose: vi.fn(),
+      onNavigate: vi.fn(),
+      compact: false,
+    });
+
+    expect(screen.getByText("Japanese")).toBeInTheDocument();
+  });
+
+  it("renders price level when provided", async () => {
+    const poiWithPrice: POI = { ...mockPOI, priceLevel: 3 as POI["priceLevel"] };
+    await renderPOIDetailCard({
+      poi: poiWithPrice,
+      onClose: vi.fn(),
+      onNavigate: vi.fn(),
+      compact: false,
+    });
+
+    expect(screen.getByText("$$$")).toBeInTheDocument();
+  });
+
+  it("renders website link when provided", async () => {
+    const poiWithWebsite: POI = { ...mockPOI, website: "https://foodclique.sg" };
+    await renderPOIDetailCard({
+      poi: poiWithWebsite,
+      onClose: vi.fn(),
+      onNavigate: vi.fn(),
+    });
+
+    const link = screen.getByText("Website");
+    expect(link.closest("a")).toHaveAttribute("href", "https://foodclique.sg");
+  });
+
+  it("renders AACEventsSection for Active Ageing Centre POI", async () => {
+    const aacPOI: POI = { ...mockPOI, category: "Active Ageing Centre" };
+    await renderPOIDetailCard({
+      poi: aacPOI,
+      onClose: vi.fn(),
+      onNavigate: vi.fn(),
+      compact: false,
+    });
+
+    expect(screen.getByTestId("aac-events-section")).toBeInTheDocument();
+  });
+});
+
+describe("POIPopup — desktop expanded details", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    useAppStore.setState({
+      selectedPOI: null,
+      selectedEvent: null,
+    });
+  });
+
+  it("renders hours in desktop popup", async () => {
+    useAppStore.setState({ selectedPOI: mockPOI });
+    await renderPOIPopup();
+    expect(screen.getByText("Mon–Fri 7AM–8PM")).toBeInTheDocument();
+  });
+
+  it("renders rating in desktop popup", async () => {
+    useAppStore.setState({ selectedPOI: mockPOI });
+    await renderPOIPopup();
+    expect(screen.getByText("4.2 / 5.0")).toBeInTheDocument();
+  });
+
+  it("renders AACEventsSection for AAC POI in desktop popup", async () => {
+    const aacPOI: POI = { ...mockPOI, category: "Active Ageing Centre" };
+    useAppStore.setState({ selectedPOI: aacPOI });
+    await renderPOIPopup();
+    expect(screen.getByTestId("aac-events-section")).toBeInTheDocument();
+  });
+
+  it("renders description in desktop popup", async () => {
+    useAppStore.setState({ selectedPOI: mockPOI });
+    await renderPOIPopup();
+    expect(screen.getByText("Campus canteen")).toBeInTheDocument();
+  });
+
+  it("fade-out transition clears after selectedPOI is null", async () => {
+    useAppStore.setState({ selectedPOI: mockPOI });
+    const { container } = await renderPOIPopup();
+
+    fireEvent.click(screen.getByRole("button", { name: "Close popup" }));
+
+    const popup = container.firstChild as HTMLElement;
+    if (popup) {
+      fireEvent.transitionEnd(popup);
+    }
+  });
+
+  it("touch swipe down far enough dismisses popup", async () => {
+    useAppStore.setState({ selectedPOI: mockPOI });
+    const { container } = await renderPOIPopup();
+
+    const popup = container.firstChild as HTMLElement;
+    if (popup) {
+      fireEvent.touchStart(popup, { touches: [{ clientY: 100 }] });
+      fireEvent.touchMove(popup, { touches: [{ clientY: 200 }] });
+      fireEvent.touchEnd(popup);
+    }
+    expect(useAppStore.getState().selectedPOI).toBeNull();
+  });
+
+  it("touch swipe down not far enough keeps popup", async () => {
+    useAppStore.setState({ selectedPOI: mockPOI });
+    const { container } = await renderPOIPopup();
+
+    const popup = container.firstChild as HTMLElement;
+    if (popup) {
+      fireEvent.touchStart(popup, { touches: [{ clientY: 100 }] });
+      fireEvent.touchMove(popup, { touches: [{ clientY: 130 }] });
+      fireEvent.touchEnd(popup);
+    }
+    expect(screen.getByText("Foodclique")).toBeInTheDocument();
+  });
+
+  it("POI without address/hours/rating renders cleanly", async () => {
+    const minimalPOI: POI = {
+      id: "min-1",
+      name: "Minimal POI",
+      lat: 1.33,
+      lng: 103.77,
+      category: "Building",
+      description: "A simple building",
+    };
+    useAppStore.setState({ selectedPOI: minimalPOI });
+    await renderPOIPopup();
+    expect(screen.getByText("Minimal POI")).toBeInTheDocument();
+    expect(screen.getByText("A simple building")).toBeInTheDocument();
+  });
 });

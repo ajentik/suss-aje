@@ -66,4 +66,43 @@ describe("HeroIntro", () => {
     expect(screen.getByText("Events & Navigation")).toBeInTheDocument();
     expect(screen.getByText("Street View")).toBeInTheDocument();
   });
+
+  it("adds fade-out class when CTA is clicked", () => {
+    vi.useFakeTimers();
+    render(<HeroIntro onEnter={vi.fn()} />);
+
+    fireEvent.click(
+      screen.getByRole("button", { name: "Enter AskSUSSi campus assistant" }),
+    );
+
+    const header = screen.getByRole("banner");
+    expect(header.className).toContain("opacity-0");
+    vi.useRealTimers();
+  });
+
+  it("renders video element when aerial video resolves", async () => {
+    const { lookupAerialVideo } = await import("@/lib/maps/aerial-view");
+    vi.mocked(lookupAerialVideo).mockResolvedValueOnce({
+      uris: { VIDEO_MP4_HIGH: "https://cdn.example.com/video.mp4" },
+    });
+
+    render(<HeroIntro onEnter={vi.fn()} />);
+
+    await vi.waitFor(() => {
+      const videos = document.querySelectorAll("video");
+      expect(videos.length).toBe(1);
+      expect(videos[0].getAttribute("src")).toBe("https://cdn.example.com/video.mp4");
+    });
+  });
+
+  it("shows progress bar when video not yet ready", () => {
+    render(<HeroIntro onEnter={vi.fn()} />);
+    const progressBar = document.querySelector(".h-1.bg-white\\/20");
+    expect(progressBar).toBeInTheDocument();
+  });
+
+  it("renders bottom label text", () => {
+    render(<HeroIntro onEnter={vi.fn()} />);
+    expect(screen.getByText("SUSS Campus Intelligent Assistant")).toBeInTheDocument();
+  });
 });

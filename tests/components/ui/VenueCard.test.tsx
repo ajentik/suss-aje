@@ -90,4 +90,76 @@ describe("VenueCard", () => {
     });
     expect(mockSetSelectedPOI).toHaveBeenCalledWith(baseVenue);
   });
+
+  it("renders price level indicator", () => {
+    render(<VenueCard venue={baseVenue} />);
+    const { container } = render(<VenueCard venue={{ ...baseVenue, priceLevel: 2 as POI["priceLevel"] }} />);
+    expect(container.textContent).toContain("$");
+  });
+
+  it("opens google maps on Navigate click", () => {
+    const openSpy = vi.spyOn(window, "open").mockImplementation(() => null);
+    render(<VenueCard venue={baseVenue} />);
+    fireEvent.click(screen.getByRole("button", { name: /Foodclique/i }));
+    fireEvent.click(screen.getByText("Navigate"));
+
+    expect(openSpy).toHaveBeenCalledWith(
+      expect.stringContaining("google.com/maps/dir"),
+      "_blank",
+      "noopener,noreferrer",
+    );
+    openSpy.mockRestore();
+  });
+
+  it("calls tel: link on Call click", () => {
+    const openSpy = vi.spyOn(window, "open").mockImplementation(() => null);
+    render(<VenueCard venue={baseVenue} />);
+    fireEvent.click(screen.getByRole("button", { name: /Foodclique/i }));
+    fireEvent.click(screen.getByRole("button", { name: "Call" }));
+
+    expect(openSpy).toHaveBeenCalledWith("tel:+6561234567", "_self");
+    openSpy.mockRestore();
+  });
+
+  it("opens website on Website click", () => {
+    const openSpy = vi.spyOn(window, "open").mockImplementation(() => null);
+    render(<VenueCard venue={baseVenue} />);
+    fireEvent.click(screen.getByRole("button", { name: /Foodclique/i }));
+    fireEvent.click(screen.getByRole("button", { name: "Website" }));
+
+    expect(openSpy).toHaveBeenCalledWith(
+      "https://example.com",
+      "_blank",
+      "noopener,noreferrer",
+    );
+    openSpy.mockRestore();
+  });
+
+  it("toggles expand/collapse with aria-expanded", () => {
+    render(<VenueCard venue={baseVenue} />);
+    const header = screen.getByRole("button", { name: /Foodclique/i });
+    expect(header).toHaveAttribute("aria-expanded", "false");
+
+    fireEvent.click(header);
+    expect(header).toHaveAttribute("aria-expanded", "true");
+
+    fireEvent.click(header);
+    expect(header).toHaveAttribute("aria-expanded", "false");
+  });
+
+  it("renders without optional fields", () => {
+    const minVenue: POI = {
+      id: "v-2",
+      name: "Simple Venue",
+      lat: 1.33,
+      lng: 103.77,
+      category: "Food",
+      description: "A venue",
+    };
+    render(<VenueCard venue={minVenue} />);
+    expect(screen.getByText("Simple Venue")).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: /Simple Venue/i }));
+    expect(screen.queryByRole("button", { name: "Call" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Website" })).not.toBeInTheDocument();
+  });
 });

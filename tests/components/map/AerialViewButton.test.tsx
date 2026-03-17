@@ -84,4 +84,75 @@ describe("AerialViewButton", () => {
 
     expect(screen.getByText("Aerial View")).toBeInTheDocument();
   });
+
+  it("shows video overlay after clicking and video resolves", async () => {
+    const { lookupAerialVideo } = await import("@/lib/maps/aerial-view");
+    vi.mocked(lookupAerialVideo).mockResolvedValueOnce({
+      uris: { VIDEO_MP4_HIGH: "https://cdn.example.com/aerial.mp4" },
+    });
+
+    useAppStore.setState({ selectedDestination: mockDestination });
+    await renderAerialViewButton();
+
+    const button = screen.getByRole("button", { name: "Aerial flyover" });
+    await fireEvent.click(button);
+
+    await vi.waitFor(() => {
+      expect(screen.getByRole("dialog", { name: "Aerial flyover video" })).toBeInTheDocument();
+    });
+  });
+
+  it("closes video overlay when close button clicked", async () => {
+    const { lookupAerialVideo } = await import("@/lib/maps/aerial-view");
+    vi.mocked(lookupAerialVideo).mockResolvedValueOnce({
+      uris: { VIDEO_MP4_MEDIUM: "https://cdn.example.com/aerial.mp4" },
+    });
+
+    useAppStore.setState({ selectedDestination: mockDestination });
+    await renderAerialViewButton();
+
+    await fireEvent.click(screen.getByRole("button", { name: "Aerial flyover" }));
+
+    await vi.waitFor(() => {
+      expect(screen.getByRole("dialog")).toBeInTheDocument();
+    });
+
+    fireEvent.click(screen.getByRole("button", { name: "Close aerial view" }));
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+  });
+
+  it("closes video on Escape key", async () => {
+    const { lookupAerialVideo } = await import("@/lib/maps/aerial-view");
+    vi.mocked(lookupAerialVideo).mockResolvedValueOnce({
+      uris: { VIDEO_MP4_HIGH: "https://cdn.example.com/aerial.mp4" },
+    });
+
+    useAppStore.setState({ selectedDestination: mockDestination });
+    await renderAerialViewButton();
+
+    await fireEvent.click(screen.getByRole("button", { name: "Aerial flyover" }));
+
+    await vi.waitFor(() => {
+      expect(screen.getByRole("dialog")).toBeInTheDocument();
+    });
+
+    fireEvent.keyDown(window, { key: "Escape" });
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+  });
+
+  it("shows destination name in video overlay", async () => {
+    const { lookupAerialVideo } = await import("@/lib/maps/aerial-view");
+    vi.mocked(lookupAerialVideo).mockResolvedValueOnce({
+      uris: { VIDEO_MP4_HIGH: "https://cdn.example.com/aerial.mp4" },
+    });
+
+    useAppStore.setState({ selectedDestination: mockDestination });
+    await renderAerialViewButton();
+
+    await fireEvent.click(screen.getByRole("button", { name: "Aerial flyover" }));
+
+    await vi.waitFor(() => {
+      expect(screen.getByText(/SUSS Library/)).toBeInTheDocument();
+    });
+  });
 });

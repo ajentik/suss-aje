@@ -192,5 +192,79 @@ describe("app-store", () => {
     expect(state.routeInfo).toBeNull();
     expect(state.selectedDestination).toBeNull();
     expect(state.selectedPOI).toBeNull();
+    expect(state.selectedEvent).toBeNull();
+    expect(state.streetViewEvent).toBeNull();
+    expect(state.sheetContentMode).toBe("default");
+    expect(state.mobileSheetState).toBe("expanded");
+    expect(state.pendingChatMessage).toBeNull();
+  });
+
+  it("setSelectedDestination sets the destination POI", () => {
+    useAppStore.getState().setSelectedDestination(mockPOI);
+    expect(useAppStore.getState().selectedDestination).toEqual(mockPOI);
+    useAppStore.getState().setSelectedDestination(null);
+    expect(useAppStore.getState().selectedDestination).toBeNull();
+  });
+
+  it("setMapEventMarkers sets markers", () => {
+    useAppStore.getState().setMapEventMarkers([mockEvent]);
+    expect(useAppStore.getState().mapEventMarkers).toEqual([mockEvent]);
+  });
+
+  it("setHighlightedEventIds sets ids", () => {
+    useAppStore.getState().setHighlightedEventIds(["evt-1", "evt-2"]);
+    expect(useAppStore.getState().highlightedEventIds).toEqual(["evt-1", "evt-2"]);
+  });
+
+  it("setStreetViewEvent sets and clears street view event", () => {
+    useAppStore.getState().setStreetViewEvent(mockEvent);
+    expect(useAppStore.getState().streetViewEvent).toEqual(mockEvent);
+    useAppStore.getState().setStreetViewEvent(null);
+    expect(useAppStore.getState().streetViewEvent).toBeNull();
+  });
+
+  it("setIsSpeaking sets speaking state", () => {
+    useAppStore.getState().setIsSpeaking(true);
+    expect(useAppStore.getState().isSpeaking).toBe(true);
+    useAppStore.getState().setIsSpeaking(false);
+    expect(useAppStore.getState().isSpeaking).toBe(false);
+  });
+
+  it("setSheetContentMode changes sheet mode", () => {
+    useAppStore.getState().setSheetContentMode("poi-detail");
+    expect(useAppStore.getState().sheetContentMode).toBe("poi-detail");
+  });
+
+  it("setMobileSheetState changes mobile sheet state", () => {
+    useAppStore.getState().setMobileSheetState("collapsed");
+    expect(useAppStore.getState().mobileSheetState).toBe("collapsed");
+    useAppStore.getState().setMobileSheetState("peek");
+    expect(useAppStore.getState().mobileSheetState).toBe("peek");
+  });
+
+  it("setIntroDismissed sets intro dismissed", () => {
+    useAppStore.getState().setIntroDismissed(true);
+    expect(useAppStore.getState().introDismissed).toBe(true);
+  });
+
+  it("setPendingChatMessage sets and clears pending message", () => {
+    useAppStore.getState().setPendingChatMessage("Hello");
+    expect(useAppStore.getState().pendingChatMessage).toBe("Hello");
+    useAppStore.getState().setPendingChatMessage(null);
+    expect(useAppStore.getState().pendingChatMessage).toBeNull();
+  });
+
+  it("setUserLocation sets and clears user location", () => {
+    useAppStore.getState().setUserLocation({ lat: 1.33, lng: 103.77 });
+    expect(useAppStore.getState().userLocation).toEqual({ lat: 1.33, lng: 103.77 });
+    useAppStore.getState().setUserLocation(null);
+    expect(useAppStore.getState().userLocation).toBeNull();
+  });
+
+  it("setMobilityLevel sets mobility level", () => {
+    useAppStore.getState().setMobilityLevel("wheelchair");
+    expect(useAppStore.getState().mobilityLevel).toBe("wheelchair");
+    useAppStore.getState().setMobilityLevel("normal");
+    expect(useAppStore.getState().mobilityLevel).toBe("normal");
   });
 });
