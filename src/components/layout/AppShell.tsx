@@ -11,7 +11,7 @@ import {
   GripVertical,
   MessageSquare,
   Calendar,
-  Building2,
+  Heart,
   // SquarePen — hidden for senior UX
   // Sun, Moon — theme toggle hidden for senior UX
 } from "lucide-react";
@@ -255,7 +255,7 @@ export default function AppShell() {
     <div className="h-dvh w-full flex flex-col md:flex-row overflow-hidden">
       {/* Desktop sidebar */}
       <aside
-        aria-label="Chat and Events"
+        aria-label="Chat, Events and Senior Care"
         style={{ width: minimized ? 0 : panelWidth }}
         className={`
           hidden md:flex md:flex-col md:relative md:h-full
@@ -294,7 +294,7 @@ export default function AppShell() {
               Events
             </TabsTrigger>
             <TabsTrigger value="aac-search" className="flex-1">
-              AAC
+              Senior Care
             </TabsTrigger>
           </TabsList>
           <TabsContent value="chat" className="flex-1 min-h-0 mt-0">
@@ -403,8 +403,8 @@ export default function AppShell() {
                   value="aac-search"
                   className="flex-1 min-h-[44px] text-sm gap-1.5 font-medium"
                 >
-                  <Building2 size={15} aria-hidden="true" />
-                  AAC
+                  <Heart size={15} aria-hidden="true" />
+                  Senior Care
                 </TabsTrigger>
               </TabsList>
               <TabsContent value="chat" className="flex-1 min-h-0 mt-0">

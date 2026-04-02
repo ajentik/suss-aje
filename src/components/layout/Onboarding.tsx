@@ -2,23 +2,23 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
-import { X, MapPin, Calendar, Utensils, BookOpen, Bus, MessageCircle } from "lucide-react";
+import { X, MapPin, Calendar, Heart, ShieldCheck, Users, MessageCircle } from "lucide-react";
 import { useAppStore } from "@/store/app-store";
 
 const CAPABILITIES = [
-  { icon: MapPin, label: "Navigate campus", description: "Get walking directions to any building" },
-  { icon: Calendar, label: "Find events", description: "Discover what\u2019s happening on campus" },
-  { icon: Utensils, label: "Food nearby", description: "Find restaurants, hawkers & cafes" },
-  { icon: BookOpen, label: "Library info", description: "Check hours, availability & services" },
-  { icon: Bus, label: "Transport", description: "Shuttle schedules & nearby transit" },
-  { icon: MessageCircle, label: "Ask anything", description: "Campus services, admin & more" },
+  { icon: Heart, label: "Senior care centres", description: "Find 122+ Active Ageing Centres nearby" },
+  { icon: ShieldCheck, label: "Emergency SOS", description: "One-tap emergency call & location sharing" },
+  { icon: Users, label: "Caregiver support", description: "AIC grants, respite care & resources" },
+  { icon: MapPin, label: "Navigate anywhere", description: "3D walking directions with rest stops" },
+  { icon: Calendar, label: "Events & activities", description: "Campus events & senior programmes" },
+  { icon: MessageCircle, label: "Ask anything", description: "Campus, eldercare, community services" },
 ] as const;
 
 const TRY_SUGGESTIONS = [
-  "Where is the library?",
-  "What events are today?",
-  "Find me a place to eat nearby",
-  "How do I get to Block D?",
+  "Find a senior care centre near me",
+  "What caregiver support is available?",
+  "What events are happening today?",
+  "How do I get to the library?",
 ];
 
 export default function Onboarding() {
@@ -72,7 +72,7 @@ export default function Onboarding() {
       className="fixed inset-0 z-[45] flex items-end md:items-center justify-center bg-black/50 backdrop-blur-sm p-0 md:p-4"
       role="dialog"
       aria-modal="true"
-      aria-label="Welcome to AskSUSSi"
+      aria-label="Welcome to AskSUSSi — campus and community care assistant"
     >
       <div
         ref={dialogRef}
@@ -108,9 +108,9 @@ export default function Onboarding() {
             <div className="h-5 w-px bg-white/25" />
             <span className="text-sm font-bold tracking-wider opacity-90">AskSUSSi</span>
           </div>
-          <h2 className="text-lg font-bold">Welcome to your campus assistant</h2>
+          <h2 className="text-lg font-bold">Your campus &amp; community care companion</h2>
           <p className="text-sm opacity-80 mt-1">
-            I can help you navigate, find events, and discover what&apos;s around SUSS.
+            Navigate campus, find senior care services, and keep your loved ones safe — all in one place.
           </p>
         </div>
 

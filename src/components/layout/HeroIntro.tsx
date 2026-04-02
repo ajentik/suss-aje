@@ -2,17 +2,19 @@
 
 import { useEffect, useRef, useState, useCallback } from "react";
 import Image from "next/image";
-import { ArrowRight, Navigation, Globe, MessageCircle, CalendarDays } from "lucide-react";
+import { ArrowRight, Navigation, Globe, MessageCircle, Heart, ShieldCheck, Users } from "lucide-react";
 import { lookupAerialVideo } from "@/lib/maps/aerial-view";
 
 const SUSS_ADDRESS =
   "Singapore University of Social Sciences, 463 Clementi Road, Singapore 599494";
 
 const FEATURES = [
-  { icon: Navigation, label: "3D Campus Map", desc: "Explore SUSS in photorealistic 3D" },
-  { icon: Globe, label: "Street View", desc: "Walk through campus & indoor spaces" },
-  { icon: MessageCircle, label: "AI Chat & Voice", desc: "Ask SUSSi anything about campus" },
-  { icon: CalendarDays, label: "Events & Navigation", desc: "Discover events, navigate to venues" },
+  { icon: Navigation, label: "3D Map & Navigation", desc: "Navigate campus and community in 3D" },
+  { icon: Heart, label: "Senior Care", desc: "Find 122+ Active Ageing Centres nearby" },
+  { icon: MessageCircle, label: "AI Chat & Voice", desc: "Ask anything — campus, eldercare, services" },
+  { icon: ShieldCheck, label: "Family Safety", desc: "SOS alerts & location sharing for loved ones" },
+  { icon: Users, label: "Caregiver Support", desc: "AIC services, grants & caregiver resources" },
+  { icon: Globe, label: "Community Events", desc: "Campus & senior activity programmes" },
 ];
 
 interface HeroIntroProps {
@@ -168,8 +170,8 @@ export default function HeroIntro({ onEnter }: HeroIntroProps) {
 
         {/* Tagline */}
         <p className="text-white/80 text-sm md:text-base mb-8 leading-relaxed drop-shadow animate-hero-fade-in-up [animation-delay:800ms]">
-          Resolve campus affairs with one sentence. Navigate, discover events,
-          and explore SUSS in 3D.
+          Your campus and community care companion. Navigate SUSS, find senior
+          services, and keep your loved ones connected — all in one place.
         </p>
 
         {/* Feature pills */}
@@ -195,19 +197,19 @@ export default function HeroIntro({ onEnter }: HeroIntroProps) {
         >
           <button
             type="button"
-            aria-label="Enter AskSUSSi campus assistant"
+            aria-label="Enter AskSUSSi campus and community care assistant"
             onClick={handleEnter}
             className="inline-flex items-center gap-2.5 px-10 h-14 bg-white text-primary rounded-full font-semibold text-base shadow-lg hover:bg-white/95 hover:shadow-xl transition-all duration-300 hover:scale-105 active:scale-95 animate-subtle-glow"
           >
             <ArrowRight size={20} aria-hidden="true" />
-            Explore Campus
+            Get Started
           </button>
         </div>
       </div>
 
       {/* Bottom label */}
       <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-10 text-white/30 text-xs tracking-[0.2em] uppercase animate-hero-fade-in [animation-delay:1400ms]">
-        SUSS Campus Intelligent Assistant
+        Campus &amp; Community Care Assistant
       </div>
     </header>
   );
